@@ -7,10 +7,11 @@ class BaseRequestObject:
     def to_dict(self):
         dict_obj = dict()
         for key, value in self.__dict__.items():
+            name = key if key[0] != "_" else key[1:]
             if inspect.isclass(type(value)) and issubclass(type(value), BaseRequestObject):
-                dict_obj[key[1:]] = value.to_dict()
+                dict_obj[name] = value.to_dict()
             elif not key.startswith('__') and not callable(key):
-                dict_obj[key[1:]] = value
+                dict_obj[name] = value
         return dict_obj
 
     @classmethod
@@ -19,15 +20,69 @@ class BaseRequestObject:
         return cls(**values)
 
 class FilterSelector(BaseRequestObject):
-
-    def __init__(self,):
-        pass
-
-class EntityTypeSelector(BaseRequestObject):
+    valid_types = ["ALLOW", "BLOCK"]
 
     def __init__(self,
-                 ):
-        pass
+                 type: str,
+                 pattern: str             
+    ):
+        if self._type_validator(type):
+            self._type = type
+        if self._pattern_validator(pattern):
+            self.pattern = pattern
+        
+    def _type_validator(self, var):
+        if  var not in self.valid_types:
+            raise ValueError(f"{var} is not valid. FilterSelector.type can only be one of the following: {', '.join(self.valid_types)}")
+        return True
+    
+    def _pattern_validator(self, var):
+        if type(var) is not str:
+            raise ValueError(f"{var} is not valid. FilterSelector. can only be a string")
+        return True
+    
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError("FilterSelector can only accept the values 'type' and 'pattern'")
+
+class EntityTypeSelector(BaseRequestObject):
+    valid_types = ["DISABLE", "ENABLE"]
+
+    def __init__(self,
+                 type: str,
+                 value: List[str] = []
+    ):
+        if self._type_validator(type):
+            self._type = type
+        if self._value_validator(value):
+            self.value = value
+    
+    @property
+    def type(self):
+        return self._type
+    
+    @type.setter
+    def type(self, var):
+        if self._type_validator(var):
+            self._type = var
+
+    def _type_validator(self, var):
+        if  var not in self.valid_types:
+            raise ValueError(f"'{var}' is not valid. EntityTypeSelector.type can only be one of the following: {', '.join(self.valid_types)}")
+        return True
+    
+    def _value_validator(self, var):
+        return True
+    
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError("EntityTypeSelector can only accept the values 'type' and 'value'")
 
 class EntityDetection(BaseRequestObject):
     default_accuracy = "high"
@@ -69,7 +124,7 @@ class EntityDetection(BaseRequestObject):
 
     def _accuracy_validator(self, var):
         if var not in self.valid_accuracies:
-            raise ValueError(f"{var} is not valid. EntityDetection.accuracy can only be one of the following values: {self.valid_accuracies}")
+            raise ValueError(f"{var} is not valid. EntityDetection.accuracy can only be one of the following: {', '.join(self.valid_accuracies)}")
         return True
     
     def _entity_types_validator(self, var):
@@ -94,6 +149,14 @@ class EntityDetection(BaseRequestObject):
     @classmethod
     def fromdict(cls, values: dict):
         try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entity_types":
+                    initializer_dict[key] = [EntityTypeSelector.fromdict(row) for row in value]
+                elif key == "filter":
+                    initializer_dict[key] = [FilterSelector.fromdict(row) for row in value]
+                else:
+                    initializer_dict[key] = value
             return cls._fromdict(values)
         except TypeError:
             raise TypeError("EntityDetection can only accept the values 'accuracy', 'entity_types', 'filter' and 'return_entity'")
@@ -133,12 +196,12 @@ class ProcessText(BaseRequestObject):
     def _type_validator(self, var):
 
         if var not in self.valid_types:
-            raise ValueError(f"{var} is not valid. ProcessText.type can only be one of the following values: {self.valid_types}")
+            raise ValueError(f"{var} is not valid. ProcessText.type can only be one of the following: {', '.join(self.valid_types)}")
         return True
 
     def _pattern_validator(self, var):
         if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
-            raise ValueError(f"{var} is not valid. ProcessText.pattern can only be one of the following values: {self.valid_patterns}")
+            raise ValueError(f"{var} is not valid. ProcessText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
         return True
 
     @classmethod
@@ -149,33 +212,19 @@ class ProcessText(BaseRequestObject):
             raise TypeError("ProcessText can only accept the values 'type' and 'pattern'")
 
 class ProcessTextRequest(BaseRequestObject):
+    default_link_batch = False
 
     def __init__(self, 
                  text: List[str], 
-                 link_batch: bool = None,
-                 entity_detection: EntityDetection = None,
+                 link_batch: bool = default_link_batch,
+                 entity_detection: EntityDetection = EntityDetection(),
                  process_text: ProcessText = ProcessText()
     ):
         self._text = text
         self._link_batch = link_batch
         self._entity_detection = entity_detection
         self._process_text = process_text
-
-    # @property
-    # def text(self):
-    #     return self._text
-    
-    # @property
-    # def link_batch(self):
-    #     return self._link_batch
-    
-    # @property
-    # def entity_detection(self):
-    #     return self._entity_detection
-    
-    # @property
-    # def process_text(self):
-    #     return self._process_text
+        
     @classmethod
     def fromdict(cls, values: dict):
         try:
