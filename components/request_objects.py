@@ -56,7 +56,7 @@ class FilterSelector(BaseRequestObject):
     
     def _pattern_validator(self, var):
         if type(var) is not str:
-            raise ValueError(f"{var} is not valid. FilterSelector. can only be a string")
+            raise ValueError(f"{var} is not valid. FilterSelector.pattern can only be a string")
         return True
     
     @classmethod
@@ -114,13 +114,15 @@ class EntityDetection(BaseRequestObject):
                  return_entity: bool = default_return_entity
     ):
         if self._accuracy_validator(accuracy):
-            self._accuracy = accuracy,
+            self._accuracy = accuracy
+            print(f"accuracy is {accuracy}, self.accuracy is {self.accuracy}")
         if self._entity_types_validator(entity_types):
             self.entity_types = entity_types
         if self._filter_validator(filter):
             self.filter = filter
         if self._return_entity_validator(return_entity):
             self._return_entity = return_entity
+
 
     @property
     def accuracy(self):
@@ -238,10 +240,10 @@ class ProcessTextRequest(BaseRequestObject):
                  entity_detection: EntityDetection = EntityDetection(),
                  process_text: ProcessText = ProcessText()
     ):
-        self._text = text
-        self._link_batch = link_batch
-        self._entity_detection = entity_detection
-        self._process_text = process_text
+        self.text = text
+        self.link_batch = link_batch
+        self.entity_detection = entity_detection
+        self.process_text = process_text
 
     @classmethod
     def fromdict(cls, values: dict):
