@@ -29,7 +29,25 @@ class FilterSelector(BaseRequestObject):
         if self._type_validator(type):
             self._type = type
         if self._pattern_validator(pattern):
-            self.pattern = pattern
+            self._pattern = pattern
+    
+    @property
+    def type(self):
+        return self._type
+    
+    @property
+    def pattern(self):
+        return self._pattern
+    
+    @type.setter
+    def type(self, var):
+        if self._type_validator(var):
+            self._type = var
+
+    @pattern.setter
+    def pattern(self, var):
+        if self._pattern_validator(var):
+            self._pattern = var
         
     def _type_validator(self, var):
         if  var not in self.valid_types:
@@ -224,7 +242,7 @@ class ProcessTextRequest(BaseRequestObject):
         self._link_batch = link_batch
         self._entity_detection = entity_detection
         self._process_text = process_text
-        
+
     @classmethod
     def fromdict(cls, values: dict):
         try:
