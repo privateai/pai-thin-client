@@ -1,6 +1,6 @@
 import logging 
-from typing import List
-from components import PAIGetRequests, PAIPostRequests, TextResponse, PAIURIs
+from typing import Union
+from components import PAIGetRequests, PAIPostRequests, MetricsResponse, TextResponse, PAIURIs, ProcessTextRequest
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +17,19 @@ class PAIClient:
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(api_key, self.uris)
         self.last_response = None
-        self. text_response = TextResponse()
-        # Hit the health endpoint to verifya
+        self._text_response = TextResponse()
+        self._metric_response = MetricsResponse()
+        # Hit the health endpoint to verify the connection
         self.ping()
+
+    @property
+    def response(self):
+        return self.last_response
+
+    def _set_response(self, response_class, response):
+        response_class.response = response
+        self.last_response = response_class
+
 
     def ping(self):
         """
@@ -37,15 +47,20 @@ class PAIClient:
         """
         Returns information about the Private-AI's server
         """
-        response = self.get.metrics()
-        return response
+        self._set_response(self._metric_response, self.get.metrics())
+        return self.last_response
     
-    def process_text_request(self, request_object: dict):
+    def process_text_request(self, request_object: Union[dict, ProcessTextRequest]):
         """
         Used to deidentify text 
         """
-        self.text_response.response = self.post.process_text(request_object)
-        self.last_response = self.text_response
+        print(type(request_object))
+        if type(request_object) is ProcessTextRequest:
+            self._set_response(self._text_response, self.post.process_text(request_object.to_dict()))
+        elif type(request_object) == dict:
+            self._set_response(self._text_response, self.post.process_text(request_object))
+        else:
+            raise ValueError("request_object can only be a dictionary or a ProcessTextRequest class")
         return self.last_response
 
     

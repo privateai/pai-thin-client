@@ -56,7 +56,6 @@ class TextResponse(BaseResponse):
     def __init__(self, response_object: Response=None):
         super(TextResponse, self).__init__(response_object, 'json')
 
-
     @property
     def processed_text(self):
         return self.get_attribute_entries("processed_text")

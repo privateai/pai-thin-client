@@ -1,5 +1,5 @@
 import inspect
-from typing import Dict, List
+from typing import List
 
 
 class BaseRequestObject:
@@ -14,10 +14,14 @@ class BaseRequestObject:
                 dict_obj[name] = value
         return dict_obj
 
+    def __call__(self):
+        return self.to_dict()
+
     @classmethod
     def _fromdict(cls,
                  values: dict):
         return cls(**values)
+    
 
 class FilterSelector(BaseRequestObject):
     valid_types = ["ALLOW", "BLOCK"]
@@ -180,7 +184,7 @@ class EntityDetection(BaseRequestObject):
         except TypeError:
             raise TypeError("EntityDetection can only accept the values 'accuracy', 'entity_types', 'filter' and 'return_entity'")
 
-class ProcessText(BaseRequestObject):
+class ProcessedText(BaseRequestObject):
     default_type = "MARKER"
     default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
     valid_types = ["MARKER", "MASK", "SYNTHETIC"]
@@ -215,12 +219,12 @@ class ProcessText(BaseRequestObject):
     def _type_validator(self, var):
 
         if var not in self.valid_types:
-            raise ValueError(f"{var} is not valid. ProcessText.type can only be one of the following: {', '.join(self.valid_types)}")
+            raise ValueError(f"{var} is not valid. ProcessedText.type can only be one of the following: {', '.join(self.valid_types)}")
         return True
 
     def _pattern_validator(self, var):
         if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
-            raise ValueError(f"{var} is not valid. ProcessText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
+            raise ValueError(f"{var} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
         return True
 
     @classmethod
@@ -228,7 +232,7 @@ class ProcessText(BaseRequestObject):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError("ProcessText can only accept the values 'type' and 'pattern'")
+            raise TypeError("ProcessedText can only accept the values 'type' and 'pattern'")
 
 class ProcessTextRequest(BaseRequestObject):
     default_link_batch = False
@@ -237,12 +241,12 @@ class ProcessTextRequest(BaseRequestObject):
                  text: List[str], 
                  link_batch: bool = default_link_batch,
                  entity_detection: EntityDetection = EntityDetection(),
-                 process_text: ProcessText = ProcessText()
+                 processed_text: ProcessedText = ProcessedText()
     ):
         self.text = text
         self.link_batch = link_batch
         self.entity_detection = entity_detection
-        self.process_text = process_text
+        self.processed_text = processed_text
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -251,8 +255,8 @@ class ProcessTextRequest(BaseRequestObject):
             for key, value in values.items():
                 if key == "entity_detection":
                     initializer_dict[key] = EntityDetection.fromdict(value)
-                elif key == "process_text":
-                    initializer_dict[key] = ProcessText.fromdict(value)
+                elif key == "processed_text":
+                    initializer_dict[key] = ProcessedText.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(values)
