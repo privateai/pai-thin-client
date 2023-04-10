@@ -22,6 +22,53 @@ class BaseRequestObject:
                  values: dict):
         return cls(**values)
     
+class File(BaseRequestObject):
+    valid_content_types = ["application/pdf", "image/jpeg", "application/xml", "application/jpg", "image/tiff", "audio/wav"]
+
+    def __init__(self,
+                 data: str,
+                 content_type: str                 
+    ):
+        if self._data_validator(data):
+            self._data = data
+        if self._content_type_validator(content_type):
+            self._content_type = content_type
+
+    @property
+    def data(self):
+        return self._data
+    
+    @property
+    def content_type(self):
+        return self._content_type
+    
+    @data.setter
+    def data(self, var):
+        if self._data_validator(var):
+            self._data = var
+
+    @content_type.setter
+    def content_type(self, var):
+        if self._content_type_validator(var):
+            self._content_type = var
+        
+
+    def _data_validator(self, var):
+        if type(var) is not str:
+            raise ValueError("data must be string-type")
+
+    def _content_type_validator(self, var):
+        if var not in self.valid_content_types:
+            raise ValueError(f"{var} is not valid. File.content_type can only be one of the following: {', '.join(self.valid_content_types)}")
+        return True
+    
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError("FilterSelector can only accept the values 'data' and 'content_type'")
+    
 
 class FilterSelector(BaseRequestObject):
     valid_types = ["ALLOW", "BLOCK"]
@@ -234,6 +281,53 @@ class ProcessedText(BaseRequestObject):
         except TypeError:
             raise TypeError("ProcessedText can only accept the values 'type' and 'pattern'")
 
+class PDFOptions(BaseRequestObject): 
+    default_density = 150
+
+    def __init__(self,
+                 density: int = default_density             
+    ):
+        self.density = density
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError("PDFOptions can only accept 'density'")
+        
+class AudioOptions(BaseRequestObject):
+    default_bleep_start_padding = 0
+    default_bleep_end_padding = 0
+
+    def __init__(self, 
+                 bleep_start_padding: int = default_bleep_start_padding,
+                 bleep_end_padding: int = default_bleep_end_padding
+    ):
+        self.bleep_start_padding = bleep_start_padding
+        self.bleep_end_padding = bleep_end_padding
+    
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError("ProcessedText can only accept the values 'bleep_start_padding' and 'bleep_end_padding'")
+
+class Timestamp(BaseRequestObject):
+
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+    
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError("Timestamp can only accept the values 'start' and 'stop'")
+
+
 class ProcessTextRequest(BaseRequestObject):
     default_link_batch = False
 
@@ -259,10 +353,93 @@ class ProcessTextRequest(BaseRequestObject):
                     initializer_dict[key] = ProcessedText.fromdict(value)
                 else:
                     initializer_dict[key] = value
-            return cls._fromdict(values)
+            return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError("ProcessTextRequest can only accept the values 'text', 'link_batch', 'entity_detection' and 'process_text'")
     
+class ProcessFileUriRequest(BaseRequestObject):
+
+    def __init__(self,
+                 uri: str,
+                 entity_detection: EntityDetection = EntityDetection(),
+                 pdf_options: PDFOptions = PDFOptions(),
+                 audio_options: AudioOptions = AudioOptions()                  
+    ):
+        self.uri = uri
+        self.entity_detection = entity_detection
+        self.pdf_options = pdf_options
+        self.audio_options = audio_options
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entity_detection":
+                    initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "pdf_options":
+                    initializer_dict[key] = PDFOptions.fromdict(value)
+                elif key == "audio_options":
+                    initializer_dict[key] = AudioOptions.fromdict(value)
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError("ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options and 'audio_options'")
+
+class ProcessFileBase64Request(BaseRequestObject):
+
+    def __init__(self,
+                 file: File,
+                 entity_detection: EntityDetection = EntityDetection(),
+                 pdf_options: PDFOptions = PDFOptions(),
+                 audio_options: AudioOptions = AudioOptions()                  
+    ):
+        self.file = file
+        self.entity_detection = entity_detection
+        self.pdf_options = pdf_options
+        self.audio_options = audio_options
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "file":
+                    initializer_dict[key] = File.fromdict(value)
+                if key == "entity_detection":
+                    initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "pdf_options":
+                    initializer_dict[key] = PDFOptions.fromdict(value)
+                elif key == "audio_options":
+                    initializer_dict[key] = AudioOptions.fromdict(value)
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError("ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options and 'audio_options'")
 
 
+class BleepRequest(BaseRequestObject):
 
+    def __init__(self,
+                 file: File,
+                 timestamps: List,             
+    ):
+        self.file = file
+        self.timestamps = timestamps
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "file":
+                    initializer_dict[key] = File.fromdict(value)
+                if key == "timestamps":
+                    initializer_dict[key] = [Timestamp.fromdict(entry) for entry in value]
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError("BleepRequest can only accept the values 'file'and 'timestamps'")

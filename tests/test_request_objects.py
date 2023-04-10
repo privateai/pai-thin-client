@@ -68,13 +68,13 @@ def test_entity_detection():
     assert entity_detection.return_entity == True
 
 def test_process_text():
-    process_text = ProcessText()
+    process_text = ProcessedText()
     assert process_text.type == "MARKER"
     assert process_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
 
-def test_process_text_request():
+def test_process_text_request_defaults():
     process_text_request = ProcessTextRequest(text = ['hey'])
     assert process_text_request.text == ['hey']
     assert process_text_request.link_batch == False
     assert type(process_text_request.entity_detection) == EntityDetection
-    assert type(process_text_request.process_text) == ProcessText
+    assert type(process_text_request.processed_text) == ProcessedText

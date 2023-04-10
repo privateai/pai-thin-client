@@ -4,10 +4,10 @@ from requests import Response
 
 class BaseResponse:
 
-    def __init__(self, response_object, body_type):
+    def __init__(self, response_object: Response, json_response:bool =True):
         self._response = response_object
         # Should be json or text
-        self.body_type = body_type
+        self._json_response = json_response
 
     def __call__(self):
         return self.response
@@ -17,19 +17,20 @@ class BaseResponse:
         return self._response
 
     @property
+    def ok(self):
+        return self().ok
+
+    @property
     def status_code(self):
-        return self.response.status_code
+        return self().status_code
     
     @property
     def body(self):
-        if self.body_type == "json":
-            return self.response.json() 
-        elif self.body_type == "text":
-            return self.response.text
+        if self._json_response == "json":
+            return self().json() 
         else:
-            return None
-        
-    
+            return self().text
+
     @response.setter
     def response(self, new_response):
         if type(new_response) is not Response:
@@ -38,18 +39,23 @@ class BaseResponse:
 
     def get_attribute_entries(self, name):
         # Used for any nested data in the response body
-        if self.body_type != "json": 
+        if not self.json_response: 
             raise ValueError("get_attribute_entries needs a response of type 'json'")
-        attributes = [row.get(name) for row in self.response.json()]
-        # Might be more intuitive to just handle receiving a list only 
-        return attributes[0] if len(attributes) == 1 else attributes
-
+        return [row.get(name) for row in self().json()]
 
 class MetricsResponse(BaseResponse):
 
     def __init__(self, response_object: Response=None):
         super(MetricsResponse, self).__init__(response_object, 'text')
 
+class VersionResponse(BaseResponse):
+
+    def __init__(self, response_object: Response=None):
+        super(VersionResponse, self).__init__(response_object, 'text')
+
+    @property
+    def app_version(self):
+        return self.body.get('app_version')
 
 class TextResponse(BaseResponse):
 
@@ -75,5 +81,4 @@ class TextResponse(BaseResponse):
     @property
     def languages_detected(self):
         return self.get_attribute_entries("languages_detected")
-    
     
