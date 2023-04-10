@@ -1,5 +1,5 @@
 import logging 
-from typing import Dict, List, str, bool 
+from typing import List
 from components import PAIGetRequests, PAIPostRequests, PAIURIs
 
 logger = logging.getLogger(__name__)
@@ -11,9 +11,9 @@ class PAIClient:
     """
     Client used to connect to private-ai's deidentication service   
     """
-    def __init__(self, pai_url, api_key=None):
+    def __init__(self, pai_uri, api_key=None):
         # Add source url
-        self.uris = PAIURIs(pai_url)
+        self.uris = PAIURIs(pai_uri)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(api_key, self.uris)
         # Hit the health endpoint to verifya
@@ -38,11 +38,11 @@ class PAIClient:
         response = self.get.metrics
         return response.text
     
-    def process_text_request(self, text: List, link_batch, ):
+    def process_text_request(self, request_object: dict):
         """
         Used to deidentify text 
         """
-        self.uri
+        return self.post.process_text(request_object)
 
     
 

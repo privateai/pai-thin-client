@@ -115,7 +115,6 @@ class EntityDetection(BaseRequestObject):
     ):
         if self._accuracy_validator(accuracy):
             self._accuracy = accuracy
-            print(f"accuracy is {accuracy}, self.accuracy is {self.accuracy}")
         if self._entity_types_validator(entity_types):
             self.entity_types = entity_types
         if self._filter_validator(filter):
