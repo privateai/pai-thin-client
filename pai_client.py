@@ -1,6 +1,6 @@
 import logging 
 from typing import List
-from components import PAIGetRequests, PAIPostRequests, PAIURIs
+from components import PAIGetRequests, PAIPostRequests, TextResponse, PAIURIs
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,8 @@ class PAIClient:
         self.uris = PAIURIs(pai_uri)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(api_key, self.uris)
+        self.last_response = None
+        self. text_response = TextResponse()
         # Hit the health endpoint to verifya
         self.ping()
 
@@ -35,14 +37,18 @@ class PAIClient:
         """
         Returns information about the Private-AI's server
         """
-        response = self.get.metrics
-        return response.text
+        response = self.get.metrics()
+        return response
     
     def process_text_request(self, request_object: dict):
         """
         Used to deidentify text 
         """
-        return self.post.process_text(request_object)
+        self.text_response.response = self.post.process_text(request_object)
+        self.last_response = self.text_response
+        return self.last_response
+
+    
 
     
 
