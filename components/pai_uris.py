@@ -2,8 +2,13 @@
 
 class PAIURIs:
 
-    def __init__(self, pai_uri):
-        self._pai_uri = pai_uri
+    def __init__(self, schema, pai_uri, port=None):
+        self.valid_schemas = ['http', 'https']
+        schema = schema.split('://'),[0]
+        if schema not in self.valid_schemas:
+            raise ValueError(f"Schema must be one of the following: {', '.join(self.valid_schemas)}")
+        port = f":{port}" if port else ""
+        self._pai_uri = f"{schema}://{pai_uri}{port}"
 
     @property
     def pai_uri(self):

@@ -227,7 +227,7 @@ class EntityDetection(BaseRequestObject):
                     initializer_dict[key] = [FilterSelector.fromdict(row) for row in value]
                 else:
                     initializer_dict[key] = value
-            return cls._fromdict(values)
+            return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError("EntityDetection can only accept the values 'accuracy', 'entity_types', 'filter' and 'return_entity'")
 

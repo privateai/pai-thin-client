@@ -11,11 +11,11 @@ class PAIClient:
     """
     Client used to connect to private-ai's deidentication service   
     """
-    def __init__(self, pai_uri, api_key=None):
+    def __init__(self, schema:str = "http", pai_uri: str ="localhost", port:str = "8080"):
         # Add source url
-        self.uris = PAIURIs(pai_uri)
+        self.uris = PAIURIs(schema, pai_uri, port)
         self.get = PAIGetRequests(self.uris)
-        self.post = PAIPostRequests(api_key, self.uris) # take out api key
+        self.post = PAIPostRequests(self.uris) 
         # Hit the health endpoint to verify the connection
         self.ping()
 
