@@ -1,6 +1,6 @@
 import logging 
 from typing import Union
-from components import PAIGetRequests, PAIPostRequests, MetricsResponse, TextResponse, VersionResponse, PAIURIs, ProcessTextRequest, ProcessFileUriRequest
+from components import *
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class PAIClient:
         elif type(request_object) is dict:
             response = TextResponse(self.post.process_text(request_object))
         else:
-            raise ValueError("request_object can only be a dictionary or a ProcessTextRequest class")
+            raise ValueError("request_object can only be a dictionary or a ProcessTextRequest object")
         return response
     
     def process_files_uri_request(self, request_object: Union[dict, ProcessFileUriRequest]):
@@ -60,11 +60,35 @@ class PAIClient:
         Used to deidentify files by uri
         """
         if type(request_object) is ProcessFileUriRequest:
-            response = TextResponse(self.post.process_text(request_object.to_dict()))
+            response = (self.post.process_files_uri(request_object.to_dict()))
         elif type(request_object) is dict:
-            response = TextResponse(self.post.process_text(request_object))
+            response = FilesUriResponse(self.post.process_files_uri(request_object))
         else:
-            raise ValueError("request_object can only be a dictionary or a ProcessTextRequest class")
+            raise ValueError("request_object can only be a dictionary or a ProcessFileUriRequest object")
+        return response
+
+    def process_files_base64_request(self, request_object: Union[dict, ProcessFileBase64Request]):
+        """
+        Used to deidentify base64 files
+        """
+        if type(request_object) is ProcessFileBase64Request:
+            response = (self.post.process_files_uri(request_object.to_dict()))
+        elif type(request_object) is dict:
+            response = FilesBase64Response(self.post.process_files_base64(request_object))
+        else:
+            raise ValueError("request_object can only be a dictionary or a ProcessFileBase64Request object")
+        return response
+    
+    def bleep_request(self, request_object: Union[dict, BleepRequest]):
+        """
+        Used to deidentify files by uri
+        """
+        if type(request_object) is BleepRequest:
+            response = (self.post.process_files_uri(request_object.to_dict()))
+        elif type(request_object) is dict:
+            response = BleepResponse(self.post.process_files_base64(request_object))
+        else:
+            raise ValueError("request_object can only be a dictionary or a BleepRequest object")
         return response
 
     
