@@ -1,6 +1,6 @@
 import logging 
 from typing import Union
-from components import PAIGetRequests, PAIPostRequests, MetricsResponse, TextResponse, VersionResponse, PAIURIs, ProcessTextRequest, ProcessFilesUriRequest
+from components import PAIGetRequests, PAIPostRequests, MetricsResponse, TextResponse, VersionResponse, PAIURIs, ProcessTextRequest, ProcessFileUriRequest
 
 logger = logging.getLogger(__name__)
 
@@ -11,9 +11,9 @@ class PAIClient:
     """
     Client used to connect to private-ai's deidentication service   
     """
-    def __init__(self, schema:str = "http", pai_uri: str ="localhost", port:str = "8080"):
+    def __init__(self, schema:str = "http", pai_host: str ="localhost", port:str = "8080"):
         # Add source url
-        self.uris = PAIURIs(schema, pai_uri, port)
+        self.uris = PAIURIs(schema, pai_host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris) 
         # Hit the health endpoint to verify the connection
@@ -55,7 +55,17 @@ class PAIClient:
             raise ValueError("request_object can only be a dictionary or a ProcessTextRequest class")
         return response
     
-    def process_files_uri_request(self, request_object: Union[dict, ProcessFilesUriRequest])
+    def process_files_uri_request(self, request_object: Union[dict, ProcessFileUriRequest]):
+        """
+        Used to deidentify files by uri
+        """
+        if type(request_object) is ProcessFileUriRequest:
+            response = TextResponse(self.post.process_text(request_object.to_dict()))
+        elif type(request_object) is dict:
+            response = TextResponse(self.post.process_text(request_object))
+        else:
+            raise ValueError("request_object can only be a dictionary or a ProcessTextRequest class")
+        return response
 
     
 

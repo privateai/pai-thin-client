@@ -42,8 +42,7 @@ class PAIGetRequests(PAIRequests):
 
 class PAIPostRequests(PAIRequests):
 
-    def __init__(self, api_key:str, uris:PAIURIs):
-        self._api_key = api_key
+    def __init__(self, uris:PAIURIs):
         self.request_type = requests.post
         super(PAIPostRequests, self).__init__(uris)
 

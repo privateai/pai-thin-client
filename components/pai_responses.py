@@ -40,27 +40,27 @@ class BaseResponse:
     def get_attribute_entries(self, name):
         # Used for any nested data in the response body
         if not self.json_response: 
-            raise ValueError("get_attribute_entries needs a response of type 'json'")
+            raise ValueError("get_attribute_entries needs a response of type json")
         return [row.get(name) for row in self().json()]
 
 class MetricsResponse(BaseResponse):
 
     def __init__(self, response_object: Response=None):
-        super(MetricsResponse, self).__init__(response_object, 'text')
+        super(MetricsResponse, self).__init__(response_object, False)
 
 class VersionResponse(BaseResponse):
 
     def __init__(self, response_object: Response=None):
-        super(VersionResponse, self).__init__(response_object, 'text')
+        super(VersionResponse, self).__init__(response_object, True)
 
     @property
     def app_version(self):
-        return self.body.get('app_version')
+        return self.get_attribute_entries('app_version')
 
-class TextResponse(BaseResponse):
+class DemiTextResponse(BaseResponse):
 
     def __init__(self, response_object: Response=None):
-        super(TextResponse, self).__init__(response_object, 'json')
+        super(TextResponse, self).__init__(response_object, True)
 
     @property
     def processed_text(self):
@@ -73,6 +73,11 @@ class TextResponse(BaseResponse):
     @property
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
+
+class TextResponse(DemiTextResponse):
+
+    def __init__(self, response_object: Response=None):
+        super(TextResponse, self).__init__(response_object)
     
     @property
     def characters_processed(self):
@@ -82,3 +87,29 @@ class TextResponse(BaseResponse):
     def languages_detected(self):
         return self.get_attribute_entries("languages_detected")
     
+class FilesUriResponse(DemiTextResponse):
+
+    def __init__(self, response_object: Response = None):
+        super(FileUriResponse, self).__init__(response_object)
+
+    @property
+    def result_uri(self):
+        return self.get_attribute_entries("result_uri")
+    
+class FilesBase64Response(DemiTextResponse):
+
+    def __init__(self, response_object: Response = None):
+        super(FilesBase64Response, self).__init__(response_object)
+
+    @property
+    def processed_file(self):
+        return self.get_attribute_entries("processed_file")
+    
+class BleepResponse(BaseResponse):
+
+    def __init__(self, response_object: Response = None):
+        super(BleepResponse, self).__init__(response_object, True)
+    
+    @property
+    def bleeped_file(self):
+        return self.get_attribute_entries("bleeped_file")
