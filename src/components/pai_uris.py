@@ -36,11 +36,11 @@ class PAIURIs:
     
     @property
     def process_files_uri(self):
-        return self._create_uri(self.pai_uri, self.api_version, "process" "files", "uri")
+        return self._create_uri(self.pai_uri, self.api_version, "process", "files", "uri")
     
     @property
     def process_files_base64(self):
-        return self._create_uri(self.pai_uri, self.api_version, "process" "files", "base64")
+        return self._create_uri(self.pai_uri, self.api_version, "process", "files", "base64")
 
     @property
     def version(self):

@@ -26,7 +26,7 @@ class BaseResponse:
     
     @property
     def body(self):
-        if self._json_response == "json":
+        if self._json_response:
             return self().json() 
         else:
             return self().text
@@ -60,7 +60,7 @@ class VersionResponse(BaseResponse):
 class DemiTextResponse(BaseResponse):
 
     def __init__(self, response_object: Response=None):
-        super(TextResponse, self).__init__(response_object, True)
+        super(DemiTextResponse, self).__init__(response_object, True)
 
     @property
     def processed_text(self):
@@ -90,7 +90,7 @@ class TextResponse(DemiTextResponse):
 class FilesUriResponse(DemiTextResponse):
 
     def __init__(self, response_object: Response = None):
-        super(FileUriResponse, self).__init__(response_object)
+        super(FilesUriResponse, self).__init__(response_object)
 
     @property
     def result_uri(self):

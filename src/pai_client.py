@@ -16,8 +16,6 @@ class PAIClient:
         self.uris = PAIURIs(schema, pai_host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris) 
-        # Hit the health endpoint to verify the connection
-        self.ping()
 
     def ping(self):
         """
@@ -60,7 +58,7 @@ class PAIClient:
         Used to deidentify files by uri
         """
         if type(request_object) is ProcessFileUriRequest:
-            response = (self.post.process_files_uri(request_object.to_dict()))
+            response = FilesUriResponse(self.post.process_files_uri(request_object.to_dict()))
         elif type(request_object) is dict:
             response = FilesUriResponse(self.post.process_files_uri(request_object))
         else:
@@ -72,7 +70,7 @@ class PAIClient:
         Used to deidentify base64 files
         """
         if type(request_object) is ProcessFileBase64Request:
-            response = (self.post.process_files_uri(request_object.to_dict()))
+            response = FilesBase64Response(self.post.process_files_base64(request_object.to_dict()))
         elif type(request_object) is dict:
             response = FilesBase64Response(self.post.process_files_base64(request_object))
         else:
