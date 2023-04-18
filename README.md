@@ -191,7 +191,7 @@ from paiclient.objects import request_objects
 import os
 import logging
 
-file_dir = '/path/to/file'
+file_dir = '/path/to/file/directory'
 client = PAIClient("http", "localhost", "8080")
 for file_name in os.listdir(file_dir):
     filepath = os.path.join(file_dir, file_name)
