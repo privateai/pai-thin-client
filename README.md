@@ -78,6 +78,33 @@ Available requests:
 | `process_files_base64` | `/v3/process/files/base64` |
 | `bleep`                | `/v3/bleep`                |
 
+Requests can be made using dictionaries:
+```python
+text_dict_request = {"text": ["This is John Smith's sample request"]}
+
+response = client.process_text(text_dict_request)
+response.processed_text
+```
+Output:
+```
+["This is [NAME_1]'s sample request"]
+```
+
+or using built-in request objects:
+
+```python
+from paiclient import request_objects
+
+sample_text = "This is John Smith's sample request"
+text_request_object =  request_objects.process_text_obj(text=[sample_text])
+
+response = client.process_text(text_request_object)
+response.processed_text
+```
+Output:
+```
+["This is [NAME_1]'s sample request"]
+```
 
 
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
