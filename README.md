@@ -175,21 +175,10 @@ print(sample_request.to_dict())
 ```
 Output:
 ```
-{
-    'text': ['Sample text.'], 
-    'link_batch': False, 
-    'entity_detection': {'accuracy': 'high', 
-                        'entity_types': [{
-                                            'type': 'DISABLE', 
-                                            'value': ['HIPAA']
-                                        }
-                        ], 
-                        'filter': [], 
-                        'return_entity': True
-    }, 
-    'processed_text': {'type': 'MARKER', 
-                      'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'
-    }
+{'text': ['Sample text.'], 
+ 'link_batch': False, 
+ 'entity_detection': {'accuracy': 'high', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True}, 
+ 'processed_text': {'type': 'MARKER', 'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'}
 }
 ```
 
