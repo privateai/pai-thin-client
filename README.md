@@ -144,5 +144,17 @@ Output:
 ```
 
 #### Building Request Objects
+Request objects can initialized by passing in all the required values needed for the request or from a dictionary:
+```python
+sample_data = "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj..."
+sample_content_type = "application/pdf"
+
+sample_file_obj = request_objects.file_obj(data=sample_data, content_type=sample_content_type)
+
+sample_dict = {"data": "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj...",
+               "content_type": "application/pdf"}
+
+sample_file_obj2 = request_objects.file_obj.fromdict(sample_dict)
+```
 
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
