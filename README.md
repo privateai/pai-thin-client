@@ -1,2 +1,8 @@
 # pai-thin-client
-A thin client used to interact with the pai api
+
+A client for communicating with the private-ai deidentication api
+
+### Quick Links
+[1.Installation](#installation)
+
+### Installation <a name=installation></a>

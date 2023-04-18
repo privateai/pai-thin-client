@@ -13,6 +13,10 @@ class BaseResponse:
         return self.response
 
     @property
+    def json_response(self):
+        return self._json_response
+
+    @property
     def response(self):
         return self._response
 
@@ -39,7 +43,7 @@ class BaseResponse:
 
     def get_attribute_entries(self, name):
         # Used for any nested data in the response body
-        if not self.json_response: 
+        if not self._json_response: 
             raise ValueError("get_attribute_entries needs a response of type json")
         return [row.get(name) for row in self().json()]
 

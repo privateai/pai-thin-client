@@ -1,11 +1,7 @@
-import components.request_objects as req_objects
-from components import pai_requests
+from .components import request_objects as req_objects
 
-
-class requests:
-    process_text = pai_requests.PAIPostRequests
-    
 class request_objects:
+
     bleep = req_objects.BleepRequest
     file_url = req_objects.ProcessFileUriRequest
     file_base64 = req_objects.ProcessFileBase64Request

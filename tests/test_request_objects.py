@@ -480,12 +480,6 @@ def test_process_text_request_invalid_initialize_fromdict():
         ProcessTextRequest.fromdict(request_obj)
     assert error_msg in str(excinfo.value)
 
-def test_process_text_request_setters():
-    pass
-
-def test_process_text_request_density_validator():
-    pass
-
 def test_process_text_request_to_dict():
     text = ['hey!']
     link_batch = True
@@ -549,11 +543,6 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         ProcessFileUriRequest.fromdict({"uri":"this/location/right/here.png", "entity_detection":entity_detection.to_dict(), "pdf_options":pdf_options.to_dict(), "audio_options":audio_options.to_dict(), "junk": "value"})
     assert error_msg in str(excinfo.value)
 
-def test_process_file_uri_request_setters():
-    pass
-
-def test_process_file_uri_request_density_validator():
-    pass
 
 def test_process_file_uri_request_to_dict():
     entity_type = EntityTypeSelector(type="ENABLE", value=['NAME'])
@@ -612,11 +601,6 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         ProcessFileBase64Request.fromdict({"file":file.to_dict(), "entity_detection":entity_detection.to_dict(), "pdf_options":pdf_options.to_dict(), "audio_options":audio_options.to_dict(), "junk":"value"})    
     assert error_msg in str(excinfo.value)
 
-def test_process_file_base64_request_setters():
-    pass
-
-def test_process_file_base64_request_validator():
-    pass
 
 def test_process_file_base64_request_to_dict():
     entity_type = EntityTypeSelector(type="ENABLE", value=['NAME'])
@@ -632,14 +616,14 @@ def test_process_file_base64_request_to_dict():
 
 # Bleep Request Tests
 def test_bleep_request_initializer():
-    file=File(data="test", content_type="application/jpg")
+    file=File(data="test", content_type="image/jpg")
     timestamps=[Timestamp(start=0.0, end=1.0)]
     bleep_request = BleepRequest(file=file, timestamps=timestamps)
     assert bleep_request.file.data == 'test'
     assert bleep_request.timestamps[0].start == 0
 
 def test_bleep_request_initialize_fromdict():
-    file=File(data="test", content_type="application/jpg")
+    file=File(data="test", content_type="image/jpg")
     timestamps=[Timestamp(start=0.0, end=1.0)]
     bleep_request = BleepRequest.fromdict({"file":file.to_dict(), "timestamps":[row.to_dict() for row in timestamps]})
     assert bleep_request.file.data == 'test'
@@ -647,20 +631,14 @@ def test_bleep_request_initialize_fromdict():
 
 def test_bleep_request_invalid_initialize_fromdict():
     error_msg = "BleepRequest can only accept the values 'file'and 'timestamps'"
-    file=File(data="test", content_type="application/jpg")
+    file=File(data="test", content_type="image/jpg")
     timestamps=[Timestamp(start=0.0, end=1.0)]
     with pytest.raises(TypeError) as excinfo:
         BleepRequest.fromdict({"file":file.to_dict(), "timestamps":[row.to_dict() for row in timestamps], "junk": "value"})
     assert error_msg in str(excinfo.value)
 
-def test_bleep_request_setters():
-    pass
-
-def test_bleep_request_density_validator():
-    pass
-
 def test_bleep_request_to_dict():
-    file=File(data="test", content_type="application/jpg")
+    file=File(data="test", content_type="image/jpg")
     timestamps=[Timestamp(start=0.0, end=1.0)]
     bleep_request = BleepRequest(file=file, timestamps=timestamps).to_dict()
     assert bleep_request["file"]["data"] == 'test'

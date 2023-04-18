@@ -1,6 +1,6 @@
 import logging 
 from typing import Union
-from components import *
+from .components import *
 
 logger = logging.getLogger(__name__)
 
@@ -11,9 +11,9 @@ class PAIClient:
     """
     Client used to connect to private-ai's deidentication service   
     """
-    def __init__(self, schema:str = "http", pai_host: str ="localhost", port:str = "8080"):
+    def __init__(self, schema:str = "http", host: str ="localhost", port:str = "8080"):
         # Add source url
-        self.uris = PAIURIs(schema, pai_host, port)
+        self.uris = PAIURIs(schema, host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris) 
 
@@ -29,19 +29,19 @@ class PAIClient:
         logger.info(f"Connected to {self.uris.pai_uri}")
         return True
 
-    def get_metrics_request(self):
+    def get_metrics(self):
         """
         Returns information about the Private-AI's server
         """
         return MetricsResponse(self.get.metrics(), json_response=False)
     
-    def get_version_request(self):
+    def get_version(self):
         """
         Returns the version of the container application code
         """
         return VersionResponse(self.get.version)
     
-    def process_text_request(self, request_object: Union[dict, ProcessTextRequest]):
+    def process_text(self, request_object: Union[dict, ProcessTextRequest]):
         """
         Used to deidentify text 
         """
@@ -53,7 +53,7 @@ class PAIClient:
             raise ValueError("request_object can only be a dictionary or a ProcessTextRequest object")
         return response
     
-    def process_files_uri_request(self, request_object: Union[dict, ProcessFileUriRequest]):
+    def process_files_uri(self, request_object: Union[dict, ProcessFileUriRequest]):
         """
         Used to deidentify files by uri
         """
@@ -65,7 +65,7 @@ class PAIClient:
             raise ValueError("request_object can only be a dictionary or a ProcessFileUriRequest object")
         return response
 
-    def process_files_base64_request(self, request_object: Union[dict, ProcessFileBase64Request]):
+    def process_files_base64(self, request_object: Union[dict, ProcessFileBase64Request]):
         """
         Used to deidentify base64 files
         """
@@ -77,7 +77,7 @@ class PAIClient:
             raise ValueError("request_object can only be a dictionary or a ProcessFileBase64Request object")
         return response
     
-    def bleep_request(self, request_object: Union[dict, BleepRequest]):
+    def bleep(self, request_object: Union[dict, BleepRequest]):
         """
         Used to deidentify files by uri
         """

@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pai_thin_client_adam.guiducci"
-version = "0.0.1"
+name = "paiclient"
+version = "0.0.7"
 authors = [
   { name="Adam Guiducci", email="adam.guiducci@private-ai.com" },
 ]
@@ -18,5 +18,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/pypa/sampleproject"
-"Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
+"Homepage" = "https://github.com/privateai/pai-thin-client/"
+"Bug Tracker" = "https://github.com/privateai/pai-thin-client/issues"
