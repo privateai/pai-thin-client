@@ -185,7 +185,6 @@ Output:
 
 ### Sample Use <a name=sample-use></a>
 #### Processing a directory of files
-# Process a directory of files
 ```python
 from paiclient import PAIClient
 from paiclient.objects import request_objects
