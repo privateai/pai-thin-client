@@ -69,8 +69,8 @@ Once initialized the client can be used to make any request listed in the [Priva
 
 Available requests:
 
-| client function | endpoint |
-| --------------- | -------- |
+| Client Function        | Endpoint                   |
+| ---------------        | --------                   |
 | `get_version`          | `/`                        |
 | `get_metrics`          | `/metrics`                 |
 | `process_text`         | `/v3/process/text`         |
