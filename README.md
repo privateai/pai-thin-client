@@ -80,14 +80,15 @@ Available requests:
 
 Requests can be made using dictionaries:
 ```python
-text_dict_request = {"text": ["This is John Smith's sample request"]}
+sample_text = "This is John Smith's sample dictionary request"
+text_dict_request = {"text": sample_text}
 
 response = client.process_text(text_dict_request)
 response.processed_text
 ```
 Output:
 ```
-["This is [NAME_1]'s sample request"]
+["This is [NAME_1]'s sample dictionary request"]
 ```
 
 or using built-in request objects:
@@ -95,7 +96,7 @@ or using built-in request objects:
 ```python
 from paiclient import request_objects
 
-sample_text = "This is John Smith's sample request"
+sample_text = "This is John Smith's sample process text object request"
 text_request_object =  request_objects.process_text_obj(text=[sample_text])
 
 response = client.process_text(text_request_object)
@@ -103,8 +104,45 @@ response.processed_text
 ```
 Output:
 ```
-["This is [NAME_1]'s sample request"]
+["This is [NAME_1]'s sample process text object request"]
 ```
 
+
+### Request Objects <a name=request-objects></a>
+Request objects are a simple way of creating request bodies without the tediousness of writing dictionaries. Every post request (as listed in the [Private-Ai documentation][1]) has its own request own request object. 
+```python
+from paiclient import request_objects
+
+sample_obj = request_objects.file_url_obj(uri='path/to/file.jpg')
+sample_obj.uri
+```
+Output:
+```
+'path/to/file.jpg'
+```
+
+Additionally there are request objects for each nested dictionary of a request:
+```python 
+from paiclient import request_objects
+
+sample_text = "This is John Smith's sample process text object request where names won't be removed"
+
+# sub-dictionary of entity_detection
+sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['NAME', 'NAME_GIVEN', 'NAME_FAMILY'])
+
+# sub-dictionary of a process text request
+sample_entity_detection = request_objects.entity_detection_obj(entity_types=[sample_entity_type_selector])
+
+# request object created using the sub-dictionaries
+sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection)
+response = client.process_text(sample_request)
+print(response.processed_text)
+```
+Output:
+```
+["This is John Smith's sample process text object request where names won't be removed"]
+```
+
+#### Building Request Objects
 
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
