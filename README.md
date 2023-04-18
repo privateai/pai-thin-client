@@ -144,17 +144,54 @@ Output:
 ```
 
 #### Building Request Objects
-Request objects can initialized by passing in all the required values needed for the request or from a dictionary:
+Request objects can initialized by passing in all the required values needed for the request as arguments or from a dictionary:
 ```python
+# Passing arguments 
 sample_data = "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj..."
 sample_content_type = "application/pdf"
 
 sample_file_obj = request_objects.file_obj(data=sample_data, content_type=sample_content_type)
 
+# Passing a dictionary
 sample_dict = {"data": "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj...",
                "content_type": "application/pdf"}
 
 sample_file_obj2 = request_objects.file_obj.fromdict(sample_dict)
 ```
+
+Request objects can be formatted as dictionaries:
+```python
+from paiclient import request_objects
+
+sample_text = "Sample text."
+# Create the nested request objects
+sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['HIPAA'])
+sample_entity_detection = request_objects.entity_detection_obj(entity_types=[sample_entity_type_selector])
+# Create the request object
+sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection)
+
+# All nested objects are also formatted
+print(sample_request.to_dict())
+```
+Output:
+```
+{
+    'text': ['Sample text.'], 
+    'link_batch': False, 
+    'entity_detection': {'accuracy': 'high', 
+                        'entity_types': [{
+                                            'type': 'DISABLE', 
+                                            'value': ['HIPAA']
+                                        }
+                        ], 
+                        'filter': [], 
+                        'return_entity': True
+    }, 
+    'processed_text': {'type': 'MARKER', 
+                      'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'
+    }
+}
+```
+
 
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
