@@ -44,6 +44,23 @@ Output:
 
 ### Working with the Client <a name=client></a>
 
+#### Initializing the Client
 
+the PAI client requires a scheme, host and optional port to initialize.
+Once created, the connection can be tested with the client's `ping` function
+
+```python
+from paiclient import PAIClient
+scheme = 'http'
+host = 'localhost'
+port= '8080'
+client = PAIClient(scheme, host, port)
+ 
+client.ping()
+```
+Output:
+```
+True
+```
 
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/

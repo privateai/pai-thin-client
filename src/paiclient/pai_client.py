@@ -11,9 +11,9 @@ class PAIClient:
     """
     Client used to connect to private-ai's deidentication service   
     """
-    def __init__(self, schema:str, host: str, port:str = None):
+    def __init__(self, scheme:str, host: str, port:str = None):
         # Add source url
-        self.uris = PAIURIs(schema, host, port)
+        self.uris = PAIURIs(scheme, host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris) 
 
