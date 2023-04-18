@@ -25,9 +25,15 @@ port = "8080"
 client = PAIClient(schema=schema, host=host, port=port)
 
 text_request = request_objects.process_text(text=["My sample name is John Smith"])
+text_request.text
 
 response = client.process_text(text_request)
 response.processed_text
 
+
+```
+Output:
+```
+["My sample name is John Smith"]
 ['My sample name is [NAME_1]']
 ```
