@@ -191,17 +191,17 @@ from paiclient.objects import request_objects
 import os
 import logging
 
-file_dir = 'path/to/file'
+file_dir = '/path/to/file'
 client = PAIClient("http", "localhost", "8080")
 for file_name in os.listdir(file_dir):
     filepath = os.path.join(file_dir, file_name)
     if not os.path.isfile(filepath):
         continue
-    req_obj = request_objects.file_obj(uri=filepath)
+    req_obj = request_objects.file_url_obj(uri=filepath)
     # NOTE this method of file processing requires the container to have an the input and output directories mounted
     resp = client.process_files_uri(req_obj)
     if not resp.ok:
-        logging.error(f"response for file {file_name} returned with {resp.body}")
+        logging.error(f"response for file {file_name} returned with {resp.status_code}")
 ```
 
 
