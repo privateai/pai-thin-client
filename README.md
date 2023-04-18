@@ -63,4 +63,21 @@ Output:
 True
 ```
 
+#### Making Requests
+
+Once initialized the client can be used to make any request listed in the [Private-Ai documentation][1]
+
+Available requests:
+
+| client function | endpoint |
+| --------------- | -------- |
+| `get_version`          | `/`                        |
+| `get_metrics`          | `/metrics`                 |
+| `process_text`         | `/v3/process/text`         |
+| `process_files_url`    | `/v3/process/files/uri`    |
+| `process_files_base64` | `/v3/process/files/base64` |
+| `bleep`                | `/v3/bleep`                |
+
+
+
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
