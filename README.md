@@ -4,9 +4,10 @@ A client for communicating with the private-ai deidentication api. This document
 
 ### Quick Links
 1. [Installation](#installation)
-2. [Usage](#usage)
+2. [Quick Start](#quick-start)
 3. [Working with the Client](#client)
-3. [Request Objects](#request-objects)
+4. [Request Objects](#request-objects)
+5. [Sample Use](#sample-use)
 
 ### Installation <a name=installation></a>
 
@@ -14,9 +15,8 @@ A client for communicating with the private-ai deidentication api. This document
 pip install paiclient
 ```
 
-### Usage <a name=usage></a>
+### Quick Start <a name=quick-start></a>
 
-#### Simple Example
 ```python
 
 from paiclient import PAIClient
@@ -159,7 +159,7 @@ sample_dict = {"data": "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQov
 sample_file_obj2 = request_objects.file_obj.fromdict(sample_dict)
 ```
 
-Request objects can be formatted as dictionaries:
+Request objects also can be formatted as dictionaries:
 ```python
 from paiclient import request_objects
 
@@ -175,11 +175,34 @@ print(sample_request.to_dict())
 ```
 Output:
 ```
-{'text': ['Sample text.'], 
+{
+ 'text': ['Sample text.'], 
  'link_batch': False, 
  'entity_detection': {'accuracy': 'high', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True}, 
  'processed_text': {'type': 'MARKER', 'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'}
 }
+```
+
+### Sample Use <a name=sample-use></a>
+#### Processing a directory of files
+# Process a directory of files
+```python
+from paiclient import PAIClient
+from paiclient.objects import request_objects
+import os
+import logging
+
+file_dir = 'path/to/file'
+client = PAIClient("http", "localhost", "8080")
+for file_name in os.listdir(file_dir):
+    filepath = os.path.join(file_dir, file_name)
+    if not os.path.isfile(filepath):
+        continue
+    req_obj = request_objects.file_obj(uri=filepath)
+    # NOTE this method of file processing requires the container to have an the input and output directories mounted
+    resp = client.process_files_uri(req_obj)
+    if not resp.ok:
+        logging.error(f"response for file {file_name} returned with {resp.body}")
 ```
 
 

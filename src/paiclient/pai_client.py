@@ -2,8 +2,6 @@ import logging
 from typing import Union
 from .components import *
 
-logger = logging.getLogger(__name__)
-
 
 
 
@@ -24,9 +22,8 @@ class PAIClient:
         """
         response = self.get.health()
         if response.status_code != 200:
-            logger.warning(f"The Private AI server cannot be reached")
+            logging.warning(f"The Private AI server cannot be reached")
             return False
-        logger.info(f"Connected to {self.uris.pai_uri}")
         return True
 
     def get_metrics(self):
