@@ -5,7 +5,7 @@ A client for communicating with the private-ai deidentication api. This document
 ### Quick Links
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. Working with the Client(#client)
+3. [Working with the Client](#client)
 3. [Request Objects](#request-objects)
 
 ### Installation <a name=installation></a>
