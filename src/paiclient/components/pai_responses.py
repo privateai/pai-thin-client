@@ -45,7 +45,12 @@ class BaseResponse:
         # Used for any nested data in the response body
         if not self._json_response: 
             raise ValueError("get_attribute_entries needs a response of type json")
-        return [row.get(name) for row in self().json()]
+        body = self.body
+        if type(body) is list:
+            return [row.get(name) for row in self().json()]
+        elif type(body) is dict:
+            return body.get(name)
+
 
 class MetricsResponse(BaseResponse):
 
