@@ -1,6 +1,6 @@
 # pai-thin-client
 
-A client for communicating with the Private Ai de-identication api. This document provides information about how to best use the client. for more information, see Private Ai's [API Documentation.][1]
+A client for communicating with the Private Ai de-identication api. This document provides information about how to best use the client. For more information, see Private Ai's [API Documentation.][1]
 
 ### Quick Links
 1. [Installation](#installation)
