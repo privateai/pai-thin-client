@@ -235,5 +235,39 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
     processed_file = base64.b64decode(processed_file, validate=True)
     redacted_file.write(processed_file)
 ```
+#### Bleep an audio file
+```python
+from paiclient import PAIClient
+from paiclient.objects import request_objects
+import base64
+import os
+import logging
 
+file_dir = "/path/to/your/file"
+file_name = 'sample_file.pdf'
+filepath = os.path.join(file_dir,file_name)
+file_type= "type/of_file" #eg. audio/mp3 or audio/wav
+client = PAIClient("http", "localhost", "8080")
+
+
+file_dir = "/home/adam/workstation/file_processing/test_audio"
+file_name = "test_audio.mp3"
+filepath = os.path.join(file_dir,file_name)
+file_type = "audio/mp3"
+with open(filepath, "rb") as b64_file:
+    file_data = base64.b64encode(b64_file.read())
+    file_data = file_data.decode("ascii")
+
+file_obj = request_objects.file_obj(data=file_data, content_type=file_type)
+timestamp = request_objects.timestamp_obj(start=1.12, end=2.14)
+request_obj = request_objects.bleep_obj(file=file_obj, timestamps=[timestamp])
+
+resp = client.bleep(request_object=request_obj)
+if not resp.ok:
+    logging.error(f"response for file {file_name} returned with {resp.status_code}")
+with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file:
+    processed_file = resp.bleeped_file.encode("ascii")
+    processed_file = base64.b64decode(processed_file, validate=True)
+    redacted_file.write(processed_file)
+```
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
