@@ -79,9 +79,9 @@ class PAIClient:
         Used to deidentify files by uri
         """
         if type(request_object) is BleepRequest:
-            response = (self.post.process_files_uri(request_object.to_dict()))
+            response = (self.post.bleep(request_object.to_dict()))
         elif type(request_object) is dict:
-            response = BleepResponse(self.post.process_files_base64(request_object))
+            response = BleepResponse(self.post.bleep(request_object))
         else:
             raise ValueError("request_object can only be a dictionary or a BleepRequest object")
         return response

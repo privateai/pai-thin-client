@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "paiclient"
-version = "0.0.11"
+version = "1.0.0"
 authors = [
   { name="Adam Guiducci", email="adam.guiducci@private-ai.com" },
 ]
