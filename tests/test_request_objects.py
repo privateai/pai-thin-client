@@ -643,3 +643,4 @@ def test_bleep_request_to_dict():
     bleep_request = BleepRequest(file=file, timestamps=timestamps).to_dict()
     assert bleep_request["file"]["data"] == 'test'
     assert bleep_request["timestamps"][0]["start"] == 0
+    
