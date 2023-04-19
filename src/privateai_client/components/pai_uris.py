@@ -48,3 +48,4 @@ class PAIURIs:
 
     def _create_uri(self, *args):
         return "/".join([x.strip("/") for x in args])
+        
