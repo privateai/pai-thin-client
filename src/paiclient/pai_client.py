@@ -79,7 +79,7 @@ class PAIClient:
         Used to deidentify files by uri
         """
         if type(request_object) is BleepRequest:
-            response = (self.post.bleep(request_object.to_dict()))
+            response = BleepResponse(self.post.bleep(request_object.to_dict()))
         elif type(request_object) is dict:
             response = BleepResponse(self.post.bleep(request_object))
         else:
