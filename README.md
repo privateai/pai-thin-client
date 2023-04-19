@@ -270,4 +270,41 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
     processed_file = base64.b64decode(processed_file, validate=True)
     redacted_file.write(processed_file)
 ```
+
+#### Working with structured data
+When deidentifying smaller strings of structured data, more accuracte results can be achieved by passing in the whole column as a string (including the header) and a delimiter. For example, making a request row by row for a column named SSN will return data identified as PHONE_NUMBER, even when the header is included
+
+```python
+# Working with data frames
+import pandas as pd
+from privateai_client import PAIClient
+from privateai_client.objects import request_objects
+
+client = PAIClient("http", "localhost", "8080")
+data_frame = pd.DataFrame(
+    {
+        "Name": [
+            "Braund, Mr. Owen Harris",
+            "Allen, Mr. William Henry",
+            "Bonnell, Miss. Elizabeth",
+        ],
+        "Age": [22, 35, 58],
+        "Sex": ["male", "male", "female"],
+    }
+)
+print(data_frame)
+text_req = request_objects.process_text_obj(text=[])
+for column in data_frame.columns:
+    text_req.text.append(f"{column}:{' | '.join([str(row) for row in data_frame[column]])}")
+
+resp = client.process_text(text_req)
+redacted_data = dict()
+for row in resp.processed_text:
+    data = row.split(':',1)
+    redacted_data[data[0]] = data[1].split(' | ')
+redacted_data_frame = pd.DataFrame(redacted_data)
+print(redacted_data_frame)
+```
+
+
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
