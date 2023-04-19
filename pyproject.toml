@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pai-thin-client"
-version = "1.0.0"
+name = "privateai_client"
+version = "1.0.4"
 authors = [
   { name="Adam Guiducci", email="adam.guiducci@private-ai.com" },
 ]

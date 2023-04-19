@@ -1,4 +1,4 @@
-# pai-thin-client
+# privateai_client
 
 A client for communicating with the Private Ai de-identication api. This document provides information about how to best use the client. For more information, see Private Ai's [API Documentation.][1]
 
@@ -12,15 +12,15 @@ A client for communicating with the Private Ai de-identication api. This documen
 ### Installation <a name=installation></a>
 
 ```
-pip install paiclient
+pip install privateai_client
 ```
 
 ### Quick Start <a name=quick-start></a>
 
 ```python
 
-from paiclient import PAIClient
-from paiclient import request_objects
+from privateai_client import PAIClient
+from privateai_client import request_objects
 
 schema = "http"
 host = "localhost"
@@ -50,7 +50,7 @@ the PAI client requires a scheme, host and optional port to initialize.
 Once created, the connection can be tested with the client's `ping` function
 
 ```python
-from paiclient import PAIClient
+from privateai_client import PAIClient
 scheme = 'http'
 host = 'localhost'
 port= '8080'
@@ -94,7 +94,7 @@ Output:
 or using built-in request objects:
 
 ```python
-from paiclient import request_objects
+from privateai_client import request_objects
 
 sample_text = "This is John Smith's sample process text object request"
 text_request_object =  request_objects.process_text_obj(text=[sample_text])
@@ -111,7 +111,7 @@ Output:
 ### Request Objects <a name=request-objects></a>
 Request objects are a simple way of creating request bodies without the tediousness of writing dictionaries. Every post request (as listed in the [Private-Ai documentation][1]) has its own request own request object. 
 ```python
-from paiclient import request_objects
+from privateai_client import request_objects
 
 sample_obj = request_objects.file_url_obj(uri='path/to/file.jpg')
 sample_obj.uri
@@ -123,7 +123,7 @@ Output:
 
 Additionally there are request objects for each nested dictionary of a request:
 ```python 
-from paiclient import request_objects
+from privateai_client import request_objects
 
 sample_text = "This is John Smith's sample process text object request where names won't be removed"
 
@@ -161,7 +161,7 @@ sample_file_obj2 = request_objects.file_obj.fromdict(sample_dict)
 
 Request objects also can be formatted as dictionaries:
 ```python
-from paiclient import request_objects
+from privateai_client import request_objects
 
 sample_text = "Sample text."
 # Create the nested request objects
@@ -186,8 +186,8 @@ Output:
 ### Sample Use <a name=sample-use></a>
 #### Processing a directory of files
 ```python
-from paiclient import PAIClient
-from paiclient.objects import request_objects
+from privateai_client import PAIClient
+from privateai_client.objects import request_objects
 import os
 import logging
 
@@ -205,8 +205,8 @@ for file_name in os.listdir(file_dir):
 ```
 #### Processing a Base64 file
 ```python
-from paiclient import PAIClient
-from paiclient.objects import request_objects
+from privateai_client import PAIClient
+from privateai_client.objects import request_objects
 import base64
 import os
 import logging
@@ -237,8 +237,8 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
 ```
 #### Bleep an audio file
 ```python
-from paiclient import PAIClient
-from paiclient.objects import request_objects
+from privateai_client import PAIClient
+from privateai_client.objects import request_objects
 import base64
 import os
 import logging
