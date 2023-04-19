@@ -115,7 +115,7 @@ class EntityTypeSelector(BaseRequestObject):
             raise TypeError("EntityTypeSelector can only accept the values 'type' and 'value'")
 
 class File(BaseRequestObject):
-    valid_content_types = ["application/pdf", "application/json", "application/xml", "image/jpg", "image/tiff", "audio/wav"]
+    valid_content_types = ["application/pdf", "application/json", "application/xml", "image/jpg", "image/tiff", "audio/wav", "audio/mp3"]
 
     def __init__(self,
                  data: str,
