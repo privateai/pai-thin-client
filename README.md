@@ -22,23 +22,22 @@ pip install privateai_client
 from privateai_client import PAIClient
 from privateai_client import request_objects
 
-schema = "http"
+scheme = "http"
 host = "localhost"
 port = "8080"
 
-client = PAIClient(schema=schema, host=host, port=port)
-
-text_request = request_objects.process_text(text=["My sample name is John Smith"])
-text_request.text
-
+client = PAIClient(scheme=scheme, host=host, port=port)
+text_request = request_objects.process_text_obj(text=["My sample name is John Smith"])
 response = client.process_text(text_request)
-response.processed_text
+
+print(text_request.text)
+print(response.processed_text)
 
 
 ```
 Output:
 ```
-["My sample name is John Smith"]
+['My sample name is John Smith']
 ['My sample name is [NAME_1]']
 ```
 
@@ -74,17 +73,17 @@ Available requests:
 | `get_version`          | `/`                        |
 | `get_metrics`          | `/metrics`                 |
 | `process_text`         | `/v3/process/text`         |
-| `process_files_url`    | `/v3/process/files/uri`    |
+| `process_files_uri`    | `/v3/process/files/uri`    |
 | `process_files_base64` | `/v3/process/files/base64` |
 | `bleep`                | `/v3/bleep`                |
 
 Requests can be made using dictionaries:
 ```python
-sample_text = "This is John Smith's sample dictionary request"
+sample_text = ["This is John Smith's sample dictionary request"]
 text_dict_request = {"text": sample_text}
 
 response = client.process_text(text_dict_request)
-response.processed_text
+print(response.processed_text)
 ```
 Output:
 ```
@@ -100,7 +99,7 @@ sample_text = "This is John Smith's sample process text object request"
 text_request_object =  request_objects.process_text_obj(text=[sample_text])
 
 response = client.process_text(text_request_object)
-response.processed_text
+print(response.processed_text)
 ```
 Output:
 ```
@@ -144,7 +143,7 @@ Output:
 ```
 
 #### Building Request Objects
-Request objects can initialized by passing in all the required values needed for the request as arguments or from a dictionary:
+Request objects can initialized by passing in all the required values needed for the request as arguments or from a dictionary, using the object's `fromdict` function:
 ```python
 # Passing arguments 
 sample_data = "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj..."
@@ -152,14 +151,14 @@ sample_content_type = "application/pdf"
 
 sample_file_obj = request_objects.file_obj(data=sample_data, content_type=sample_content_type)
 
-# Passing a dictionary
+# Passing a dictionary using .fromdict()
 sample_dict = {"data": "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj...",
                "content_type": "application/pdf"}
 
 sample_file_obj2 = request_objects.file_obj.fromdict(sample_dict)
 ```
 
-Request objects also can be formatted as dictionaries:
+Request objects also can be formatted as dictionaries, using the request object's `to_dict()` function:
 ```python
 from privateai_client import request_objects
 
@@ -170,7 +169,7 @@ sample_entity_detection = request_objects.entity_detection_obj(entity_types=[sam
 # Create the request object
 sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection)
 
-# All nested objects are also formatted
+# All nested request objects are also formatted
 print(sample_request.to_dict())
 ```
 Output:
@@ -272,7 +271,9 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
 ```
 
 #### Working with structured data
-When deidentifying smaller strings of structured data, more accuracte results can be achieved by passing in the whole column as a string (including the header) and a delimiter. For example, making a request row by row for a column named SSN will return data identified as PHONE_NUMBER, even when the header is included
+
+Redacting a data frame column by column
+##### NOTE: When deidentifying smaller strings of structured data, more accuracte results can be achieved by passing in the whole column as a string (including the header) and a delimiter. For example, making a request row by row for a column named SSN will return data identified as PHONE_NUMBER, even when the header is included
 
 ```python
 # Working with data frames
@@ -305,6 +306,30 @@ for row in resp.processed_text:
 redacted_data_frame = pd.DataFrame(redacted_data)
 print(redacted_data_frame)
 ```
+Redacting cell by cell for columns with large text content
+```python
+# Working with data frames
+import pandas as pd
+from privateai_client import PAIClient
+from privateai_client.objects import request_objects
 
+client = PAIClient("http", "localhost", "8080")
+data_frame = pd.DataFrame(
+    {
+        "Book": [
+            "Treasure Island",
+            "Moby Dick",
+        ],
+        "chapter": [1,1],
+        "paragraph": [1,1],
+        "text": ["The Old Sea-dog at the Admiral Benbow\nSquire Trelawney, Dr. Livesey, and the rest of...",
+                 "Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse..."
+                 ]
+    }
+)
+obj = request_objects.process_text_obj
+func = client.process_text
+data_frame['text'] = [(lambda x: func(obj(text=[x])).processed_text[0])(row) for row in data_frame['text']]
+```
 
 [1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
