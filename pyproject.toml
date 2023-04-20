@@ -8,7 +8,7 @@ version = "1.0.4"
 authors = [
   { name="Adam Guiducci", email="adam.guiducci@private-ai.com" },
 ]
-description = "A thin client for communicating with the Private Ai de-identication api."
+description = "A thin client for communicating with the Private AI de-identication API."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
