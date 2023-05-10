@@ -1,6 +1,6 @@
-# privateai_client
+# Private AI Python Client
 
-A client for communicating with the Private Ai de-identication api. This document provides information about how to best use the client. For more information, see Private Ai's [API Documentation.][1]
+A Python client library for communicating with the Private AI API. This document provides information about how to best use the client. For more information, see Private AI's [API Documentation.][1]
 
 ### Quick Links
 1. [Installation](#installation)
@@ -41,7 +41,7 @@ Output:
 ['My sample name is [NAME_1]']
 ```
 
-### Working with the Client <a name=client></a>
+### Working With The Client <a name=client></a>
 
 #### Initializing the Client
 
@@ -64,7 +64,7 @@ True
 
 #### Making Requests
 
-Once initialized the client can be used to make any request listed in the [Private-Ai documentation][1]
+Once initialized the client can be used to make any request listed in the [Private-AI documentation][1]
 
 Available requests:
 
@@ -108,7 +108,7 @@ Output:
 
 
 ### Request Objects <a name=request-objects></a>
-Request objects are a simple way of creating request bodies without the tediousness of writing dictionaries. Every post request (as listed in the [Private-Ai documentation][1]) has its own request own request object. 
+Request objects are a simple way of creating request bodies without the tediousness of writing dictionaries. Every post request (as listed in the [Private-AI documentation][1]) has its own request own request object. 
 ```python
 from privateai_client import request_objects
 
@@ -273,7 +273,7 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
 #### Working with structured data
 
 Redacting a data frame column by column
-##### NOTE: When deidentifying smaller strings of structured data, more accuracte results can be achieved by passing in the whole column as a string (including the header) and a delimiter. For example, making a request row by row for a column named SSN will return data identified as PHONE_NUMBER, even when the header is included
+##### NOTE: When de-identifying smaller strings of structured data, more accurate results can be achieved by passing in the whole column as a string (including the header) and a delimiter. For example, making a request row by row for a column named SSN will return data identified as PHONE_NUMBER, even when the header is included
 
 ```python
 # Working with data frames
