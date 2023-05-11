@@ -30,7 +30,7 @@ class PAIClient:
         """
         Returns information about the Private-AI's server
         """
-        return MetricsResponse(self.get.metrics(), json_response=False)
+        return MetricsResponse(self.get.metrics())
     
     def get_version(self):
         """
