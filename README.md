@@ -4,10 +4,11 @@ A Python client library for communicating with the Private AI API. This document
 
 ### Quick Links
 1. [Installation](#installation)
-2. [Quick Start](#quick-start)
-3. [Working with the Client](#client)
-4. [Request Objects](#request-objects)
-5. [Sample Use](#sample-use)
+1. [Quick Start](#quick-start)
+1. [Running the tests](#testing)
+1. [Working with the Client](#client)
+1. [Request Objects](#request-objects)
+1. [Sample Use](#sample-use)
 
 ### Installation <a name=installation></a>
 
@@ -41,18 +42,31 @@ Output:
 ['My sample name is [NAME_1]']
 ```
 
+### Running the tests <a name=testing></a>
+
+We use [pytest](https://docs.pytest.org/) to run our tests in the tests folder.
+
+To run from command line, ensure you have pytest installed, and then run `pytest` from the main project folder.
+
+```shell
+pip install -U pytest -y
+pytest
+```
+
+Alternatively, you can run automatically run all tests from the Testing window in Visual Studio Code.
+
 ### Working With The Client <a name=client></a>
 
 #### Initializing the Client
 
-the PAI client requires a scheme, host and optional port to initialize.
+The PAI client requires a scheme, host and optional port to initialize.
 Once created, the connection can be tested with the client's `ping` function
 
 ```python
 from privateai_client import PAIClient
 scheme = 'http'
 host = 'localhost'
-port= '8080'
+port = '8080'
 client = PAIClient(scheme, host, port)
  
 client.ping()
