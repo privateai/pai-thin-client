@@ -1,19 +1,39 @@
-import logging 
+import logging
 from typing import Union
+
 from .components import *
-
-
 
 
 class PAIClient:
     """
     Client used to connect to private-ai's deidentication service   
     """
-    def __init__(self, scheme:str, host: str, port:str = None):
+    def __init__(self, scheme:str, host: str, port:str = None, **kwargs):
         # Add source url
         self.uris = PAIURIs(scheme, host, port)
         self.get = PAIGetRequests(self.uris)
-        self.post = PAIPostRequests(self.uris) 
+        self.post = PAIPostRequests(self.uris)
+        if "api_key" in kwargs.keys():
+            self.add_api_key(kwargs['api_key'])
+        elif "bearer_token" in kwargs.keys():
+            self.add_bearer_token(kwargs['bearer_token'])
+        
+    def _add_auth(self, auth_type, auth_val):
+        auth_header = {}
+        if auth_type == 'api_key':
+            auth_header = {'x-api-key': auth_val}
+        elif auth_type == 'bearer_token':
+            auth_header = {'Authorization': f"Bearer {auth_val}"}
+        else:
+            raise ValueError(f"{auth_type} is not currently a supported method of authorization")
+        for subclass in [self.get, self.post]:
+            subclass.headers = {**auth_header, **subclass.base_header}
+
+    def add_api_key(self, api_key):
+        self._add_auth("api_key", api_key)
+
+    def add_bearer_token(self, token):
+        self._add_auth('bearer_token', token)
 
     def ping(self):
         """
