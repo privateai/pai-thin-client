@@ -10,7 +10,7 @@ class PAIClient:
     """
     def __init__(self, scheme:str, host: str, port:str = None, **kwargs):
         # Add source url
-        self.uris = PAIURIs(scheme, host, port)
+        self.uris = (PAIURIs)(scheme, host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris)
         if "api_key" in kwargs.keys():
