@@ -1,4 +1,4 @@
-from src.pai_client import PAIClient
+from ..pai_client import PAIClient
 
 
 def test_initialization_with_auth():

@@ -1,5 +1,7 @@
 import pytest
-from src.components import *
+
+from ..components import *
+
 
 # File Tests
 def test_file_initializer():
