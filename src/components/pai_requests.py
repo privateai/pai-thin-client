@@ -1,7 +1,8 @@
-import requests
 from typing import Union
-from .pai_uris import PAIURIs
 
+import requests
+
+from .pai_uris import PAIURIs
 
 
 class PAIRequests:
@@ -9,13 +10,18 @@ class PAIRequests:
     def __init__(self, uris:PAIURIs):
 
         self._uris = uris
+        self.headers = self.base_header
 
     @property
     def uris(self):
         return self._uris
     
+    @property
+    def base_header(self):
+        return {'Accept': 'application/json'}
+    
     def make_request(self, request_type: Union[requests.get, requests.post], uri:str, payload: dict=None):
-        return request_type(uri, json=payload)
+        return request_type(uri, json=payload, headers=self.headers)
 
 
 
