@@ -3,6 +3,7 @@
 A Python client library for communicating with the Private AI API. This document provides information about how to best use the client. For more information, see Private AI's [API Documentation.][1]
 
 ### Quick Links
+
 1. [Installation](#installation)
 1. [Quick Start](#quick-start)
 1. [Running the tests](#testing)
@@ -36,7 +37,9 @@ print(response.processed_text)
 
 
 ```
+
 Output:
+
 ```
 ['My sample name is John Smith']
 ['My sample name is [NAME_1]']
@@ -68,12 +71,26 @@ scheme = 'http'
 host = 'localhost'
 port = '8080'
 client = PAIClient(scheme, host, port)
- 
+
 client.ping()
 ```
+
 Output:
+
 ```
 True
+```
+
+#### Adding Authorization to the Client
+
+```python
+from privateai_client import PAIClient
+# On initialization
+client = PAIClient("http", "localhost", "8080", api_key='testkey')
+
+# After initialization
+client = PAIClient("http", "localhost", "8080")
+client.add_api_key("testkey")
 ```
 
 #### Making Requests
@@ -83,7 +100,7 @@ Once initialized the client can be used to make any request listed in the [Priva
 Available requests:
 
 | Client Function        | Endpoint                   |
-| ---------------        | --------                   |
+| ---------------------- | -------------------------- |
 | `get_version`          | `/`                        |
 | `get_metrics`          | `/metrics`                 |
 | `process_text`         | `/v3/process/text`         |
@@ -92,6 +109,7 @@ Available requests:
 | `bleep`                | `/v3/bleep`                |
 
 Requests can be made using dictionaries:
+
 ```python
 sample_text = ["This is John Smith's sample dictionary request"]
 text_dict_request = {"text": sample_text}
@@ -99,7 +117,9 @@ text_dict_request = {"text": sample_text}
 response = client.process_text(text_dict_request)
 print(response.processed_text)
 ```
+
 Output:
+
 ```
 ["This is [NAME_1]'s sample dictionary request"]
 ```
@@ -115,27 +135,33 @@ text_request_object =  request_objects.process_text_obj(text=[sample_text])
 response = client.process_text(text_request_object)
 print(response.processed_text)
 ```
+
 Output:
+
 ```
 ["This is [NAME_1]'s sample process text object request"]
 ```
 
-
 ### Request Objects <a name=request-objects></a>
-Request objects are a simple way of creating request bodies without the tediousness of writing dictionaries. Every post request (as listed in the [Private-AI documentation][1]) has its own request own request object. 
+
+Request objects are a simple way of creating request bodies without the tediousness of writing dictionaries. Every post request (as listed in the [Private-AI documentation][1]) has its own request own request object.
+
 ```python
 from privateai_client import request_objects
 
 sample_obj = request_objects.file_url_obj(uri='path/to/file.jpg')
 sample_obj.uri
 ```
+
 Output:
+
 ```
 'path/to/file.jpg'
 ```
 
 Additionally there are request objects for each nested dictionary of a request:
-```python 
+
+```python
 from privateai_client import request_objects
 
 sample_text = "This is John Smith's sample process text object request where names won't be removed"
@@ -151,15 +177,19 @@ sample_request = request_objects.process_text_obj(text=[sample_text], entity_det
 response = client.process_text(sample_request)
 print(response.processed_text)
 ```
+
 Output:
+
 ```
 ["This is John Smith's sample process text object request where names won't be removed"]
 ```
 
 #### Building Request Objects
+
 Request objects can initialized by passing in all the required values needed for the request as arguments or from a dictionary, using the object's `fromdict` function:
+
 ```python
-# Passing arguments 
+# Passing arguments
 sample_data = "JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PC9UaXRsZSAoc2FtcGxlKQovUHJvZHVj..."
 sample_content_type = "application/pdf"
 
@@ -173,6 +203,7 @@ sample_file_obj2 = request_objects.file_obj.fromdict(sample_dict)
 ```
 
 Request objects also can be formatted as dictionaries, using the request object's `to_dict()` function:
+
 ```python
 from privateai_client import request_objects
 
@@ -186,18 +217,22 @@ sample_request = request_objects.process_text_obj(text=[sample_text], entity_det
 # All nested request objects are also formatted
 print(sample_request.to_dict())
 ```
+
 Output:
+
 ```
 {
- 'text': ['Sample text.'], 
- 'link_batch': False, 
- 'entity_detection': {'accuracy': 'high', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True}, 
+ 'text': ['Sample text.'],
+ 'link_batch': False,
+ 'entity_detection': {'accuracy': 'high', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True},
  'processed_text': {'type': 'MARKER', 'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'}
 }
 ```
 
 ### Sample Use <a name=sample-use></a>
+
 #### Processing a directory of files
+
 ```python
 from privateai_client import PAIClient
 from privateai_client.objects import request_objects
@@ -216,7 +251,9 @@ for file_name in os.listdir(file_dir):
     if not resp.ok:
         logging.error(f"response for file {file_name} returned with {resp.status_code}")
 ```
+
 #### Processing a Base64 file
+
 ```python
 from privateai_client import PAIClient
 from privateai_client.objects import request_objects
@@ -248,7 +285,9 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
     processed_file = base64.b64decode(processed_file, validate=True)
     redacted_file.write(processed_file)
 ```
+
 #### Bleep an audio file
+
 ```python
 from privateai_client import PAIClient
 from privateai_client.objects import request_objects
@@ -287,6 +326,7 @@ with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file
 #### Working with structured data
 
 Redacting a data frame column by column
+
 ##### NOTE: When de-identifying smaller strings of structured data, more accurate results can be achieved by passing in the whole column as a string (including the header) and a delimiter. For example, making a request row by row for a column named SSN will return data identified as PHONE_NUMBER, even when the header is included
 
 ```python
@@ -320,7 +360,9 @@ for row in resp.processed_text:
 redacted_data_frame = pd.DataFrame(redacted_data)
 print(redacted_data_frame)
 ```
+
 Redacting cell by cell for columns with large text content
+
 ```python
 # Working with data frames
 import pandas as pd
@@ -346,4 +388,4 @@ func = client.process_text
 data_frame['text'] = [(lambda x: func(obj(text=[x])).processed_text[0])(row) for row in data_frame['text']]
 ```
 
-[1]:https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
+[1]: https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
