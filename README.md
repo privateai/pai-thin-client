@@ -186,7 +186,7 @@ Output:
 
 #### Building Request Objects
 
-Request objects can initialized by passing in all the required values needed for the request as arguments or from a dictionary, using the object's `fromdict` function:
+Request objects can initialized by passing in all the required values needed for the request as arguments or from a dictionary, using the object's `fromdict` function. Any object can be created as per the [Private AI documentation][1].
 
 ```python
 # Passing arguments
@@ -208,9 +208,15 @@ Request objects also can be formatted as dictionaries, using the request object'
 from privateai_client import request_objects
 
 sample_text = "Sample text."
+sample_accuracy = "standard"
+
 # Create the nested request objects
 sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['HIPAA'])
-sample_entity_detection = request_objects.entity_detection_obj(entity_types=[sample_entity_type_selector])
+sample_entity_detection = request_objects.entity_detection_obj(
+    entity_types=[sample_entity_type_selector], 
+    accuracy=sample_accuracy
+)
+
 # Create the request object
 sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection)
 
@@ -224,7 +230,7 @@ Output:
 {
  'text': ['Sample text.'],
  'link_batch': False,
- 'entity_detection': {'accuracy': 'high', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True},
+ 'entity_detection': {'accuracy': 'standard', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True},
  'processed_text': {'type': 'MARKER', 'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'}
 }
 ```
