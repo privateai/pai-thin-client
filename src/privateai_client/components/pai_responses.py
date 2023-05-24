@@ -68,6 +68,31 @@ class VersionResponse(BaseResponse):
         return self.get_attribute_entries("app_version")
 
 
+class DiagnosticResponse(BaseResponse):
+
+    def __init__(self, response_object: Response=None):
+        super(DiagnosticResponse, self).__init__(response_object, True)
+
+    @property
+    def get_platform(self):
+        return self.get_attribute_entries('platform')
+
+    @property
+    def get_cpu_count(self):
+        return self.get_attribute_entries('cpu_count')
+
+    @property
+    def get_container_version(self):
+        return self.get_attribute_entries('container_version')
+
+    @property
+    def get_cpu_name(self):
+        return self.get_attribute_entries('cpu_name')
+
+    @property
+    def get_gpu_info(self):
+        return self.get_attribute_entries('gpu_info')
+
 class DemiTextResponse(BaseResponse):
     def __init__(self, response_object: Response = None):
         super(DemiTextResponse, self).__init__(response_object, True)

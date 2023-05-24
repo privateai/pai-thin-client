@@ -60,6 +60,12 @@ class PAIClient:
         Returns the version of the container application code
         """
         return VersionResponse(self.get.version)
+    
+    def get_diagnostics(self):
+        """
+        Returns diagnostic information about the Private-AI container host
+        """
+        return DiagnosticResponse(self.get.diagnostics())
 
     def process_text(self, request_object: Union[dict, ProcessTextRequest]):
         """
@@ -129,7 +135,7 @@ class PAIClient:
 
     def bleep(self, request_object: Union[dict, BleepRequest]):
         """
-        Used to deidentify files by uri
+        Used to deidentify audio files by uri
         """
         if type(request_object) is BleepRequest:
             response = BleepResponse(self.post.bleep(request_object.to_dict()))

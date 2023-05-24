@@ -103,6 +103,7 @@ Available requests:
 | ---------------------- | -------------------------- |
 | `get_version`          | `/`                        |
 | `get_metrics`          | `/metrics`                 |
+| `get_diagnostics`      | `/diagnostics`             |
 | `process_text`         | `/v3/process/text`         |
 | `process_files_uri`    | `/v3/process/files/uri`    |
 | `process_files_base64` | `/v3/process/files/base64` |
