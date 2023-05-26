@@ -1,7 +1,8 @@
 import pytest
 
 from ..components import *
-
+from ..objects import request_objects
+from ..pai_client import PAIClient
 
 # File Tests
 def test_file_initializer():
@@ -242,28 +243,28 @@ def test_entity_detection_to_dict():
 
 # Processed Text Tests
 def test_processed_text_default_initializer():
-    processed_text = ProcessedText()
+    processed_text = ProcessText()
     assert processed_text.type == "MARKER"
     assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
 
 def test_processed_text_initializer():
-    processed_text = ProcessedText(type="MASK", pattern= "*ALL_ENTITY_TYPES*")
+    processed_text = ProcessText(type="MASK", pattern= "*ALL_ENTITY_TYPES*")
     assert processed_text.type == "MASK"
     assert processed_text.pattern == "*ALL_ENTITY_TYPES*"
 
 def test_processed_text_initialize_fromdict():
-    processed_text = ProcessedText.fromdict({"type":"MARKER","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+    processed_text = ProcessText({"type":"MARKER","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]"})
     assert processed_text.type == "MARKER"
     assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
 
 def test_processed_text_invalid_initialize_fromdict():
     error_msg = "ProcessedText can only accept the values 'type' and 'pattern'"
     with pytest.raises(TypeError) as excinfo:
-        ProcessedText.fromdict({"type":"MARKER","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]", "junk":"value"})
+        ProcessText({"type":"MARKER","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]", "junk":"value"})
     assert error_msg in str(excinfo.value)
 
 def test_processed_text_setters():
-    processed_text = ProcessedText()
+    processed_text = ProcessText()
     processed_text.type = "MASK"
     processed_text.pattern = "*ALL_ENTITY_TYPES*"
     assert processed_text.type == "MASK"
@@ -272,17 +273,17 @@ def test_processed_text_setters():
 def test_processed_text_type_validator():
     error_msg = "junk is not valid. ProcessedText.type can only be one of the following: "
     with pytest.raises(ValueError) as excinfo:
-        ProcessedText.fromdict({"type":"junk","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+        ProcessText({"type":"junk","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]"})
     assert error_msg in str(excinfo.value)
 
 def test_processed_text_pattern_validator():
     error_msg = "junk is not valid. ProcessedText.pattern can only be one of the following: "
     with pytest.raises(ValueError) as excinfo:
-        ProcessedText.fromdict({"type":"MASK","pattern":"junk"})
+        ProcessText({"type":"MASK","pattern":"junk"})
     assert error_msg in str(excinfo.value)
 
 def test_processed_text_to_dict():
-    processed_text = ProcessedText(type="MASK", pattern= "*ALL_ENTITY_TYPES*").to_dict()
+    processed_text = ProcessText(type="MASK", pattern= "*ALL_ENTITY_TYPES*").to_dict()
     assert processed_text["type"] == "MASK"
     assert processed_text["pattern"] == "*ALL_ENTITY_TYPES*"
 
@@ -415,7 +416,7 @@ def test_process_text_request_default_initializer():
     assert process_text_request.text == ['hey']
     assert process_text_request.link_batch == False
     assert type(process_text_request.entity_detection) == EntityDetection
-    assert type(process_text_request.processed_text) == ProcessedText
+    assert type(process_text_request.processed_text) == ProcessedMarkerText
 
 def test_process_text_request_initializer():
     text = ['hey!']
@@ -423,7 +424,7 @@ def test_process_text_request_initializer():
     entity_type = EntityTypeSelector(type="ENABLE", value=['NAME'])
     filter = FilterSelector(type='ALLOW', pattern='hey')
     entity_detection = EntityDetection(accuracy='standard', entity_types=[entity_type], filter=[filter], return_entity=False)
-    processed_text = ProcessedText(type='MARKER', pattern='BEST_ENTITY_TYPE')
+    processed_text = ProcessText(type='MARKER', pattern='BEST_ENTITY_TYPE')
     
     process_text_request = ProcessTextRequest(text=text, link_batch=link_batch, entity_detection=entity_detection, processed_text=processed_text)
 
@@ -488,7 +489,7 @@ def test_process_text_request_to_dict():
     entity_type = EntityTypeSelector(type="ENABLE", value=['NAME'])
     filter = FilterSelector(type='ALLOW', pattern='hey')
     entity_detection = EntityDetection(accuracy='standard', entity_types=[entity_type], filter=[filter], return_entity=False)
-    processed_text = ProcessedText(type='MARKER', pattern='BEST_ENTITY_TYPE')
+    processed_text = ProcessText(type='MARKER', pattern='BEST_ENTITY_TYPE')
     
     process_text_request = ProcessTextRequest(text=text, link_batch=link_batch, entity_detection=entity_detection, processed_text=processed_text).to_dict()
     print(process_text_request)
@@ -646,3 +647,16 @@ def test_bleep_request_to_dict():
     assert bleep_request["file"]["data"] == 'test'
     assert bleep_request["timestamps"][0]["start"] == 0
     
+def test_synthetic_todelete():
+    scheme = "http"
+    host = "localhost"
+    port = "8080"
+
+    client = PAIClient(scheme=scheme, host=host, port=port)
+    processed_text = ProcessText(type = "SYNTHETIC")
+    text_request = request_objects.process_text_obj(text=["My sample name is John Smith"], processed_text=processed_text)
+    response = client.process_text(text_request)
+
+    print(text_request.text)
+    print(response.processed_text)
+    assert 1 == 1

@@ -1,5 +1,5 @@
 import inspect
-from typing import List
+from typing import List, Union
 
 
 class BaseRequestObject:
@@ -237,21 +237,7 @@ class PDFOptions(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError("PDFOptions can only accept 'density'")
-
-class ProcessedText(BaseRequestObject):
-    default_type = "MARKER"
-    default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
-    valid_types = ["MARKER", "MASK", "SYNTHETIC"]
-    valid_patterns = ["BEST_ENTITY_TYPE", "ALL_ENTITY_TYPES", "UNIQUE_NUMBERED_ENTITY_TYPE"]
-    
-    def __init__(self,
-                 type: str = default_type,
-                 pattern: str = default_pattern             
-    ):
-        if self._type_validator(type):
-            self._type = type
-        if self._pattern_validator(pattern):
-            self._pattern = pattern
+class ProcessedKText(BaseRequestObject):
     @property
     def type(self):
         return self._type
@@ -262,24 +248,12 @@ class ProcessedText(BaseRequestObject):
     
     @type.setter
     def type(self, var):
-        if self._type_validator(var):
-            self._type = var
+        self._type = var
     
     @pattern.setter
     def pattern(self, var):
         if self._pattern_validator(var):
             self._pattern = var
-
-    def _type_validator(self, var):
-
-        if var not in self.valid_types:
-            raise ValueError(f"{var} is not valid. ProcessedText.type can only be one of the following: {', '.join(self.valid_types)}")
-        return True
-
-    def _pattern_validator(self, var):
-        if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
-            raise ValueError(f"{var} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
-        return True
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -287,6 +261,57 @@ class ProcessedText(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError("ProcessedText can only accept the values 'type' and 'pattern'")
+        
+class ProcessedMarkerText(ProcessedKText):
+    default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    valid_patterns = ["BEST_ENTITY_TYPE", "ALL_ENTITY_TYPES", "UNIQUE_NUMBERED_ENTITY_TYPE"]
+    
+    def __init__(self,
+                 pattern: str = default_pattern             
+    ):
+        self._type = "MARKER"
+        if self._pattern_validator(pattern):
+            self._pattern = pattern
+
+    def _pattern_validator(self, var):
+        if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
+            raise ValueError(f"{var} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
+        return True
+
+class ProcessedMaskText(ProcessedKText):
+    def __init__(self):
+        self._type = "MARKER"
+
+class ProcessedSyntheticText(ProcessedKText):
+    def __init__(self):
+        self._type = "SYNTHETIC"
+
+def ProcessText(type: str = "MARKER", pattern: str = "[UNIQUE_NUMBERED_ENTITY_TYPE]", values: dict = None):
+    valid_types = ["MARKER", "MASK", "SYNTHETIC"]
+    valid_patterns = ["BEST_ENTITY_TYPE", "ALL_ENTITY_TYPES", "UNIQUE_NUMBERED_ENTITY_TYPE"]
+
+    if values != None:
+        if "type" in values.keys:
+            type = values["type"]
+        else:
+            raise ValueError("Type is not in the dictionary.")
+        if "pattern" in values.keys:
+            if values["pattern"] in valid_patterns:
+                type = values["pattern"]
+            else:
+                raise ValueError(f"{values['pattern']} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(valid_patterns)}")
+        else:
+            type = "[UNIQUE_NUMBERED_ENTITY_TYPE]"     
+
+    if type == "MARKER":
+        return ProcessedMarkerText(type, pattern)
+    elif type == "MASK":
+        return ProcessedMaskText(type, pattern)
+    elif type == "SYNTHETIC":
+        return ProcessedSyntheticText(type)
+    else:
+        raise ValueError(f"{type} is not valid. ProcessedText.type can only be one of the following: {', '.join(valid_types)}")
+
 
 class Timestamp(BaseRequestObject):
 
@@ -415,7 +440,7 @@ class ProcessTextRequest(BaseRequestObject):
                  text: List[str], 
                  link_batch: bool = default_link_batch,
                  entity_detection: EntityDetection = EntityDetection(),
-                 processed_text: ProcessedText = ProcessedText()
+                 processed_text: Union[ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticText] = ProcessText()
     ):
         self.text = text
         self.link_batch = link_batch
@@ -430,7 +455,7 @@ class ProcessTextRequest(BaseRequestObject):
                 if key == "entity_detection":
                     initializer_dict[key] = EntityDetection.fromdict(value)
                 elif key == "processed_text":
-                    initializer_dict[key] = ProcessedText.fromdict(value)
+                    initializer_dict[key] = ProcessText(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
