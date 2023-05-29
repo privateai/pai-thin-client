@@ -1,7 +1,7 @@
 from .components import request_objects as req_objects
 
-class request_objects:
 
+class request_objects:
     bleep_obj = req_objects.BleepRequest
     file_uri_obj = req_objects.ProcessFileUriRequest
     file_base64_obj = req_objects.ProcessFileBase64Request
@@ -14,4 +14,3 @@ class request_objects:
     pdf_options_obj = req_objects.PDFOptions
     processed_text_obj = req_objects.ProcessedMarkerText
     timestamp_obj = req_objects.Timestamp
-
