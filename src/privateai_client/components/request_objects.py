@@ -1,5 +1,5 @@
 import inspect
-from typing import List, Union
+from typing import List, Union, Dict
 
 
 class BaseRequestObject:
@@ -237,7 +237,23 @@ class PDFOptions(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError("PDFOptions can only accept 'density'")
-class ProcessedKText(BaseRequestObject):
+        
+class ProcessedMarkerText(BaseRequestObject):
+    default_pattern = "UNIQUE_NUMBERED_ENTITY_TYPE"
+    valid_patterns = ["BEST_ENTITY_TYPE", "ALL_ENTITY_TYPES", "UNIQUE_NUMBERED_ENTITY_TYPE"]
+    
+    def __init__(self,
+                 pattern: str = default_pattern             
+    ):
+        self._type = "MARKER"
+        if self._pattern_validator(pattern):
+            self._pattern = pattern
+
+    def _pattern_validator(self, var):
+        if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
+            raise ValueError(f"{var} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
+        return True
+    
     @property
     def type(self):
         return self._type
@@ -261,54 +277,54 @@ class ProcessedKText(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError("ProcessedText can only accept the values 'type' and 'pattern'")
-        
-class ProcessedMarkerText(ProcessedKText):
-    default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
-    valid_patterns = ["BEST_ENTITY_TYPE", "ALL_ENTITY_TYPES", "UNIQUE_NUMBERED_ENTITY_TYPE"]
-    
-    def __init__(self,
-                 pattern: str = default_pattern             
-    ):
-        self._type = "MARKER"
+
+class ProcessedMaskText(ProcessedMarkerText):
+    def __init__(self, pattern: str = "UNIQUE_NUMBERED_ENTITY_TYPE"):
+        self._type = "MASK"
         if self._pattern_validator(pattern):
             self._pattern = pattern
 
-    def _pattern_validator(self, var):
-        if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
-            raise ValueError(f"{var} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(self.valid_patterns)}")
-        return True
-
-class ProcessedMaskText(ProcessedKText):
-    def __init__(self):
-        self._type = "MARKER"
-
-class ProcessedSyntheticText(ProcessedKText):
+class ProcessedSyntheticText(ProcessedMarkerText):
     def __init__(self):
         self._type = "SYNTHETIC"
+        self._pattern = None
 
-def ProcessText(type: str = "MARKER", pattern: str = "[UNIQUE_NUMBERED_ENTITY_TYPE]", values: dict = None):
+    @property
+    def pattern(self):
+        return self._pattern   
+    
+    @pattern.setter
+    def pattern(self, var):
+        raise TypeError("Pattern cannot be set when type is Synthetic")
+
+def ProcessText(type: str = "MARKER", pattern: str = "UNIQUE_NUMBERED_ENTITY_TYPE", values: Dict = None):
     valid_types = ["MARKER", "MASK", "SYNTHETIC"]
     valid_patterns = ["BEST_ENTITY_TYPE", "ALL_ENTITY_TYPES", "UNIQUE_NUMBERED_ENTITY_TYPE"]
 
     if values != None:
-        if "type" in values.keys:
-            type = values["type"]
+        if "type" in values.keys():
+            if values["type"] in valid_types:
+                type = values["type"]
+            else:
+                raise ValueError(f"{values['type']} is not valid. ProcessedText.type can only be one of the following: {', '.join(valid_types)}")
         else:
             raise ValueError("Type is not in the dictionary.")
-        if "pattern" in values.keys:
+        if "pattern" in values.keys():
             if values["pattern"] in valid_patterns:
-                type = values["pattern"]
+                pattern = values["pattern"]
             else:
                 raise ValueError(f"{values['pattern']} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(valid_patterns)}")
         else:
-            type = "[UNIQUE_NUMBERED_ENTITY_TYPE]"     
+            type = "UNIQUE_NUMBERED_ENTITY_TYPE"
+        if len(values.keys()) > 2:
+            raise TypeError("ProcessedText can only accept the values 'type' and 'pattern'")  
 
     if type == "MARKER":
-        return ProcessedMarkerText(type, pattern)
+        return ProcessedMarkerText(pattern)
     elif type == "MASK":
-        return ProcessedMaskText(type, pattern)
+        return ProcessedMaskText(pattern)
     elif type == "SYNTHETIC":
-        return ProcessedSyntheticText(type)
+        return ProcessedSyntheticText()
     else:
         raise ValueError(f"{type} is not valid. ProcessedText.type can only be one of the following: {', '.join(valid_types)}")
 
@@ -455,7 +471,7 @@ class ProcessTextRequest(BaseRequestObject):
                 if key == "entity_detection":
                     initializer_dict[key] = EntityDetection.fromdict(value)
                 elif key == "processed_text":
-                    initializer_dict[key] = ProcessText(value)
+                    initializer_dict[key] = ProcessText(values=value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)

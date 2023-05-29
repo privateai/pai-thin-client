@@ -12,6 +12,6 @@ class request_objects:
     file_obj = req_objects.File
     filter_selector_obj = req_objects.FilterSelector
     pdf_options_obj = req_objects.PDFOptions
-    processed_text_obj = req_objects.ProcessedText
+    processed_text_obj = req_objects.ProcessedMarkerText
     timestamp_obj = req_objects.Timestamp
 

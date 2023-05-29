@@ -245,7 +245,7 @@ def test_entity_detection_to_dict():
 def test_processed_text_default_initializer():
     processed_text = ProcessText()
     assert processed_text.type == "MARKER"
-    assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    assert processed_text.pattern == "UNIQUE_NUMBERED_ENTITY_TYPE"
 
 def test_processed_text_initializer():
     processed_text = ProcessText(type="MASK", pattern= "*ALL_ENTITY_TYPES*")
@@ -253,14 +253,14 @@ def test_processed_text_initializer():
     assert processed_text.pattern == "*ALL_ENTITY_TYPES*"
 
 def test_processed_text_initialize_fromdict():
-    processed_text = ProcessText({"type":"MARKER","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+    processed_text = ProcessText(values = {"type":"MARKER","pattern":"UNIQUE_NUMBERED_ENTITY_TYPE"})
     assert processed_text.type == "MARKER"
-    assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    assert processed_text.pattern == "UNIQUE_NUMBERED_ENTITY_TYPE"
 
 def test_processed_text_invalid_initialize_fromdict():
     error_msg = "ProcessedText can only accept the values 'type' and 'pattern'"
     with pytest.raises(TypeError) as excinfo:
-        ProcessText({"type":"MARKER","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]", "junk":"value"})
+        ProcessText(values = {"type":"MARKER","pattern":"UNIQUE_NUMBERED_ENTITY_TYPE", "junk":"value"})
     assert error_msg in str(excinfo.value)
 
 def test_processed_text_setters():
@@ -273,13 +273,13 @@ def test_processed_text_setters():
 def test_processed_text_type_validator():
     error_msg = "junk is not valid. ProcessedText.type can only be one of the following: "
     with pytest.raises(ValueError) as excinfo:
-        ProcessText({"type":"junk","pattern":"[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+        ProcessText(values = {"type":"junk","pattern":"UNIQUE_NUMBERED_ENTITY_TYPE"})
     assert error_msg in str(excinfo.value)
 
 def test_processed_text_pattern_validator():
     error_msg = "junk is not valid. ProcessedText.pattern can only be one of the following: "
     with pytest.raises(ValueError) as excinfo:
-        ProcessText({"type":"MASK","pattern":"junk"})
+        ProcessText(values = {"type":"MASK","pattern":"junk"})
     assert error_msg in str(excinfo.value)
 
 def test_processed_text_to_dict():
@@ -647,16 +647,17 @@ def test_bleep_request_to_dict():
     assert bleep_request["file"]["data"] == 'test'
     assert bleep_request["timestamps"][0]["start"] == 0
     
-def test_synthetic_todelete():
-    scheme = "http"
-    host = "localhost"
-    port = "8080"
-
-    client = PAIClient(scheme=scheme, host=host, port=port)
+def test_synthetic():
     processed_text = ProcessText(type = "SYNTHETIC")
     text_request = request_objects.process_text_obj(text=["My sample name is John Smith"], processed_text=processed_text)
-    response = client.process_text(text_request)
+    assert text_request.processed_text.type == "SYNTHETIC"
+    assert text_request.processed_text.pattern == None
 
-    print(text_request.text)
-    print(response.processed_text)
-    assert 1 == 1
+def test_synthetic_invalid_pattern():
+    error_msg = "Pattern cannot be set when type is Synthetic"
+    processed_text = ProcessText(type = "SYNTHETIC")
+    text_request = request_objects.process_text_obj(text=["My sample name is John Smith"], processed_text=processed_text)
+    with pytest.raises(TypeError) as excinfo:
+        text_request.processed_text.pattern = "UNIQUE_NUMBERED_ENTITY_TYPE"
+    assert error_msg == str(excinfo.value)
+    assert text_request.processed_text.pattern == None
