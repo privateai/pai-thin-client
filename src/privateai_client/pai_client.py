@@ -75,6 +75,22 @@ class PAIClient:
             )
         return response
 
+    def reidentify_text(self, request_object: Union[dict, ReidentifyTextRequest]):
+        """
+        Used to reidentify text
+        """
+        if type(request_object) is ReidentifyTextRequest:
+            response = ReidentifyTextResponse(
+                self.post.reidentify_text(request_object.to_dict())
+            )
+        elif type(request_object) is dict:
+            response = ReidentifyTextRequest(self.post.process_text(request_object))
+        else:
+            raise ValueError(
+                "request_object can only be a dictionary or a ReidentifyTextRequest object"
+            )
+        return response
+
     def process_files_uri(self, request_object: Union[dict, ProcessFileUriRequest]):
         """
         Used to deidentify files by uri

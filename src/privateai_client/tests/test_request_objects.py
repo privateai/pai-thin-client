@@ -114,6 +114,50 @@ def test_filter_to_dict():
     assert filter_dict["pattern"] == test_pattern
 
 
+# Entity Tests
+def test_entity_initializer():
+    entity = Entity(processed_text="NAME_1", text="this is a test")
+    assert entity.processed_text == "NAME_1"
+    assert entity.text == "this is a test"
+
+
+def test_entity_initializer_fromdict():
+    entity = Entity.fromdict({"processed_text": "NAME_1", "text": "this is a test"})
+    assert entity.processed_text == "NAME_1"
+    assert entity.text == "this is a test"
+
+
+def test_entity_invalid_initialize_fromdict():
+    error_msg = "Entity can only accept the values 'processed_text' and 'text'"
+    with pytest.raises(TypeError) as excinfo:
+        Entity.fromdict(
+            {"processed_text": "NAME_1", "text": "this is a test", "garbage": "value"}
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_entity_processed_text_validator():
+    error_msg = "Entity.processed_text must be of type string"
+    with pytest.raises(TypeError) as excinfo:
+        Entity(processed_text=12, text="ayy")
+    assert error_msg in str(excinfo.value)
+
+
+def test_entity_text_validator():
+    error_msg = "Entity.text must be of type string"
+    with pytest.raises(TypeError) as excinfo:
+        entity = Entity(processed_text="ORGANIZATION_60", text=45.2)
+    assert error_msg in str(excinfo.value)
+
+
+def test_entity_setters():
+    entity = Entity(processed_text="NAME_1", text="Jerry Stevens")
+    entity.processed_text = "CONDITION_20"
+    entity.text = "Broken leg"
+    assert entity.processed_text == "CONDITION_20"
+    assert entity.text == "Broken leg"
+
+
 # Entity Type Selector Tests
 def test_entity_type_selector_initializer():
     test_type = "DISABLE"
@@ -927,3 +971,61 @@ def test_bleep_request_to_dict():
     bleep_request = BleepRequest(file=file, timestamps=timestamps).to_dict()
     assert bleep_request["file"]["data"] == "test"
     assert bleep_request["timestamps"][0]["start"] == 0
+
+
+# Reidentify Text Request Tests
+def test_reidentify_text_request_initializer():
+    processed_text = ["this is a test"]
+    entities = [Entity(processed_text="NAME", text="Hola")]
+    model = "gpt-700.2-ultra-turbo"
+    reid = ReidentifyTextRequest(
+        processed_text=processed_text, entities=entities, model=model
+    )
+    assert reid.processed_text == ["this is a test"]
+    assert reid.entities[0].text == "Hola"
+    assert reid.model == "gpt-700.2-ultra-turbo"
+
+
+def test_reidentify_text_request_initialize_fromdict():
+    processed_text = ["this is a test"]
+    entities = [Entity(processed_text="NAME", text="Hola")]
+    model = "gpt-700.2-ultra-turbo"
+    reid = ReidentifyTextRequest.fromdict(
+        {
+            "processed_text": processed_text,
+            "entities": [row.to_dict() for row in entities],
+            "model": model,
+        }
+    )
+    assert reid.processed_text == ["this is a test"]
+    assert reid.entities[0].text == "Hola"
+    assert reid.model == "gpt-700.2-ultra-turbo"
+
+
+def test_reidentify_text_request_invalid_initialize_fromdict():
+    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities' and 'model"
+    processed_text = ["this is a test"]
+    entities = [Entity(processed_text="NAME", text="Hola")]
+    model = "gpt-700.2-ultra-turbo"
+    with pytest.raises(TypeError) as excinfo:
+        ReidentifyTextRequest.fromdict(
+            {
+                "processed_text": processed_text,
+                "entities": [row.to_dict() for row in entities],
+                "model": model,
+                "junk": "value",
+            }
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_reidentify_text_request_to_dict():
+    processed_text = ["this is a test"]
+    entities = [Entity(processed_text="NAME", text="Hola")]
+    model = "gpt-700.2-ultra-turbo"
+    reid = ReidentifyTextRequest(
+        processed_text=processed_text, entities=entities, model=model
+    ).to_dict()
+    assert reid["processed_text"][0] == "this is a test"
+    assert reid["entities"][0]["text"] == "Hola"
+    assert reid["model"] == "gpt-700.2-ultra-turbo"

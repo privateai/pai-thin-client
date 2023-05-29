@@ -67,3 +67,8 @@ class PAIPostRequests(PAIRequests):
 
     def bleep(self, request_object):
         return self.make_request(self.request_type, self.uris.bleep, request_object)
+
+    def reidentify_text(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.reidentify_text, request_object
+        )

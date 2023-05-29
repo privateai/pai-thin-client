@@ -40,6 +40,12 @@ class PAIURIs:
         )
 
     @property
+    def reidentify_text(self):
+        return self._create_uri(
+            self.pai_uri, self.api_version, "process", "text", "reidentify"
+        )
+
+    @property
     def process_files_base64(self):
         return self._create_uri(
             self.pai_uri, self.api_version, "process", "files", "base64"
