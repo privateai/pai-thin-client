@@ -1,6 +1,8 @@
 import pytest
 
 from ..components import *
+from ..objects import request_objects
+
 
 
 # File Tests
@@ -313,9 +315,9 @@ def test_processed_text_default_initializer():
 
 
 def test_processed_text_initializer():
-    processed_text = ProcessedText(type="MASK", pattern="*ALL_ENTITY_TYPES*")
+    processed_text = ProcessedText(type="MASK", mask_character="*")
     assert processed_text.type == "MASK"
-    assert processed_text.pattern == "*ALL_ENTITY_TYPES*"
+    assert processed_text.mask_character == "*"
 
 
 def test_processed_text_initialize_fromdict():
@@ -363,14 +365,14 @@ def test_processed_text_pattern_validator():
         "junk is not valid. ProcessedText.pattern can only be one of the following: "
     )
     with pytest.raises(ValueError) as excinfo:
-        ProcessedText.fromdict({"type": "MASK", "pattern": "junk"})
+        ProcessedText.fromdict({"type": "MARKER", "pattern": "junk"})
     assert error_msg in str(excinfo.value)
 
 
 def test_processed_text_to_dict():
-    processed_text = ProcessedText(type="MASK", pattern="*ALL_ENTITY_TYPES*").to_dict()
+    processed_text = ProcessedText(type="MASK", mask_character="*").to_dict()
     assert processed_text["type"] == "MASK"
-    assert processed_text["pattern"] == "*ALL_ENTITY_TYPES*"
+    assert processed_text["mask_character"] == "*"
 
 
 # PDF Options Tests
@@ -927,3 +929,11 @@ def test_bleep_request_to_dict():
     bleep_request = BleepRequest(file=file, timestamps=timestamps).to_dict()
     assert bleep_request["file"]["data"] == "test"
     assert bleep_request["timestamps"][0]["start"] == 0
+
+def test_synthetic_text():
+    processed_text = ProcessedText(type="SYNTHETIC", synthetic_entity_accuracy="standard", preserve_relationships=True)
+    text_request = request_objects.process_text_obj(
+        text=["My sample name is John Smith"], processed_text=processed_text
+    )
+    assert text_request.processed_text.type == "SYNTHETIC"
+    assert hasattr(text_request.processed_text,"pattern") == False
