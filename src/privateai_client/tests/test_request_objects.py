@@ -4,7 +4,6 @@ from ..components import *
 from ..objects import request_objects
 
 
-
 # File Tests
 def test_file_initializer():
     file = File(data="test", content_type="application/pdf")
@@ -930,10 +929,15 @@ def test_bleep_request_to_dict():
     assert bleep_request["file"]["data"] == "test"
     assert bleep_request["timestamps"][0]["start"] == 0
 
+
 def test_synthetic_text():
-    processed_text = ProcessedText(type="SYNTHETIC", synthetic_entity_accuracy="standard", preserve_relationships=True)
+    processed_text = ProcessedText(
+        type="SYNTHETIC",
+        synthetic_entity_accuracy="standard",
+        preserve_relationships=True,
+    )
     text_request = request_objects.process_text_obj(
         text=["My sample name is John Smith"], processed_text=processed_text
     )
     assert text_request.processed_text.type == "SYNTHETIC"
-    assert hasattr(text_request.processed_text,"pattern") == False
+    assert hasattr(text_request.processed_text, "pattern") == False

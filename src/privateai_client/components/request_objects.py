@@ -281,6 +281,7 @@ class ProcessedMarkerText(BaseRequestObject):
             )
         return True
 
+
 class ProcessedMaskText(BaseRequestObject):
     def __init__(self, mask_character: str = "#"):
         self._mask_character = mask_character
@@ -295,14 +296,17 @@ class ProcessedMaskText(BaseRequestObject):
         self._mask_character = var
 
 
-    
 class ProcessedSyntheticText(BaseRequestObject):
-    def __init__(self, synthetic_entity_accuracy: str = "standard", preserve_relationships: bool = True):
+    def __init__(
+        self,
+        synthetic_entity_accuracy: str = "standard",
+        preserve_relationships: bool = True,
+    ):
         self._type = "SYNTHETIC"
         self._synthetic_entity_accuracy = synthetic_entity_accuracy
         self._preserve_relationships = preserve_relationships
         self._preserve_relationships = True
-        
+
     @property
     def synthetic_entity_accuracy(self):
         return self._synthetic_entity_accuracy
@@ -310,7 +314,7 @@ class ProcessedSyntheticText(BaseRequestObject):
     @synthetic_entity_accuracy.setter
     def pattern(self, var):
         self._synthetic_entity_accuracy = var
-    
+
     @property
     def preserve_relationships(self):
         return self._mask_character
@@ -344,14 +348,15 @@ class ProcessedText(ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticTe
             raise TypeError(
                 "ProcessedText can only accept the values 'type' and 'pattern'"
             )
+
     @property
     def type(self):
         return self._type
-    
+
     @type.setter
     def type(self, var):
         if var in self.valid_types:
-            if(var != self._type):
+            if var != self._type:
                 self.__init__(var)
 
 
