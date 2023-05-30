@@ -253,6 +253,7 @@ class PDFOptions(BaseRequestObject):
 
 
 class ProcessedMarkerText(BaseRequestObject):
+    attributes = ["_pattern"]
     default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
     valid_patterns = [
         "BEST_ENTITY_TYPE",
@@ -261,6 +262,8 @@ class ProcessedMarkerText(BaseRequestObject):
     ]
 
     def __init__(self, pattern: str = default_pattern):
+        for attribute in ProcessedMaskText.attributes + ProcessedMaskText.attributes:
+            delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "MARKER"
         if self._pattern_validator(pattern):
             self._pattern = pattern
@@ -283,7 +286,13 @@ class ProcessedMarkerText(BaseRequestObject):
 
 
 class ProcessedMaskText(BaseRequestObject):
+    attributes = ["_mask_character"]
+
     def __init__(self, mask_character: str = "#"):
+        for attribute in (
+            ProcessedMarkerText.attributes + ProcessedSyntheticText.attributes
+        ):
+            delattr(self, attribute) if hasattr(self, attribute) else False
         self._mask_character = mask_character
         self._type = "MASK"
 
@@ -297,11 +306,15 @@ class ProcessedMaskText(BaseRequestObject):
 
 
 class ProcessedSyntheticText(BaseRequestObject):
+    attributes = ["_synthetic_entity_accuracy", "_preserve_relationships"]
+
     def __init__(
         self,
         synthetic_entity_accuracy: str = "standard",
         preserve_relationships: bool = True,
     ):
+        for attribute in ProcessedMarkerText.attributes + ProcessedMaskText.attributes:
+            delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "SYNTHETIC"
         self._synthetic_entity_accuracy = synthetic_entity_accuracy
         self._preserve_relationships = preserve_relationships
@@ -355,9 +368,8 @@ class ProcessedText(ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticTe
 
     @type.setter
     def type(self, var):
-        if var in self.valid_types:
-            if var != self._type:
-                self.__init__(var)
+        if var in self.valid_types and var != self._type:
+            self.__init__(var)
 
 
 class Timestamp(BaseRequestObject):

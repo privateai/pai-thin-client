@@ -941,3 +941,13 @@ def test_synthetic_text():
     )
     assert text_request.processed_text.type == "SYNTHETIC"
     assert hasattr(text_request.processed_text, "pattern") == False
+
+
+def test_change_type():
+    processed_text = ProcessedText(
+        type="MARKER", pattern="UNIQUE_NUMBERED_ENTITY_TYPE"
+    )  # Marker
+    processed_text.type = "MASK"
+    assert processed_text.type == "MASK"
+    assert hasattr(processed_text, "pattern") == False
+    assert processed_text.mask_character == "#"
