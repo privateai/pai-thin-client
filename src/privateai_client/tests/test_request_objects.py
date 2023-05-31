@@ -1,7 +1,6 @@
 import pytest
 
 from ..components import *
-from ..objects import request_objects
 
 
 # File Tests
@@ -936,11 +935,8 @@ def test_synthetic_text():
         synthetic_entity_accuracy="standard",
         preserve_relationships=True,
     )
-    text_request = request_objects.process_text_obj(
-        text=["My sample name is John Smith"], processed_text=processed_text
-    )
-    assert text_request.processed_text.type == "SYNTHETIC"
-    assert hasattr(text_request.processed_text, "pattern") == False
+    assert processed_text.type == "SYNTHETIC"
+    assert hasattr(processed_text, "pattern") == False
 
 
 def test_change_type():
@@ -951,3 +947,42 @@ def test_change_type():
     assert processed_text.type == "MASK"
     assert hasattr(processed_text, "pattern") == False
     assert processed_text.mask_character == "#"
+
+
+def test_mask_invalid_mask_character_initialize():
+    error_msg = "mask_character must have only one character."
+    with pytest.raises(ValueError) as excinfo:
+        processed_text = ProcessedText(type="MASK", mask_character="invalid")
+    assert error_msg in str(excinfo.value)
+
+
+def test_mask_invalid_mask_character():
+    error_msg = "mask_character must have only one character."
+    processed_text = ProcessedText()
+    processed_text.type = "MASK"
+    assert processed_text.type == "MASK"
+    with pytest.raises(ValueError) as excinfo:
+        processed_text.mask_character = "invalid"
+    assert error_msg in str(excinfo.value)
+
+
+def test_synthetic_invalid_accuracy_initialize():
+    error_msg = "Synthetic Entity Accuracy can only accept values"
+    with pytest.raises(ValueError) as excinfo:
+        processed_text = ProcessedText(
+            type="SYNTHETIC",
+            synthetic_entity_accuracy="invalid",
+            preserve_relationships=True,
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_synthetic_invalid_accuracy():
+    error_msg = "Synthetic Entity Accuracy can only accept values"
+    processed_text = ProcessedText(
+        type="SYNTHETIC",
+        preserve_relationships=True,
+    )
+    with pytest.raises(ValueError) as excinfo:
+        processed_text.synthetic_entity_accuracy = "invalid"
+    assert error_msg in str(excinfo.value)

@@ -262,7 +262,9 @@ class ProcessedMarkerText(BaseRequestObject):
     ]
 
     def __init__(self, pattern: str = default_pattern):
-        for attribute in ProcessedMaskText.attributes + ProcessedSyntheticText.attributes:
+        for attribute in (
+            ProcessedMaskText.attributes + ProcessedSyntheticText.attributes
+        ):
             delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "MARKER"
         if self._pattern_validator(pattern):
@@ -293,7 +295,8 @@ class ProcessedMaskText(BaseRequestObject):
             ProcessedMarkerText.attributes + ProcessedSyntheticText.attributes
         ):
             delattr(self, attribute) if hasattr(self, attribute) else False
-        self._mask_character = mask_character
+        if self._mask_character_validator(mask_character):
+            self._mask_character = mask_character
         self._type = "MASK"
 
     @property
@@ -301,12 +304,21 @@ class ProcessedMaskText(BaseRequestObject):
         return self._mask_character
 
     @mask_character.setter
-    def pattern(self, var):
-        self._mask_character = var
+    def mask_character(self, var):
+        if self._mask_character_validator(var):
+            self._mask_character = var
+
+    def _mask_character_validator(self, var):
+        if len(var) != 1:
+            raise ValueError(
+                f"mask_character must have only one character. {var} has {len(var)} characters."
+            )
+        return True
 
 
 class ProcessedSyntheticText(BaseRequestObject):
     attributes = ["_synthetic_entity_accuracy", "_preserve_relationships"]
+    valid_synthetic_accuracy_values = ["standard", "standard_multilingual"]
 
     def __init__(
         self,
@@ -316,7 +328,8 @@ class ProcessedSyntheticText(BaseRequestObject):
         for attribute in ProcessedMarkerText.attributes + ProcessedMaskText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "SYNTHETIC"
-        self._synthetic_entity_accuracy = synthetic_entity_accuracy
+        if self._synthetic_entity_accuracy_validator(synthetic_entity_accuracy):
+            self._synthetic_entity_accuracy = synthetic_entity_accuracy
         self._preserve_relationships = preserve_relationships
         self._preserve_relationships = True
 
@@ -325,16 +338,23 @@ class ProcessedSyntheticText(BaseRequestObject):
         return self._synthetic_entity_accuracy
 
     @synthetic_entity_accuracy.setter
-    def pattern(self, var):
-        self._synthetic_entity_accuracy = var
+    def synthetic_entity_accuracy(self, var):
+        if self._synthetic_entity_accuracy_validator(var):
+            self._synthetic_entity_accuracy = var
 
     @property
     def preserve_relationships(self):
-        return self._mask_character
+        return self._preserve_relationships
 
     @preserve_relationships.setter
     def preserve_relationships(self, var):
         self._preserve_relationships = var
+
+    def _synthetic_entity_accuracy_validator(self, var):
+        if var not in self.valid_synthetic_accuracy_values:
+            raise ValueError(
+                f"{var} is not valid. Synthetic Entity Accuracy can only accept values {', '.join(self.valid_synthetic_accuracy_values)}"
+            )
 
 
 class ProcessedText(ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticText):
