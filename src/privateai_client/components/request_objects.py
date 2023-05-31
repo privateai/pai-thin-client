@@ -262,7 +262,7 @@ class ProcessedMarkerText(BaseRequestObject):
     ]
 
     def __init__(self, pattern: str = default_pattern):
-        for attribute in ProcessedMaskText.attributes + ProcessedMaskText.attributes:
+        for attribute in ProcessedMaskText.attributes + ProcessedSyntheticText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "MARKER"
         if self._pattern_validator(pattern):
