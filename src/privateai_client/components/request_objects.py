@@ -252,46 +252,32 @@ class PDFOptions(BaseRequestObject):
             raise TypeError("PDFOptions can only accept 'density'")
 
 
-class ProcessedText(BaseRequestObject):
-    default_type = "MARKER"
+class ProcessedMarkerText(BaseRequestObject):
+    attributes = ["_pattern"]
     default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
-    valid_types = ["MARKER", "MASK", "SYNTHETIC"]
     valid_patterns = [
         "BEST_ENTITY_TYPE",
         "ALL_ENTITY_TYPES",
         "UNIQUE_NUMBERED_ENTITY_TYPE",
     ]
 
-    def __init__(self, type: str = default_type, pattern: str = default_pattern):
-        if self._type_validator(type):
-            self._type = type
+    def __init__(self, pattern: str = default_pattern):
+        for attribute in (
+            ProcessedMaskText.attributes + ProcessedSyntheticText.attributes
+        ):
+            delattr(self, attribute) if hasattr(self, attribute) else False
+        self._type = "MARKER"
         if self._pattern_validator(pattern):
             self._pattern = pattern
-
-    @property
-    def type(self):
-        return self._type
 
     @property
     def pattern(self):
         return self._pattern
 
-    @type.setter
-    def type(self, var):
-        if self._type_validator(var):
-            self._type = var
-
     @pattern.setter
     def pattern(self, var):
         if self._pattern_validator(var):
             self._pattern = var
-
-    def _type_validator(self, var):
-        if var not in self.valid_types:
-            raise ValueError(
-                f"{var} is not valid. ProcessedText.type can only be one of the following: {', '.join(self.valid_types)}"
-            )
-        return True
 
     def _pattern_validator(self, var):
         if var not in self.valid_patterns and var[1:-1] not in self.valid_patterns:
@@ -299,6 +285,93 @@ class ProcessedText(BaseRequestObject):
                 f"{var} is not valid. ProcessedText.pattern can only be one of the following: {', '.join(self.valid_patterns)}"
             )
         return True
+
+
+class ProcessedMaskText(BaseRequestObject):
+    attributes = ["_mask_character"]
+
+    def __init__(self, mask_character: str = "#"):
+        for attribute in (
+            ProcessedMarkerText.attributes + ProcessedSyntheticText.attributes
+        ):
+            delattr(self, attribute) if hasattr(self, attribute) else False
+        if self._mask_character_validator(mask_character):
+            self._mask_character = mask_character
+        self._type = "MASK"
+
+    @property
+    def mask_character(self):
+        return self._mask_character
+
+    @mask_character.setter
+    def mask_character(self, var):
+        if self._mask_character_validator(var):
+            self._mask_character = var
+
+    def _mask_character_validator(self, var):
+        if len(var) != 1:
+            raise ValueError(
+                f"mask_character must have only one character. {var} has {len(var)} characters."
+            )
+        return True
+
+
+class ProcessedSyntheticText(BaseRequestObject):
+    attributes = ["_synthetic_entity_accuracy", "_preserve_relationships"]
+    valid_synthetic_accuracy_values = ["standard", "standard_multilingual"]
+
+    def __init__(
+        self,
+        synthetic_entity_accuracy: str = "standard",
+        preserve_relationships: bool = True,
+    ):
+        for attribute in ProcessedMarkerText.attributes + ProcessedMaskText.attributes:
+            delattr(self, attribute) if hasattr(self, attribute) else False
+        self._type = "SYNTHETIC"
+        if self._synthetic_entity_accuracy_validator(synthetic_entity_accuracy):
+            self._synthetic_entity_accuracy = synthetic_entity_accuracy
+        self._preserve_relationships = preserve_relationships
+        self._preserve_relationships = True
+
+    @property
+    def synthetic_entity_accuracy(self):
+        return self._synthetic_entity_accuracy
+
+    @synthetic_entity_accuracy.setter
+    def synthetic_entity_accuracy(self, var):
+        if self._synthetic_entity_accuracy_validator(var):
+            self._synthetic_entity_accuracy = var
+
+    @property
+    def preserve_relationships(self):
+        return self._preserve_relationships
+
+    @preserve_relationships.setter
+    def preserve_relationships(self, var):
+        self._preserve_relationships = var
+
+    def _synthetic_entity_accuracy_validator(self, var):
+        if var not in self.valid_synthetic_accuracy_values:
+            raise ValueError(
+                f"{var} is not valid. Synthetic Entity Accuracy can only accept values {', '.join(self.valid_synthetic_accuracy_values)}"
+            )
+
+
+class ProcessedText(ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticText):
+    default_type = "MARKER"
+    valid_types = ["MARKER", "MASK", "SYNTHETIC"]
+
+    def __init__(self, type: str = default_type, **kwargs):
+        if type == "MARKER":
+            ProcessedMarkerText.__init__(self, **kwargs)
+        elif type == "MASK":
+            ProcessedMaskText.__init__(self, **kwargs)
+        elif type == "SYNTHETIC":
+            ProcessedSyntheticText.__init__(self, **kwargs)
+        else:
+            raise ValueError(
+                f"{type} is not valid. ProcessedText.type can only be one of the following: {', '.join(self.valid_types)}"
+            )
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -308,6 +381,15 @@ class ProcessedText(BaseRequestObject):
             raise TypeError(
                 "ProcessedText can only accept the values 'type' and 'pattern'"
             )
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, var):
+        if var in self.valid_types and var != self._type:
+            self.__init__(var)
 
 
 class Timestamp(BaseRequestObject):
