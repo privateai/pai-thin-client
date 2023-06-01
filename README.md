@@ -394,6 +394,7 @@ func = client.process_text
 data_frame['text'] = [(lambda x: func(obj(text=[x])).processed_text[0])(row) for row in data_frame['text']]
 ```
 
+Reidentifying Text
 ```python
 from privateai_client import PAIClient
 from privateai_client import request_objects
