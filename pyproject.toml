@@ -21,3 +21,4 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/privateai/pai-thin-client/"
 "Bug Tracker" = "https://github.com/privateai/pai-thin-client/issues"
+

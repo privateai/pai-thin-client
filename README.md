@@ -213,7 +213,7 @@ sample_accuracy = "standard"
 # Create the nested request objects
 sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['HIPAA'])
 sample_entity_detection = request_objects.entity_detection_obj(
-    entity_types=[sample_entity_type_selector], 
+    entity_types=[sample_entity_type_selector],
     accuracy=sample_accuracy
 )
 
@@ -392,6 +392,30 @@ data_frame = pd.DataFrame(
 obj = request_objects.process_text_obj
 func = client.process_text
 data_frame['text'] = [(lambda x: func(obj(text=[x])).processed_text[0])(row) for row in data_frame['text']]
+```
+
+```
+# Reidentifying Text
+from privateai_client import PAIClient
+from privateai_client import request_objects
+
+client = PAIClient("http", "localhost", "8080")
+
+# Deidentify the text
+initial_text = 'My name is John. I work for Private AI'
+request_obj = request_objects.process_text_obj(text=[initial_text])
+response_obj = client.process_text(request_obj)
+
+# Store the response data
+deidentified_text = response_obj.processed_text
+print(deidentified_text)
+entity_list = [request_objects.entity(row['processed_text'], row['text']) for row in response_obj.entities]
+print([row.to_dict() for row in entity_list])
+
+# # Call the reidentify Route
+request_obj = request_objects.reidentify_text_obj(processed_text=[deidentified_text], entities=entity_list)
+response_obj = client.reidentify_text(request_obj)
+print(response_obj.body)
 ```
 
 [1]: https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
