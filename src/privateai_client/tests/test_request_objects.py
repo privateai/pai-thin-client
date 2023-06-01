@@ -357,9 +357,9 @@ def test_processed_text_default_initializer():
 
 
 def test_processed_text_initializer():
-    processed_text = ProcessedText(type="MASK", pattern="*ALL_ENTITY_TYPES*")
+    processed_text = ProcessedText(type="MASK", mask_character="*")
     assert processed_text.type == "MASK"
-    assert processed_text.pattern == "*ALL_ENTITY_TYPES*"
+    assert processed_text.mask_character == "*"
 
 
 def test_processed_text_initialize_fromdict():
@@ -407,14 +407,14 @@ def test_processed_text_pattern_validator():
         "junk is not valid. ProcessedText.pattern can only be one of the following: "
     )
     with pytest.raises(ValueError) as excinfo:
-        ProcessedText.fromdict({"type": "MASK", "pattern": "junk"})
+        ProcessedText.fromdict({"type": "MARKER", "pattern": "junk"})
     assert error_msg in str(excinfo.value)
 
 
 def test_processed_text_to_dict():
-    processed_text = ProcessedText(type="MASK", pattern="*ALL_ENTITY_TYPES*").to_dict()
+    processed_text = ProcessedText(type="MASK", mask_character="*").to_dict()
     assert processed_text["type"] == "MASK"
-    assert processed_text["pattern"] == "*ALL_ENTITY_TYPES*"
+    assert processed_text["mask_character"] == "*"
 
 
 # PDF Options Tests
@@ -1016,7 +1016,7 @@ def test_reidentify_text_request_invalid_initialize_fromdict():
                 "junk": "value",
             }
         )
-    assert error_msg in str(excinfo.value)
+        assert error_msg in str(excinfo.value)
 
 
 def test_reidentify_text_request_to_dict():
@@ -1029,3 +1029,62 @@ def test_reidentify_text_request_to_dict():
     assert reid["processed_text"][0] == "this is a test"
     assert reid["entities"][0]["text"] == "Hola"
     assert reid["model"] == "gpt-700.2-ultra-turbo"
+
+
+def test_synthetic_text():
+    processed_text = ProcessedText(
+        type="SYNTHETIC",
+        synthetic_entity_accuracy="standard",
+        preserve_relationships=True,
+    )
+    assert processed_text.type == "SYNTHETIC"
+    assert hasattr(processed_text, "pattern") == False
+
+
+def test_change_type():
+    processed_text = ProcessedText(
+        type="MARKER", pattern="UNIQUE_NUMBERED_ENTITY_TYPE"
+    )  # Marker
+    processed_text.type = "MASK"
+    assert processed_text.type == "MASK"
+    assert hasattr(processed_text, "pattern") == False
+    assert processed_text.mask_character == "#"
+
+
+def test_mask_invalid_mask_character_initialize():
+    error_msg = "mask_character must have only one character."
+    with pytest.raises(ValueError) as excinfo:
+        processed_text = ProcessedText(type="MASK", mask_character="invalid")
+    assert error_msg in str(excinfo.value)
+
+
+def test_mask_invalid_mask_character():
+    error_msg = "mask_character must have only one character."
+    processed_text = ProcessedText()
+    processed_text.type = "MASK"
+    assert processed_text.type == "MASK"
+    with pytest.raises(ValueError) as excinfo:
+        processed_text.mask_character = "invalid"
+    assert error_msg in str(excinfo.value)
+
+
+def test_synthetic_invalid_accuracy_initialize():
+    error_msg = "Synthetic Entity Accuracy can only accept values"
+    with pytest.raises(ValueError) as excinfo:
+        processed_text = ProcessedText(
+            type="SYNTHETIC",
+            synthetic_entity_accuracy="invalid",
+            preserve_relationships=True,
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_synthetic_invalid_accuracy():
+    error_msg = "Synthetic Entity Accuracy can only accept values"
+    processed_text = ProcessedText(
+        type="SYNTHETIC",
+        preserve_relationships=True,
+    )
+    with pytest.raises(ValueError) as excinfo:
+        processed_text.synthetic_entity_accuracy = "invalid"
+    assert error_msg in str(excinfo.value)
