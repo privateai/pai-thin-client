@@ -80,6 +80,53 @@ class AudioOptions(BaseRequestObject):
             )
 
 
+class Entity(BaseRequestObject):
+    def __init__(self, processed_text: str, text: str):
+        if self._processed_text_validator(processed_text):
+            self._processed_text = processed_text
+        if self._text_validator(text):
+            self._text = text
+
+    @property
+    def processed_text(self):
+        return self._processed_text
+
+    @property
+    def text(self):
+        return self._text
+
+    @processed_text.setter
+    def processed_text(self, var):
+        if self._processed_text_validator(var):
+            self._processed_text = var
+
+    @text.setter
+    def text(self, var):
+        if self._text_validator(var):
+            self._text = var
+
+    def _processed_text_validator(self, var):
+        if type(var) is not str:
+            raise TypeError(
+                f"{var} is not valid. Entity.processed_text must be of type string"
+            )
+        return True
+
+    def _text_validator(self, var):
+        if type(var) is not str:
+            raise TypeError(f"{var} is not valid. Entity.text must be of type string")
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError(
+                "Entity can only accept the values 'processed_text' and 'text'"
+            )
+
+
 class EntityTypeSelector(BaseRequestObject):
     valid_types = ["DISABLE", "ENABLE"]
 
@@ -663,4 +710,33 @@ class BleepRequest(BaseRequestObject):
         except TypeError:
             raise TypeError(
                 "BleepRequest can only accept the values 'file'and 'timestamps'"
+            )
+
+
+class ReidentifyTextRequest(BaseRequestObject):
+    def __init__(
+        self,
+        processed_text: List[str] = [],
+        entities: List[Entity] = [],
+        model: str = "",
+    ):
+        self.processed_text = processed_text
+        self.entities = entities
+        self.model = model
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entities":
+                    initializer_dict[key] = [
+                        Entity.fromdict(entity) for entity in values[key]
+                    ]
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities' and 'model"
             )

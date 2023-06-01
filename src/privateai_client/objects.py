@@ -7,10 +7,12 @@ class request_objects:
     file_base64_obj = req_objects.ProcessFileBase64Request
     process_text_obj = req_objects.ProcessTextRequest
     audio_options_obj = req_objects.AudioOptions
+    entity = req_objects.Entity
     entity_type_selector_obj = req_objects.EntityTypeSelector
     entity_detection_obj = req_objects.EntityDetection
     file_obj = req_objects.File
     filter_selector_obj = req_objects.FilterSelector
     pdf_options_obj = req_objects.PDFOptions
     processed_text_obj = req_objects.ProcessedText
+    reidentify_text_obj = req_objects.ReidentifyTextRequest
     timestamp_obj = req_objects.Timestamp

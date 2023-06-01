@@ -119,3 +119,8 @@ class BleepResponse(BaseResponse):
     @property
     def bleeped_file(self):
         return self.get_attribute_entries("bleeped_file")
+
+
+class ReidentifyTextResponse(BaseResponse):
+    def __init__(self, response_object: Response = None):
+        super(ReidentifyTextResponse, self).__init__(response_object, True)
