@@ -99,15 +99,16 @@ Once initialized the client can be used to make any request listed in the [Priva
 
 Available requests:
 
-| Client Function        | Endpoint                   |
-| ---------------------- | -------------------------- |
-| `get_version`          | `/`                        |
-| `get_metrics`          | `/metrics`                 |
-| `get_diagnostics`      | `/diagnostics`             |
-| `process_text`         | `/v3/process/text`         |
-| `process_files_uri`    | `/v3/process/files/uri`    |
-| `process_files_base64` | `/v3/process/files/base64` |
-| `bleep`                | `/v3/bleep`                |
+| Client Function          | Endpoint                   |
+| ------------------------ | -------------------------- |
+| `get_version()`          | `/`                        |
+| `ping()`                 | `/healthz`                 |
+| `get_metrics()`          | `/metrics`                 |
+| `get_diagnostics()`      | `/diagnostics`             |
+| `process_text()`         | `/v3/process/text`         |
+| `process_files_uri()`    | `/v3/process/files/uri`    |
+| `process_files_base64()` | `/v3/process/files/base64` |
+| `bleep()`                | `/v3/bleep`                |
 
 Requests can be made using dictionaries:
 

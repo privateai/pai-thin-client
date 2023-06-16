@@ -24,7 +24,9 @@ class PAIRequests:
         uri: str,
         payload: dict = None,
     ):
-        return request_type(uri, json=payload, headers=self.headers)
+        response = request_type(uri, json=payload, headers=self.headers)
+        response.raise_for_status()
+        return response
 
 
 class PAIGetRequests(PAIRequests):
@@ -43,6 +45,9 @@ class PAIGetRequests(PAIRequests):
 
     def version(self):
         return self.make_request(self.request_type, self.uris.version)
+
+    def diagnostics(self):
+        return self.make_request(self.request_type, self.uris.diagnostics)
 
 
 class PAIPostRequests(PAIRequests):

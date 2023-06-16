@@ -1,4 +1,5 @@
 import logging
+from requests import HTTPError
 from typing import Union
 
 from .components import *
@@ -59,8 +60,8 @@ class PAIClient:
         """
         Returns the version of the container application code
         """
-        return VersionResponse(self.get.version)
-    
+        return VersionResponse(self.get.version())
+
     def get_diagnostics(self):
         """
         Returns diagnostic information about the Private-AI container host
