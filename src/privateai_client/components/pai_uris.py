@@ -30,6 +30,10 @@ class PAIURIs:
         return self._create_uri(self.pai_uri, "metrics")
 
     @property
+    def diagnostics(self):
+        return self._create_uri(self.pai_uri, "diagnostics")
+
+    @property
     def process_text(self):
         return self._create_uri(self.pai_uri, self.api_version, "process", "text")
 
