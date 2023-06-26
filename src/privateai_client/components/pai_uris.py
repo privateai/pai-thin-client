@@ -1,13 +1,26 @@
+import logging
+
+
 class PAIURIs:
-    def __init__(self, scheme, host, port=None):
-        self.valid_schemes = ["http", "https"]
-        scheme = scheme.split("://")[0]
-        if scheme not in self.valid_schemes:
-            raise ValueError(
-                f"Scheme must be one of the following: {', '.join(self.valid_schemes)}"
+    def __init__(self, url=None, scheme=None, host=None, port=None, **kwargs):
+        if url:
+            self._pai_uri = url
+        elif scheme and host:
+            logging.warning(
+                'Deprecation warning. scheme, host and port are no longer supported. Please use url when initializing the client. Eg. PAIClient(url="http://localhost:8080")'
             )
-        port = f":{port}" if port else ""
-        self._pai_uri = f"{scheme}://{host}{port}"
+            self.valid_schemes = ["http", "https"]
+            scheme = scheme.split("://")[0]
+            if scheme not in self.valid_schemes:
+                raise ValueError(
+                    f"Scheme must be one of the following: {', '.join(self.valid_schemes)}"
+                )
+            port = f":{port}" if port else ""
+            self._pai_uri = f"{scheme}://{host}{port}"
+        else:
+            raise ValueError(
+                "PAIClient needs either a url, or a scheme and host to initialize"
+            )
 
     @property
     def pai_uri(self):

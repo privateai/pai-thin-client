@@ -1,4 +1,4 @@
-from requests import Response
+from requests import HTTPError, Response
 
 
 class BaseResponse:
@@ -6,6 +6,13 @@ class BaseResponse:
         self._response = response_object
         # Should be json or text
         self._json_response = json_response
+        if not self.response.ok:
+            message = (
+                f"The request returned with a {self.response.status_code} {self.reason}"
+            )
+            if self.response.status_code == 400:
+                message += f" -- {self.body.get('detail')}"
+            raise HTTPError(message)
 
     def __call__(self):
         return self.response
@@ -27,6 +34,10 @@ class BaseResponse:
         return self().status_code
 
     @property
+    def reason(self):
+        return self().reason
+
+    @property
     def body(self):
         if self._json_response:
             return self().json()
@@ -45,11 +56,7 @@ class BaseResponse:
             raise ValueError("get_attribute_entries needs a response of type json")
         body = self.body
         if type(body) is list:
-            return (
-                self.body[0].get(name)
-                if len(body) == 1
-                else [row.get(name) for row in self().json()]
-            )
+            return [row.get(name) for row in self().json()]
         elif type(body) is dict:
             return body.get(name)
 
