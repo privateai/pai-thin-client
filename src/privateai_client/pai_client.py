@@ -41,10 +41,10 @@ class PAIClient:
         for subclass in [self.get, self.post]:
             subclass.headers = {**auth_header, **subclass.base_header}
 
-    def add_api_key(self, api_key):
+    def add_api_key(self, api_key: str):
         self._add_auth("api_key", api_key)
 
-    def add_bearer_token(self, token):
+    def add_bearer_token(self, token: str):
         self._add_auth("bearer_token", token)
 
     def ping(self):
