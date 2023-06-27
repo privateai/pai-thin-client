@@ -1,6 +1,7 @@
 import logging
-from requests import HTTPError
 from typing import Union
+
+from requests import HTTPError
 
 from .components import *
 
@@ -10,7 +11,14 @@ class PAIClient:
     Client used to connect to private-ai's deidentication service
     """
 
-    def __init__(self, scheme=None, host=None, port=None, url=None, **kwargs):
+    def __init__(
+        self,
+        scheme: str = None,
+        host: str = None,
+        port: str = None,
+        url: str = None,
+        **kwargs,
+    ):
         # Add source url
         self.uris = PAIURIs(url, scheme, host, port)
         self.get = PAIGetRequests(self.uris)
