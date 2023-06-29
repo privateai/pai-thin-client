@@ -1,6 +1,7 @@
 import logging
-from requests import HTTPError
 from typing import Union
+
+from requests import HTTPError
 
 from .components import *
 
@@ -10,9 +11,16 @@ class PAIClient:
     Client used to connect to private-ai's deidentication service
     """
 
-    def __init__(self, scheme: str, host: str, port: str = None, **kwargs):
+    def __init__(
+        self,
+        scheme: str = None,
+        host: str = None,
+        port: str = None,
+        url: str = None,
+        **kwargs,
+    ):
         # Add source url
-        self.uris = PAIURIs(scheme, host, port)
+        self.uris = PAIURIs(url, scheme, host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris)
         if "api_key" in kwargs.keys():
@@ -33,10 +41,10 @@ class PAIClient:
         for subclass in [self.get, self.post]:
             subclass.headers = {**auth_header, **subclass.base_header}
 
-    def add_api_key(self, api_key):
+    def add_api_key(self, api_key: str):
         self._add_auth("api_key", api_key)
 
-    def add_bearer_token(self, token):
+    def add_bearer_token(self, token: str):
         self._add_auth("bearer_token", token)
 
     def ping(self):
