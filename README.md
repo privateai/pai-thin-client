@@ -60,11 +60,19 @@ Alternatively, you can run automatically run all tests from the Testing window i
 
 #### Initializing the Client
 
-The PAI client requires a scheme, host and optional port to initialize.
+The PAI client requires a scheme, host, and optional port to initialize. 
+Alternatively, a full url can be used.
 Once created, the connection can be tested with the client's `ping` function
 
 ```python
-from privateai_client import PAIClient
+scheme = 'http'
+host = 'localhost'
+port= '8080'
+client = PAIClient(scheme, host, port)
+
+client.ping()
+
+
 url = "http://localhost:8080"
 client = PAIClient(url=url)
 
@@ -74,6 +82,7 @@ client.ping()
 Output:
 
 ```
+True
 True
 ```
 
