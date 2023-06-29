@@ -6,9 +6,6 @@ class PAIURIs:
         if url:
             self._pai_uri = url
         elif scheme and host:
-            logging.warning(
-                'Deprecation warning. scheme, host and port are no longer supported. Please use url when initializing the client. Eg. PAIClient(url="http://localhost:8080")'
-            )
             self.valid_schemes = ["http", "https"]
             scheme = scheme.split("://")[0]
             if scheme not in self.valid_schemes:
