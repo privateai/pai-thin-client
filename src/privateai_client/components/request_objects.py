@@ -224,12 +224,24 @@ class File(BaseRequestObject):
 
 class FilterSelector(BaseRequestObject):
     valid_types = ["ALLOW", "BLOCK"]
+    default_threshold = 1
 
-    def __init__(self, type: str, pattern: str):
+    def __init__(
+        self,
+        type: str,
+        pattern: str,
+        entity_type: str = None,
+        threshold: int | float = default_threshold,
+    ):
         if self._type_validator(type):
             self._type = type
         if self._pattern_validator(pattern):
             self._pattern = pattern
+        if self.type == "BLOCK":
+            if self._entity_type_validator(entity_type):
+                self._entity_type = entity_type
+            if self._threshold_validator(threshold):
+                self._threshold = threshold
 
     @property
     def type(self):
@@ -238,6 +250,22 @@ class FilterSelector(BaseRequestObject):
     @property
     def pattern(self):
         return self._pattern
+
+    @property
+    def entity_type(self):
+        if self.type != "BLOCK":
+            raise AttributeError(
+                f"FilterSelector of type {self.type} does not contain entity_type"
+            )
+        return self._entity_type
+
+    @property
+    def threshold(self):
+        if self.type != "BLOCK":
+            raise AttributeError(
+                f"FilterSelector of type {self.type} does not contain threshold"
+            )
+        return self._threshold
 
     @type.setter
     def type(self, var):
@@ -249,6 +277,16 @@ class FilterSelector(BaseRequestObject):
         if self._pattern_validator(var):
             self._pattern = var
 
+    @entity_type.setter
+    def entity_type(self, var):
+        if self._entity_type_validator(var):
+            self._entity_type = var
+
+    @threshold.setter
+    def threshold(self, var):
+        if self._threshold_validator(var):
+            self._threshold = var
+
     def _type_validator(self, var):
         if var not in self.valid_types:
             raise ValueError(
@@ -259,6 +297,16 @@ class FilterSelector(BaseRequestObject):
     def _pattern_validator(self, var):
         if type(var) is not str:
             raise TypeError("FilterSelector.pattern must be of type string")
+        return True
+
+    def _entity_type_validator(self, var):
+        if type(var) is not str:
+            raise TypeError("FilterSelector.entity_type must be of type string")
+        return True
+
+    def _threshold_validator(self, var):
+        if var < 0:
+            raise TypeError("FilterSelector.threshold must be greater than 0")
         return True
 
     @classmethod

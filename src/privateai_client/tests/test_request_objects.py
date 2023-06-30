@@ -56,6 +56,19 @@ def test_filter_selector_initializer():
     assert filter_selector.pattern == test_pattern
 
 
+def test_filter_selector_initializer2():
+    test_type = "BLOCK"
+    test_pattern = "[A-Z]"
+    test_entity_type = "CHARACTER"
+    filter_selector = FilterSelector(
+        type=test_type, pattern=test_pattern, entity_type=test_entity_type
+    )
+    assert filter_selector.type == test_type
+    assert filter_selector.pattern == test_pattern
+    assert filter_selector.entity_type == "CHARACTER"
+    assert filter_selector.threshold == 1
+
+
 def test_filter_selector_initialize_fromdict():
     test_type = "ALLOW"
     test_pattern = "[A-Z]"
@@ -81,9 +94,13 @@ def test_filter_selector_setters():
     filter_selector = FilterSelector(type=test_type, pattern=test_pattern)
     filter_selector.type = "BLOCK"
     filter_selector.pattern = "*1"
+    filter_selector.entity_type = "TEST"
+    filter_selector.threshold = 0.5
 
     assert filter_selector.type == "BLOCK"
     assert filter_selector.pattern == "*1"
+    assert filter_selector.entity_type == "TEST"
+    assert filter_selector.threshold == 0.5
 
 
 def test_filter_selector_type_validator():
@@ -103,6 +120,32 @@ def test_filter_selector_pattern_validator():
     with pytest.raises(TypeError) as excinfo:
         FilterSelector(type=test_type, pattern=test_pattern)
     assert "FilterSelector.pattern must be of type string" in str(excinfo.value)
+
+
+def test_filter_selector_entity_type_validator():
+    test_type = "BLOCK"
+    test_pattern = "[A-Z]"
+    test_entity_type = 30
+    with pytest.raises(TypeError) as excinfo:
+        FilterSelector(
+            type=test_type, pattern=test_pattern, entity_type=test_entity_type
+        )
+    assert "FilterSelector.entity_type must be of type string" in str(excinfo.value)
+
+
+def test_filter_selector_entity_type_validator():
+    test_type = "BLOCK"
+    test_pattern = "[A-Z]"
+    test_entity_type = "TEST"
+    test_threshold = -1
+    with pytest.raises(TypeError) as excinfo:
+        FilterSelector(
+            type=test_type,
+            pattern=test_pattern,
+            entity_type=test_entity_type,
+            threshold=test_threshold,
+        )
+    assert "FilterSelector.threshold must be greater than 0" in str(excinfo.value)
 
 
 def test_filter_to_dict():
@@ -617,7 +660,7 @@ def test_process_text_request_initialize_fromdict():
         "entity_detection": {
             "accuracy": "standard",
             "entity_types": [{"type": "DISABLE", "value": ["LOCATION"]}],
-            "filter": [{"type": "BLOCK", "pattern": "Roger"}],
+            "filter": [{"type": "BLOCK", "pattern": "Roger", "entity_type": "TEST"}],
             "return_entity": False,
         },
         "processed_text": {"type": "MARKER", "pattern": "ALL_ENTITY_TYPES"},
