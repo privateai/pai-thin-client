@@ -1,5 +1,5 @@
 import inspect
-from typing import List
+from typing import List, Union
 
 
 class BaseRequestObject:
@@ -231,7 +231,7 @@ class FilterSelector(BaseRequestObject):
         type: str,
         pattern: str,
         entity_type: str = None,
-        threshold: int | float = default_threshold,
+        threshold: Union[int, float] = default_threshold,
     ):
         if self._type_validator(type):
             self._type = type
