@@ -1,5 +1,7 @@
 from requests import Response
 
+from .request_objects import Entity
+
 
 class BaseResponse:
     def __init__(self, response_object: Response, json_response: bool = True):
@@ -45,11 +47,7 @@ class BaseResponse:
             raise ValueError("get_attribute_entries needs a response of type json")
         body = self.body
         if type(body) is list:
-            return (
-                self.body[0].get(name)
-                if len(body) == 1
-                else [row.get(name) for row in self().json()]
-            )
+            return self.body[0].get(name) if len(body) == 1 else [row.get(name) for row in self().json()]
         elif type(body) is dict:
             return body.get(name)
 
@@ -83,6 +81,9 @@ class DemiTextResponse(BaseResponse):
     @property
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
+
+    def get_reidentify_entities(self):
+        return [Entity(entity["processed_text"], entity["text"]) for entity in self.entities]
 
 
 class TextResponse(DemiTextResponse):
