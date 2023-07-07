@@ -1,5 +1,7 @@
 from requests import HTTPError, Response
 
+from .request_objects import Entity, ReidentifyTextRequest
+
 
 class BaseResponse:
     def __init__(self, response_object: Response, json_response: bool = True):
@@ -7,9 +9,7 @@ class BaseResponse:
         # Should be json or text
         self._json_response = json_response
         if not self.response.ok:
-            message = (
-                f"The request returned with a {self.response.status_code} {self.reason}"
-            )
+            message = f"The request returned with a {self.response.status_code} {self.reason}"
             if self.response.status_code == 400:
                 message += f" -- {self.body.get('detail')}"
             raise HTTPError(message)
@@ -76,29 +76,29 @@ class VersionResponse(BaseResponse):
 
 
 class DiagnosticResponse(BaseResponse):
-
-    def __init__(self, response_object: Response=None):
+    def __init__(self, response_object: Response = None):
         super(DiagnosticResponse, self).__init__(response_object, True)
 
     @property
     def get_platform(self):
-        return self.get_attribute_entries('platform')
+        return self.get_attribute_entries("platform")
 
     @property
     def get_cpu_count(self):
-        return self.get_attribute_entries('cpu_count')
+        return self.get_attribute_entries("cpu_count")
 
     @property
     def get_container_version(self):
-        return self.get_attribute_entries('container_version')
+        return self.get_attribute_entries("container_version")
 
     @property
     def get_cpu_name(self):
-        return self.get_attribute_entries('cpu_name')
+        return self.get_attribute_entries("cpu_name")
 
     @property
     def get_gpu_info(self):
-        return self.get_attribute_entries('gpu_info')
+        return self.get_attribute_entries("gpu_info")
+
 
 class DemiTextResponse(BaseResponse):
     def __init__(self, response_object: Response = None):
@@ -115,6 +115,13 @@ class DemiTextResponse(BaseResponse):
     @property
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
+
+    def get_reidentify_entities(self):
+        return [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
+
+    def get_reidentify_request(self):
+        entities = self.get_reidentify_entities()
+        return ReidentifyTextRequest(self.processed_text, entities)
 
 
 class TextResponse(DemiTextResponse):
