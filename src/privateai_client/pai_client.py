@@ -1,6 +1,8 @@
 import logging
 from typing import Union
 
+from requests import HTTPError
+
 from .components import *
 
 
@@ -9,9 +11,16 @@ class PAIClient:
     Client used to connect to private-ai's deidentication service
     """
 
-    def __init__(self, scheme: str, host: str, port: str = None, **kwargs):
+    def __init__(
+        self,
+        scheme: str = None,
+        host: str = None,
+        port: str = None,
+        url: str = None,
+        **kwargs,
+    ):
         # Add source url
-        self.uris = PAIURIs(scheme, host, port)
+        self.uris = PAIURIs(url, scheme, host, port)
         self.get = PAIGetRequests(self.uris)
         self.post = PAIPostRequests(self.uris)
         if "api_key" in kwargs.keys():
@@ -32,10 +41,10 @@ class PAIClient:
         for subclass in [self.get, self.post]:
             subclass.headers = {**auth_header, **subclass.base_header}
 
-    def add_api_key(self, api_key):
+    def add_api_key(self, api_key: str):
         self._add_auth("api_key", api_key)
 
-    def add_bearer_token(self, token):
+    def add_bearer_token(self, token: str):
         self._add_auth("bearer_token", token)
 
     def ping(self):
@@ -59,7 +68,13 @@ class PAIClient:
         """
         Returns the version of the container application code
         """
-        return VersionResponse(self.get.version)
+        return VersionResponse(self.get.version())
+
+    def get_diagnostics(self):
+        """
+        Returns diagnostic information about the Private-AI container host
+        """
+        return DiagnosticResponse(self.get.diagnostics())
 
     def process_text(self, request_object: Union[dict, ProcessTextRequest]):
         """
@@ -129,7 +144,7 @@ class PAIClient:
 
     def bleep(self, request_object: Union[dict, BleepRequest]):
         """
-        Used to deidentify files by uri
+        Used to deidentify audio files by uri
         """
         if type(request_object) is BleepRequest:
             response = BleepResponse(self.post.bleep(request_object.to_dict()))

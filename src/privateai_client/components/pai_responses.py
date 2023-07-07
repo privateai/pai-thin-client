@@ -1,6 +1,6 @@
-from requests import Response
+from requests import HTTPError, Response
 
-from .request_objects import Entity
+from .request_objects import Entity, ReidentifyTextRequest
 
 
 class BaseResponse:
@@ -8,6 +8,11 @@ class BaseResponse:
         self._response = response_object
         # Should be json or text
         self._json_response = json_response
+        if not self.response.ok:
+            message = f"The request returned with a {self.response.status_code} {self.reason}"
+            if self.response.status_code == 400:
+                message += f" -- {self.body.get('detail')}"
+            raise HTTPError(message)
 
     def __call__(self):
         return self.response
@@ -29,6 +34,10 @@ class BaseResponse:
         return self().status_code
 
     @property
+    def reason(self):
+        return self().reason
+
+    @property
     def body(self):
         if self._json_response:
             return self().json()
@@ -47,7 +56,7 @@ class BaseResponse:
             raise ValueError("get_attribute_entries needs a response of type json")
         body = self.body
         if type(body) is list:
-            return self.body[0].get(name) if len(body) == 1 else [row.get(name) for row in self().json()]
+            return [row.get(name) for row in self().json()]
         elif type(body) is dict:
             return body.get(name)
 
@@ -66,6 +75,31 @@ class VersionResponse(BaseResponse):
         return self.get_attribute_entries("app_version")
 
 
+class DiagnosticResponse(BaseResponse):
+    def __init__(self, response_object: Response = None):
+        super(DiagnosticResponse, self).__init__(response_object, True)
+
+    @property
+    def get_platform(self):
+        return self.get_attribute_entries("platform")
+
+    @property
+    def get_cpu_count(self):
+        return self.get_attribute_entries("cpu_count")
+
+    @property
+    def get_container_version(self):
+        return self.get_attribute_entries("container_version")
+
+    @property
+    def get_cpu_name(self):
+        return self.get_attribute_entries("cpu_name")
+
+    @property
+    def get_gpu_info(self):
+        return self.get_attribute_entries("gpu_info")
+
+
 class DemiTextResponse(BaseResponse):
     def __init__(self, response_object: Response = None):
         super(DemiTextResponse, self).__init__(response_object, True)
@@ -82,8 +116,10 @@ class DemiTextResponse(BaseResponse):
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
 
-    def get_reidentify_entities(self):
-        return [Entity(entity["processed_text"], entity["text"]) for entity in self.entities]
+    def get_reidentify_request(self):
+        return ReidentifyTextRequest(
+            self.processed_text, [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
+        )
 
 
 class TextResponse(DemiTextResponse):

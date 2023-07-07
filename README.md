@@ -24,11 +24,9 @@ pip install privateai_client
 from privateai_client import PAIClient
 from privateai_client import request_objects
 
-scheme = "http"
-host = "localhost"
-port = "8080"
+url="http://localhost:8080"
 
-client = PAIClient(scheme=scheme, host=host, port=port)
+client = PAIClient(url="http://localhost:8080")
 text_request = request_objects.process_text_obj(text=["My sample name is John Smith"])
 response = client.process_text(text_request)
 
@@ -62,15 +60,21 @@ Alternatively, you can run automatically run all tests from the Testing window i
 
 #### Initializing the Client
 
-The PAI client requires a scheme, host and optional port to initialize.
+The PAI client requires a scheme, host, and optional port to initialize. 
+Alternatively, a full url can be used.
 Once created, the connection can be tested with the client's `ping` function
 
 ```python
-from privateai_client import PAIClient
 scheme = 'http'
 host = 'localhost'
-port = '8080'
+port= '8080'
 client = PAIClient(scheme, host, port)
+
+client.ping()
+
+
+url = "http://localhost:8080"
+client = PAIClient(url=url)
 
 client.ping()
 ```
@@ -79,6 +83,7 @@ Output:
 
 ```
 True
+True
 ```
 
 #### Adding Authorization to the Client
@@ -86,12 +91,21 @@ True
 ```python
 from privateai_client import PAIClient
 # On initialization
-client = PAIClient("http", "localhost", "8080", api_key='testkey')
+client = PAIClient(url="http://localhost:8080", api_key='testkey')
 
 # After initialization
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
+client.ping()
 client.add_api_key("testkey")
+client.ping()
 ```
+Output:
+
+```
+The request returned with a 401 Unauthorized
+True
+```
+
 
 #### Making Requests
 
@@ -99,14 +113,16 @@ Once initialized the client can be used to make any request listed in the [Priva
 
 Available requests:
 
-| Client Function        | Endpoint                   |
-| ---------------------- | -------------------------- |
-| `get_version`          | `/`                        |
-| `get_metrics`          | `/metrics`                 |
-| `process_text`         | `/v3/process/text`         |
-| `process_files_uri`    | `/v3/process/files/uri`    |
-| `process_files_base64` | `/v3/process/files/base64` |
-| `bleep`                | `/v3/bleep`                |
+| Client Function          | Endpoint                   |
+| ------------------------ | -------------------------- |
+| `get_version()`          | `/`                        |
+| `ping()`                 | `/healthz`                 |
+| `get_metrics()`          | `/metrics`                 |
+| `get_diagnostics()`      | `/diagnostics`             |
+| `process_text()`         | `/v3/process/text`         |
+| `process_files_uri()`    | `/v3/process/files/uri`    |
+| `process_files_base64()` | `/v3/process/files/base64` |
+| `bleep()`                | `/v3/bleep`                |
 
 Requests can be made using dictionaries:
 
@@ -246,7 +262,7 @@ import os
 import logging
 
 file_dir = "/path/to/file/directory"
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
 for file_name in os.listdir(file_dir):
     filepath = os.path.join(file_dir, file_name)
     if not os.path.isfile(filepath):
@@ -254,8 +270,6 @@ for file_name in os.listdir(file_dir):
     req_obj = request_objects.file_url_obj(uri=filepath)
     # NOTE this method of file processing requires the container to have an the input and output directories mounted
     resp = client.process_files_uri(req_obj)
-    if not resp.ok:
-        logging.error(f"response for file {file_name} returned with {resp.status_code}")
 ```
 
 #### Processing a Base64 file
@@ -271,7 +285,7 @@ file_dir = "/path/to/your/file"
 file_name = 'sample_file.pdf'
 filepath = os.path.join(file_dir,file_name)
 file_type= "type/of_file" #eg. application/pdf
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
 
 # Read from file
 with open(filepath, "rb") as b64_file:
@@ -282,8 +296,6 @@ with open(filepath, "rb") as b64_file:
 file_obj = request_objects.file_obj(data=file_data, content_type=file_type)
 request_obj = request_objects.file_base64_obj(file=file_obj)
 resp = client.process_files_base64(request_object=request_obj)
-if not resp.ok:
-    logging.error(f"response for file {file_name} returned with {resp.status_code}")
 
 # Write to file
 with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file:
@@ -305,7 +317,7 @@ file_dir = "/path/to/your/file"
 file_name = 'sample_file.pdf'
 filepath = os.path.join(file_dir,file_name)
 file_type= "type/of_file" #eg. audio/mp3 or audio/wav
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
 
 
 file_dir = "/home/adam/workstation/file_processing/test_audio"
@@ -321,8 +333,6 @@ timestamp = request_objects.timestamp_obj(start=1.12, end=2.14)
 request_obj = request_objects.bleep_obj(file=file_obj, timestamps=[timestamp])
 
 resp = client.bleep(request_object=request_obj)
-if not resp.ok:
-    logging.error(f"response for file {file_name} returned with {resp.status_code}")
 with open(os.path.join(file_dir,f"redacted-{file_name}"), 'wb') as redacted_file:
     processed_file = resp.bleeped_file.encode("ascii")
     processed_file = base64.b64decode(processed_file, validate=True)
@@ -341,7 +351,7 @@ import pandas as pd
 from privateai_client import PAIClient
 from privateai_client.objects import request_objects
 
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
 data_frame = pd.DataFrame(
     {
         "Name": [
@@ -375,7 +385,7 @@ import pandas as pd
 from privateai_client import PAIClient
 from privateai_client.objects import request_objects
 
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
 data_frame = pd.DataFrame(
     {
         "Book": [
@@ -399,7 +409,7 @@ Reidentifying Text
 from privateai_client import PAIClient
 from privateai_client import request_objects
 
-client = PAIClient("http", "localhost", "8080")
+client = PAIClient(url="http://localhost:8080")
 
 # Deidentify the text
 initial_text = 'My name is John. I work for Private AI'
