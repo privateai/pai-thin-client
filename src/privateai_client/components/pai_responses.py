@@ -116,10 +116,11 @@ class DemiTextResponse(BaseResponse):
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
 
+    def get_reidentify_entities(self):
+        return [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
+
     def get_reidentify_request(self):
-        return ReidentifyTextRequest(
-            self.processed_text, [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
-        )
+        return ReidentifyTextRequest(self.processed_text, self.get_reidentify_entities())
 
 
 class TextResponse(DemiTextResponse):
