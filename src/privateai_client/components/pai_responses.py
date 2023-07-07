@@ -120,7 +120,8 @@ class DemiTextResponse(BaseResponse):
         return [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
 
     def get_reidentify_request(self):
-        return ReidentifyTextRequest(self.processed_text, self.get_reidentify_entities())
+        entities = self.get_reidentify_entities()
+        return ReidentifyTextRequest(self.processed_text, entities)
 
 
 class TextResponse(DemiTextResponse):
