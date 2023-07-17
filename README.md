@@ -416,16 +416,11 @@ initial_text = 'My name is John. I work for Private AI'
 request_obj = request_objects.process_text_obj(text=[initial_text])
 response_obj = client.process_text(request_obj)
 
-# Store the response data
-deidentified_text = response_obj.processed_text
-print(deidentified_text)
-entity_list = [request_objects.entity(row['processed_text'], row['text']) for row in response_obj.entities]
-print([row.to_dict() for row in entity_list])
-
-# # Call the reidentify Route
-request_obj = request_objects.reidentify_text_obj(processed_text=[deidentified_text], entities=entity_list)
-response_obj = client.reidentify_text(request_obj)
-print(response_obj.body)
+# Build reidentify request object from the deidentified response
+new_request_obj = response_obj.get_reidentify_request()
+# Call the reidentify Route
+new_response_obj = client.reidentify_text(new_request_obj)
+print(new_response_obj.body)
 ```
 
 [1]: https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
