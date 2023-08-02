@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "privateai_client"
-version = "1.3.0rc1"
+version = "1.3.0"
 authors = [
   { name="Adam Guiducci", email="adam.guiducci@private-ai.com" },
   { name="Bryan Bell-Smith", email="bryan.bellsmith@private-ai.com" },
