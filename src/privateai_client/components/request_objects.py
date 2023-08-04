@@ -169,13 +169,29 @@ class EntityTypeSelector(BaseRequestObject):
 
 class File(BaseRequestObject):
     valid_content_types = [
-        "application/pdf",
         "application/json",
+        "application/msword",
+        "application/pdf",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/xml",
+        "message/rfc822",
+        "text/csv",
+        "text/plain",
+        "image/jpeg",
         "image/jpg",
+        "image/tif",
         "image/tiff",
-        "audio/wav",
+        "image/png",
+        "image/bmp",
+        "audio/mp4",
+        "audio/m4a",
+        "audio/mp4a-latm",
         "audio/mp3",
+        "audio/mpeg",
+        "audio/wav",
+        "audio/x-wav",
     ]
 
     def __init__(self, data: str, content_type: str):
