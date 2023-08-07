@@ -117,7 +117,11 @@ class DemiTextResponse(BaseResponse):
         return self.get_attribute_entries("entities_present")
 
     def get_reidentify_entities(self):
-        return [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
+        if type(self.body) == dict:
+            entities = [Entity(entity["processed_text"], entity["text"]) for entity in self.entities]
+        else:
+            entities = [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
+        return entities
 
     def get_reidentify_request(self):
         entities = self.get_reidentify_entities()
