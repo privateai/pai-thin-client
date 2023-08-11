@@ -29,13 +29,13 @@ class BaseRequestObject:
 
 
 class AudioOptions(BaseRequestObject):
-    default_bleep_start_padding = 0
-    default_bleep_end_padding = 0
+    default_bleep_start_padding: float = 0.5
+    default_bleep_end_padding: float = 0.5
 
     def __init__(
         self,
-        bleep_start_padding: int = default_bleep_start_padding,
-        bleep_end_padding: int = default_bleep_end_padding,
+        bleep_start_padding: float = default_bleep_start_padding,
+        bleep_end_padding: float = default_bleep_end_padding,
     ):
         if self._bleep_start_padding_validator(bleep_start_padding):
             self._bleep_start_padding = bleep_start_padding
@@ -61,13 +61,17 @@ class AudioOptions(BaseRequestObject):
             self._bleep_end_padding = var
 
     def _bleep_start_padding_validator(self, var):
-        if type(var) is not int:
-            raise ValueError("AudioOptions.bleep_start_padding must be of type int")
+        if type(var) is not float:
+            raise ValueError(f"AudioOptions.bleep_start_padding must be of type float, but got {type(var)}")
+        if var < 0:
+            raise ValueError("AudioOptions.bleep_start_padding must be positive")
         return True
 
     def _bleep_end_padding_validator(self, var):
-        if type(var) is not int:
-            raise ValueError("AudioOptions.bleep_end_padding must be of type int")
+        if type(var) is not float:
+            raise ValueError(f"AudioOptions.bleep_end_padding must be of type float, but got {type(var)}")
+        if var < 0:
+            raise ValueError("AudioOptions.bleep_end_padding must be positive")
         return True
 
     @classmethod
@@ -336,24 +340,41 @@ class FilterSelector(BaseRequestObject):
 
 
 class PDFOptions(BaseRequestObject):
-    default_density = 150
+    default_density = 200
+    default_max_resolution = 3000
 
-    def __init__(self, density: int = default_density):
+    def __init__(self, density: int = default_density, max_resolution: int = default_max_resolution):
         self._density = density
+        self._max_resolution = max_resolution
 
     @property
     def density(self):
         return self._density
+
+    @property
+    def max_resolution(self):
+        return self._max_resolution
 
     @density.setter
     def density(self, var):
         if self._density_validator(var):
             self._density = var
 
+    @max_resolution.setter
+    def max_resolution(self, var):
+        if self._max_resolution_validator(var):
+            self._max_resolution = var
+
     def _density_validator(self, var):
         if type(var) is not int:
-            raise ValueError("PDFOptions.density must be of type int")
+            raise ValueError("PDFOptions.density must be of type int and >0")
         return True
+
+    def _max_resolution_validator(self, var):
+        if type(var) is not int:
+            raise ValueError("PDFOptions.max_resolution must be of type int and >0")
+        return True
+
 
     @classmethod
     def fromdict(cls, values: dict):
