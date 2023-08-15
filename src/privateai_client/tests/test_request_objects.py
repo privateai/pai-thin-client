@@ -463,23 +463,26 @@ def test_processed_text_to_dict():
 # PDF Options Tests
 def test_pdf_options_default_initializer():
     pdf_options = PDFOptions()
-    assert pdf_options.density == 150
+    assert pdf_options.density == 200
+    assert pdf_options.max_resolution == 3000
 
 
 def test_pdf_options_initializer():
-    pdf_options = PDFOptions(density=300)
+    pdf_options = PDFOptions(density=300, max_resolution=500)
     assert pdf_options.density == 300
+    assert pdf_options.max_resolution == 500
 
 
 def test_pdf_options_initialize_fromdict():
-    pdf_options = PDFOptions.fromdict({"density": 300})
+    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500})
     assert pdf_options.density == 300
+    assert pdf_options.max_resolution == 500
 
 
 def test_pdf_options_invalid_initialize_fromdict():
     error_msg = "PDFOptions can only accept 'density'"
     with pytest.raises(TypeError) as excinfo:
-        PDFOptions.fromdict({"density": 300, "junk": "value"})
+        PDFOptions.fromdict({"density": 300, "max_resolution": 500, "junk": "value"})
     assert error_msg in str(excinfo.value)
 
 
@@ -487,69 +490,80 @@ def test_pdf_options_setters():
     pdf_options = PDFOptions(density=300)
     pdf_options.density = 10
     assert pdf_options.density == 10
+    pdf_options.max_resolution = 10
+    assert pdf_options.max_resolution == 10
 
 
 def test_pdf_options_density_validator():
-    error_msg = "PDFOptions.density must be of type int"
+    error_msg = "PDFOptions.density must be of type int and >0"
     pdf_options = PDFOptions()
     with pytest.raises(ValueError) as excinfo:
         pdf_options.density = "junk"
     assert error_msg in str(excinfo.value)
 
 
+def test_pdf_options_max_resolution_validator():
+    error_msg = "PDFOptions.max_resolution must be of type int and >0"
+    pdf_options = PDFOptions()
+    with pytest.raises(ValueError) as excinfo:
+        pdf_options.max_resolution = "junk"
+    assert error_msg in str(excinfo.value)
+
+
 def test_pdf_options_to_dict():
     pdf_options = PDFOptions().to_dict()
-    assert pdf_options["density"] == 150
+    assert pdf_options["density"] == 200
+    assert pdf_options["max_resolution"] == 3000
 
 
 # Audio Options Tests
 def test_audio_options_default_initializer():
     audio_options = AudioOptions()
-    assert audio_options.bleep_end_padding == 0
-    assert audio_options.bleep_start_padding == 0
+    assert audio_options.bleep_end_padding == 0.5
+    assert audio_options.bleep_start_padding == 0.5
 
 
 def test_audio_options_initializer():
-    audio_options = AudioOptions(bleep_start_padding=200, bleep_end_padding=300)
-    assert audio_options.bleep_end_padding == 300
-    assert audio_options.bleep_start_padding == 200
+    audio_options = AudioOptions(bleep_start_padding=200., bleep_end_padding=300.)
+    assert audio_options.bleep_start_padding == 200.
+    assert audio_options.bleep_end_padding == 300.
 
 
 def test_audio_options_initialize_fromdict():
     audio_options = AudioOptions.fromdict(
-        {"bleep_start_padding": 200, "bleep_end_padding": 300}
+        {"bleep_start_padding": 0.3, "bleep_end_padding": 0.7}
     )
-    assert audio_options.bleep_end_padding == 300
-    assert audio_options.bleep_start_padding == 200
+    assert audio_options.bleep_start_padding == 0.3
+    assert audio_options.bleep_end_padding == 0.7
 
 
 def test_audio_options_invalid_initialize_fromdict():
     error_msg = "ProcessedText can only accept the values 'bleep_start_padding' and 'bleep_end_padding'"
     with pytest.raises(TypeError) as excinfo:
         AudioOptions.fromdict(
-            {"bleep_start_padding": 200, "bleep_end_padding": 300, "junk": "value"}
+            {"bleep_start_padding": 0.2, "bleep_end_padding": 0.1, "junk": "value"}
         )
     assert error_msg in str(excinfo.value)
 
 
 def test_audio_options_setters():
     audio_options = AudioOptions()
-    audio_options.bleep_end_padding = 1
-    audio_options.bleep_start_padding = 2
+    audio_options.bleep_end_padding = 1.
+    audio_options.bleep_start_padding = 2.
 
-    assert audio_options.bleep_end_padding == 1
-    assert audio_options.bleep_start_padding == 2
+    assert audio_options.bleep_end_padding == 1.
+    assert audio_options.bleep_start_padding == 2.
 
 
 def test_audio_options_bleep_start_padding_validator():
-    error_msg = "AudioOptions.bleep_start_padding must be of type int"
+    error_msg = "AudioOptions.bleep_start_padding must be of type float"
     with pytest.raises(ValueError) as excinfo:
         AudioOptions().bleep_start_padding = "junk"
     assert error_msg in str(excinfo.value)
 
 
 def test_audio_options_bleep_end_padding_validator():
-    error_msg = "AudioOptions.bleep_end_padding must be of type int"
+    error_msg = "AudioOptions.bleep_end_padding must be of type float"
     with pytest.raises(ValueError) as excinfo:
         AudioOptions().bleep_end_padding = "junk"
     assert error_msg in str(excinfo.value)
@@ -557,8 +571,8 @@ def test_audio_options_bleep_end_padding_validator():
 
 def test_audio_options_to_dict():
     audio_options = AudioOptions().to_dict()
-    assert audio_options["bleep_end_padding"] == 0
-    assert audio_options["bleep_start_padding"] == 0
+    assert audio_options["bleep_end_padding"] == 0.5
+    assert audio_options["bleep_start_padding"] == 0.5
 
 
 # Timestamp Tests
@@ -779,7 +793,7 @@ def test_process_file_uri_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -789,7 +803,7 @@ def test_process_file_uri_request_initializer():
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
     assert process_file_uri_obj.pdf_options.density == 100
-    assert process_file_uri_obj.audio_options.bleep_end_padding == 2
+    assert process_file_uri_obj.audio_options.bleep_end_padding == 2.
 
 
 def test_process_file_uri_request_initialize_fromdict():
@@ -802,7 +816,7 @@ def test_process_file_uri_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
         {
             "uri": "this/location/right/here.png",
@@ -814,7 +828,7 @@ def test_process_file_uri_request_initialize_fromdict():
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
     assert process_file_uri_obj.pdf_options.density == 100
-    assert process_file_uri_obj.audio_options.bleep_end_padding == 2
+    assert process_file_uri_obj.audio_options.bleep_end_padding == 2.
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
@@ -828,7 +842,7 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     with pytest.raises(TypeError) as excinfo:
         ProcessFileUriRequest.fromdict(
             {
@@ -852,7 +866,7 @@ def test_process_file_uri_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -862,7 +876,7 @@ def test_process_file_uri_request_to_dict():
     assert process_file_uri_obj["uri"] == "this/location/right/here.png"
     assert process_file_uri_obj["entity_detection"]["accuracy"] == "standard"
     assert process_file_uri_obj["pdf_options"]["density"] == 100
-    assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2
+    assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2.
 
 
 # Process File Base64 Request Tests
@@ -886,7 +900,7 @@ def test_process_file_base64_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -896,7 +910,7 @@ def test_process_file_base64_request_initializer():
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
     assert process_file_base64_request_obj.pdf_options.density == 100
-    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2
+    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.
 
 
 def test_process_file_base64_request_initialize_fromdict():
@@ -910,7 +924,7 @@ def test_process_file_base64_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
         {
             "file": file.to_dict(),
@@ -922,7 +936,7 @@ def test_process_file_base64_request_initialize_fromdict():
     assert process_file_base64_request_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
     assert process_file_base64_request_obj.pdf_options.density == 100
-    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2
+    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
@@ -937,7 +951,7 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     with pytest.raises(TypeError) as excinfo:
         ProcessFileBase64Request.fromdict(
             {
@@ -961,7 +975,7 @@ def test_process_file_base64_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1, bleep_end_padding=2)
+    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -971,7 +985,7 @@ def test_process_file_base64_request_to_dict():
     assert process_file_base64_request_obj["file"] == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj["entity_detection"]["accuracy"] == "standard"
     assert process_file_base64_request_obj["pdf_options"]["density"] == 100
-    assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2
+    assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.
 
 
 # Bleep Request Tests
