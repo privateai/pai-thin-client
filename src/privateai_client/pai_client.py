@@ -1,16 +1,15 @@
 import logging
 from typing import Union
-
 from requests import HTTPError
 
 from .components import *
+from .components.llm_connector import LLMConnector
 
 
 class PAIClient:
     """
     Client used to connect to private-ai's deidentication service
     """
-
     def __init__(
         self,
         scheme: str = None,
@@ -27,6 +26,8 @@ class PAIClient:
             self.add_api_key(kwargs["api_key"])
         elif "bearer_token" in kwargs.keys():
             self.add_bearer_token(kwargs["bearer_token"])
+        if "llm" in kwargs.keys():
+            self.llm_connector = LLMConnector(llm=kwargs["llm"])     
 
     def _add_auth(self, auth_type, auth_val):
         auth_header = {}
@@ -155,3 +156,9 @@ class PAIClient:
                 "request_object can only be a dictionary or a BleepRequest object"
             )
         return response
+    
+    def send_redacted_prompt(self, prompt: str, model: str):
+       """
+       Used to send redacted prompts to LLMs
+       """
+       return self.llm_connector.send_redacted_prompt(prompt=prompt, model=model)
