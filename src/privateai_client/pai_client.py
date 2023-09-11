@@ -26,8 +26,8 @@ class PAIClient:
             self.add_api_key(kwargs["api_key"])
         elif "bearer_token" in kwargs.keys():
             self.add_bearer_token(kwargs["bearer_token"])
-        if "llm" in kwargs.keys():
-            self.llm_connector = LLMConnector(llm=kwargs["llm"])     
+
+        self.llm_connector = LLMConnector()
 
     def _add_auth(self, auth_type, auth_val):
         auth_header = {}
@@ -157,8 +157,24 @@ class PAIClient:
             )
         return response
     
-    def send_redacted_prompt(self, prompt: str, model: str):
+    def send_redacted_prompt(self, prompt: str, llm_model: str, **kwargs):
        """
        Used to send redacted prompts to LLMs
        """
-       return self.llm_connector.send_redacted_prompt(prompt=prompt, model=model)
+
+       deidentify_request = ProcessTextRequest(text=[prompt])
+       deidentified_response = self.process_text(deidentify_request)
+
+       #Send prompt to LLM
+       redacted_responses = self.llm_connector.send_redacted_prompt(prompt=deidentified_response.processed_text[0], llm_model=llm_model, **kwargs)
+
+       #Create entities used for reidentification
+       reid_entities = []
+       if len(deidentified_response.entities) > 0:
+            for entity in deidentified_response.entities[0]:
+               reid_entities.append(Entity(entity["processed_text"], entity["text"]))
+
+            #Reidentify request
+            reidentified_responses = self.reidentify_text(request_object=ReidentifyTextRequest(redacted_responses, entities=reid_entities)).body
+
+       return reidentified_responses
