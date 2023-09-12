@@ -5,15 +5,14 @@ class LLMConnector:
 
     accepted_llms = ["openai", "cohere", "palm", "vertexai"]
         
-    def _vertexai_prompt_completion(self, prompt:str, chat_model_name:str, project:str=None, location:str = None, **kwargs):
+    def _vertexai_prompt_completion(self, prompt:str, chat_model_name:str, project:str=None, location:str = None, chat_parameters: List = None, **kwargs):
         import vertexai
         from vertexai.preview.language_models import ChatModel
 
         vertexai.init(project=project, location=location)
         chat_model = ChatModel.from_pretrained(chat_model_name)
-        chat_parameters = kwargs
-        chat = chat_model.start_chat(**kwargs)
-        completion = chat.send_message(f'{prompt}', chat_parameters)
+        chat = chat_model.start_chat(chat_parameters)
+        completion = chat.send_message(f'{prompt}', **kwargs)
         return completion.text
     
     def _cohere_prompt_completion(self, prompt:str, **kwargs):
