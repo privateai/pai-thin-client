@@ -13,7 +13,7 @@ class LLMConnector:
         chat_model = ChatModel.from_pretrained(chat_model_name)
         chat = chat_model.start_chat(chat_parameters)
         completion = chat.send_message(f'{prompt}', **kwargs)
-        return completion.text
+        return [prompt, completion.text]
     
     def _cohere_prompt_completion(self, prompt:str, **kwargs):
         import cohere
