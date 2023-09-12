@@ -3,6 +3,8 @@ from typing import Union
 
 from requests import HTTPError
 
+from .components.llm_connector import LLMConnector
+
 from .components import *
 
 
@@ -27,6 +29,7 @@ class PAIClient:
             self.add_api_key(kwargs["api_key"])
         elif "bearer_token" in kwargs.keys():
             self.add_bearer_token(kwargs["bearer_token"])
+        self.llm_conector = LLMConnector()
 
     def _add_auth(self, auth_type, auth_val):
         auth_header = {}
@@ -155,3 +158,6 @@ class PAIClient:
                 "request_object can only be a dictionary or a BleepRequest object"
             )
         return response
+    
+    def send_redacted_prompt(self, prompt:str, llm_model:str, **kwargs):
+        return self.llm_conector.send_redacted_prompt(prompt=prompt, llm_model=llm_model, **kwargs)
