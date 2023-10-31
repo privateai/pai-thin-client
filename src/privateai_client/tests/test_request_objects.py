@@ -524,9 +524,9 @@ def test_audio_options_default_initializer():
 
 
 def test_audio_options_initializer():
-    audio_options = AudioOptions(bleep_start_padding=200., bleep_end_padding=300.)
-    assert audio_options.bleep_start_padding == 200.
-    assert audio_options.bleep_end_padding == 300.
+    audio_options = AudioOptions(bleep_start_padding=200.0, bleep_end_padding=300.0)
+    assert audio_options.bleep_start_padding == 200.0
+    assert audio_options.bleep_end_padding == 300.0
 
 
 def test_audio_options_initialize_fromdict():
@@ -548,11 +548,11 @@ def test_audio_options_invalid_initialize_fromdict():
 
 def test_audio_options_setters():
     audio_options = AudioOptions()
-    audio_options.bleep_end_padding = 1.
-    audio_options.bleep_start_padding = 2.
+    audio_options.bleep_end_padding = 1.0
+    audio_options.bleep_start_padding = 2.0
 
-    assert audio_options.bleep_end_padding == 1.
-    assert audio_options.bleep_start_padding == 2.
+    assert audio_options.bleep_end_padding == 1.0
+    assert audio_options.bleep_start_padding == 2.0
 
 
 def test_audio_options_bleep_start_padding_validator():
@@ -793,7 +793,7 @@ def test_process_file_uri_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -803,7 +803,7 @@ def test_process_file_uri_request_initializer():
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
     assert process_file_uri_obj.pdf_options.density == 100
-    assert process_file_uri_obj.audio_options.bleep_end_padding == 2.
+    assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
 
 
 def test_process_file_uri_request_initialize_fromdict():
@@ -816,7 +816,7 @@ def test_process_file_uri_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
         {
             "uri": "this/location/right/here.png",
@@ -828,7 +828,7 @@ def test_process_file_uri_request_initialize_fromdict():
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
     assert process_file_uri_obj.pdf_options.density == 100
-    assert process_file_uri_obj.audio_options.bleep_end_padding == 2.
+    assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
@@ -842,7 +842,7 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     with pytest.raises(TypeError) as excinfo:
         ProcessFileUriRequest.fromdict(
             {
@@ -866,7 +866,7 @@ def test_process_file_uri_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -876,7 +876,7 @@ def test_process_file_uri_request_to_dict():
     assert process_file_uri_obj["uri"] == "this/location/right/here.png"
     assert process_file_uri_obj["entity_detection"]["accuracy"] == "standard"
     assert process_file_uri_obj["pdf_options"]["density"] == 100
-    assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2.
+    assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2.0
 
 
 # Process File Base64 Request Tests
@@ -900,7 +900,7 @@ def test_process_file_base64_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -910,7 +910,7 @@ def test_process_file_base64_request_initializer():
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
     assert process_file_base64_request_obj.pdf_options.density == 100
-    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.
+    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
 
 
 def test_process_file_base64_request_initialize_fromdict():
@@ -924,7 +924,7 @@ def test_process_file_base64_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
         {
             "file": file.to_dict(),
@@ -936,7 +936,7 @@ def test_process_file_base64_request_initialize_fromdict():
     assert process_file_base64_request_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
     assert process_file_base64_request_obj.pdf_options.density == 100
-    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.
+    assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
@@ -951,7 +951,7 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     with pytest.raises(TypeError) as excinfo:
         ProcessFileBase64Request.fromdict(
             {
@@ -975,7 +975,7 @@ def test_process_file_base64_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1., bleep_end_padding=2.)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -985,7 +985,7 @@ def test_process_file_base64_request_to_dict():
     assert process_file_base64_request_obj["file"] == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj["entity_detection"]["accuracy"] == "standard"
     assert process_file_base64_request_obj["pdf_options"]["density"] == 100
-    assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.
+    assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.0
 
 
 # Bleep Request Tests
@@ -1036,11 +1036,15 @@ def test_reidentify_text_request_initializer():
     entities = [Entity(processed_text="NAME", text="Hola")]
     model = "gpt-700.2-ultra-turbo"
     reid = ReidentifyTextRequest(
-        processed_text=processed_text, entities=entities, model=model
+        processed_text=processed_text,
+        entities=entities,
+        model=model,
+        reidentify_sensitive_labels=True,
     )
     assert reid.processed_text == ["this is a test"]
     assert reid.entities[0].text == "Hola"
     assert reid.model == "gpt-700.2-ultra-turbo"
+    assert reid.reidentify_sensitive_labels == True
 
 
 def test_reidentify_text_request_initialize_fromdict():

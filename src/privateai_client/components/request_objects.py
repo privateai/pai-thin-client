@@ -62,14 +62,18 @@ class AudioOptions(BaseRequestObject):
 
     def _bleep_start_padding_validator(self, var):
         if type(var) is not float:
-            raise ValueError(f"AudioOptions.bleep_start_padding must be of type float, but got {type(var)}")
+            raise ValueError(
+                f"AudioOptions.bleep_start_padding must be of type float, but got {type(var)}"
+            )
         if var < 0:
             raise ValueError("AudioOptions.bleep_start_padding must be positive")
         return True
 
     def _bleep_end_padding_validator(self, var):
         if type(var) is not float:
-            raise ValueError(f"AudioOptions.bleep_end_padding must be of type float, but got {type(var)}")
+            raise ValueError(
+                f"AudioOptions.bleep_end_padding must be of type float, but got {type(var)}"
+            )
         if var < 0:
             raise ValueError("AudioOptions.bleep_end_padding must be positive")
         return True
@@ -343,7 +347,11 @@ class PDFOptions(BaseRequestObject):
     default_density = 200
     default_max_resolution = 3000
 
-    def __init__(self, density: int = default_density, max_resolution: int = default_max_resolution):
+    def __init__(
+        self,
+        density: int = default_density,
+        max_resolution: int = default_max_resolution,
+    ):
         self._density = density
         self._max_resolution = max_resolution
 
@@ -374,7 +382,6 @@ class PDFOptions(BaseRequestObject):
         if type(var) is not int:
             raise ValueError("PDFOptions.max_resolution must be of type int and >0")
         return True
-
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -804,7 +811,9 @@ class ReidentifyTextRequest(BaseRequestObject):
         processed_text: List[str] = [],
         entities: List[Entity] = [],
         model: str = "",
+        reidentify_sensitive_labels: bool = True,
     ):
+        self.reidentify_sensitive_labels = reidentify_sensitive_labels
         self.processed_text = processed_text
         self.entities = entities
         self.model = model
@@ -823,5 +832,5 @@ class ReidentifyTextRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities' and 'model"
+                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_labels'"
             )
