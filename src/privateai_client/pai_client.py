@@ -99,7 +99,7 @@ class PAIClient:
                 self.post.reidentify_text(request_object.to_dict())
             )
         elif type(request_object) is dict:
-            response = ReidentifyTextRequest(self.post.process_text(request_object))
+            response = ReidentifyTextRequest(self.post.reidentify_text(request_object))
         else:
             raise ValueError(
                 "request_object can only be a dictionary or a ReidentifyTextRequest object"

@@ -1039,12 +1039,12 @@ def test_reidentify_text_request_initializer():
         processed_text=processed_text,
         entities=entities,
         model=model,
-        reidentify_sensitive_labels=True,
+        reidentify_sensitive_fields=True,
     )
     assert reid.processed_text == ["this is a test"]
     assert reid.entities[0].text == "Hola"
     assert reid.model == "gpt-700.2-ultra-turbo"
-    assert reid.reidentify_sensitive_labels == True
+    assert reid.reidentify_sensitive_fields == True
 
 
 def test_reidentify_text_request_initialize_fromdict():
@@ -1056,17 +1056,17 @@ def test_reidentify_text_request_initialize_fromdict():
             "processed_text": processed_text,
             "entities": [row.to_dict() for row in entities],
             "model": model,
-            "reidentify_sensitive_labels": False,
+            "reidentify_sensitive_fields": False,
         }
     )
     assert reid.processed_text == ["this is a test"]
     assert reid.entities[0].text == "Hola"
     assert reid.model == "gpt-700.2-ultra-turbo"
-    assert reid.reidentify_sensitive_labels == False
+    assert reid.reidentify_sensitive_fields == False
 
 
 def test_reidentify_text_request_invalid_initialize_fromdict():
-    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_labels'"
+    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_fields'"
     processed_text = ["this is a test"]
     entities = [Entity(processed_text="NAME", text="Hola")]
     model = "gpt-700.2-ultra-turbo"
@@ -1086,17 +1086,17 @@ def test_reidentify_text_request_to_dict():
     processed_text = ["this is a test"]
     entities = [Entity(processed_text="NAME", text="Hola")]
     model = "gpt-700.2-ultra-turbo"
-    reidentify_sensitive_labels = False
+    reidentify_sensitive_fields = False
     reid = ReidentifyTextRequest(
         processed_text=processed_text,
         entities=entities,
         model=model,
-        reidentify_sensitive_labels=reidentify_sensitive_labels,
+        reidentify_sensitive_fields=reidentify_sensitive_fields,
     ).to_dict()
     assert reid["processed_text"][0] == "this is a test"
     assert reid["entities"][0]["text"] == "Hola"
     assert reid["model"] == "gpt-700.2-ultra-turbo"
-    assert reid["reidentify_sensitive_labels"] == reidentify_sensitive_labels
+    assert reid["reidentify_sensitive_fields"] == reidentify_sensitive_fields
 
 
 def test_synthetic_text():

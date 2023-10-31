@@ -811,9 +811,9 @@ class ReidentifyTextRequest(BaseRequestObject):
         processed_text: List[str] = [],
         entities: List[Entity] = [],
         model: str = "",
-        reidentify_sensitive_labels: bool = True,
+        reidentify_sensitive_fields: bool = True,
     ):
-        self.reidentify_sensitive_labels = reidentify_sensitive_labels
+        self.reidentify_sensitive_fields = reidentify_sensitive_fields
         self.processed_text = processed_text
         self.entities = entities
         self.model = model
@@ -832,5 +832,5 @@ class ReidentifyTextRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_labels'"
+                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_fields'"
             )
