@@ -1056,15 +1056,17 @@ def test_reidentify_text_request_initialize_fromdict():
             "processed_text": processed_text,
             "entities": [row.to_dict() for row in entities],
             "model": model,
+            "reidentify_sensitive_labels": False,
         }
     )
     assert reid.processed_text == ["this is a test"]
     assert reid.entities[0].text == "Hola"
     assert reid.model == "gpt-700.2-ultra-turbo"
+    assert reid.reidentify_sensitive_labels == False
 
 
 def test_reidentify_text_request_invalid_initialize_fromdict():
-    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities' and 'model"
+    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_labels'"
     processed_text = ["this is a test"]
     entities = [Entity(processed_text="NAME", text="Hola")]
     model = "gpt-700.2-ultra-turbo"
@@ -1084,12 +1086,17 @@ def test_reidentify_text_request_to_dict():
     processed_text = ["this is a test"]
     entities = [Entity(processed_text="NAME", text="Hola")]
     model = "gpt-700.2-ultra-turbo"
+    reidentify_sensitive_labels = False
     reid = ReidentifyTextRequest(
-        processed_text=processed_text, entities=entities, model=model
+        processed_text=processed_text,
+        entities=entities,
+        model=model,
+        reidentify_sensitive_labels=reidentify_sensitive_labels,
     ).to_dict()
     assert reid["processed_text"][0] == "this is a test"
     assert reid["entities"][0]["text"] == "Hola"
     assert reid["model"] == "gpt-700.2-ultra-turbo"
+    assert reid["reidentify_sensitive_labels"] == reidentify_sensitive_labels
 
 
 def test_synthetic_text():
