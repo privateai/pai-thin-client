@@ -118,7 +118,11 @@ class DemiTextResponse(BaseResponse):
 
     @property
     def best_labels(self):
-        return [attr["best_label"] for entity in self.entities for attr in entity]
+        if type(self.body) == dict:
+            best_labels = [entity["best_label"] for entity in self.entities]
+        else:
+            best_labels = [attr["best_label"] for entity in self.entities for attr in entity]
+        return best_labels
 
     def get_reidentify_entities(self):
         if type(self.body) == dict:
