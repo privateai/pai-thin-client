@@ -116,6 +116,14 @@ class DemiTextResponse(BaseResponse):
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
 
+    @property
+    def best_labels(self):
+        if type(self.body) == dict:
+            best_labels = [entity["best_label"] for entity in self.entities]
+        else:
+            best_labels = [attr["best_label"] for entity in self.entities for attr in entity]
+        return best_labels
+
     def get_reidentify_entities(self):
         if type(self.body) == dict:
             entities = [Entity(entity["processed_text"], entity["text"]) for entity in self.entities]
