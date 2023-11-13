@@ -586,6 +586,7 @@ class EntityDetection(BaseRequestObject):
         "high",
         "high_multilingual",
     ]
+    default_enable_non_max_suppression = False
 
     def __init__(
         self,
@@ -593,6 +594,7 @@ class EntityDetection(BaseRequestObject):
         entity_types: List[EntityTypeSelector] = [],
         filter: List[FilterSelector] = [],
         return_entity: bool = default_return_entity,
+        enable_non_max_suppression: bool = default_enable_non_max_suppression,
     ):
         if self._accuracy_validator(accuracy):
             self._accuracy = accuracy
@@ -602,6 +604,8 @@ class EntityDetection(BaseRequestObject):
             self.filter = filter
         if self._return_entity_validator(return_entity):
             self._return_entity = return_entity
+        if self._enable_non_max_suppression_validator(enable_non_max_suppression):
+            self._enable_non_max_suppression = enable_non_max_suppression
 
     @property
     def accuracy(self):
@@ -653,6 +657,13 @@ class EntityDetection(BaseRequestObject):
     def _return_entity_validator(self, var):
         if type(var) is not bool:
             raise ValueError("EntityDetection.return_entity must be of type bool")
+        return True
+
+    def _enable_non_max_suppression_validator(self, var):
+        if type(var) is not bool:
+            raise ValueError(
+                "EntityDetection.enable_non_max_suppression must be of type bool"
+            )
         return True
 
     @classmethod
