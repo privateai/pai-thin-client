@@ -725,9 +725,9 @@ class ProcessFileUriRequest(BaseRequestObject):
     def __init__(
         self,
         uri: str,
-        entity_detection: EntityDetection = EntityDetection(),
-        pdf_options: PDFOptions = PDFOptions(),
-        audio_options: AudioOptions = AudioOptions(),
+        entity_detection: Optional[EntityDetection] = None,
+        pdf_options: Optional[PDFOptions] = None,
+        audio_options: Optional[AudioOptions] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
@@ -758,9 +758,9 @@ class ProcessFileBase64Request(BaseRequestObject):
     def __init__(
         self,
         file: File,
-        entity_detection: EntityDetection = EntityDetection(),
-        pdf_options: PDFOptions = PDFOptions(),
-        audio_options: AudioOptions = AudioOptions(),
+        entity_detection: Optional[EntityDetection] = None,
+        pdf_options: Optional[PDFOptions] = None,
+        audio_options: Optional[AudioOptions] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection

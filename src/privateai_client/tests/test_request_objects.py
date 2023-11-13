@@ -778,9 +778,9 @@ def test_process_text_request_to_dict():
 def test_process_file_uri_request_default_initializer():
     process_file_uri_obj = ProcessFileUriRequest(uri="this/location/right/here.png")
     assert process_file_uri_obj.uri == "this/location/right/here.png"
-    assert type(process_file_uri_obj.entity_detection) is EntityDetection
-    assert type(process_file_uri_obj.pdf_options) is PDFOptions
-    assert type(process_file_uri_obj.audio_options) is AudioOptions
+    assert process_file_uri_obj.entity_detection is None
+    assert process_file_uri_obj.pdf_options is None
+    assert process_file_uri_obj.audio_options is None
 
 
 def test_process_file_uri_request_initializer():
@@ -885,9 +885,9 @@ def test_process_file_base64_request_default_initializer():
         file="sfsfxe234jkjsdlkfnDATA!!!!!!"
     )
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA!!!!!!"
-    assert type(process_file_base64_request_obj.entity_detection) is EntityDetection
-    assert type(process_file_base64_request_obj.pdf_options) is PDFOptions
-    assert type(process_file_base64_request_obj.audio_options) is AudioOptions
+    assert process_file_base64_request_obj.entity_detection is None
+    assert process_file_base64_request_obj.pdf_options is None
+    assert process_file_base64_request_obj.audio_options is None
 
 
 def test_process_file_base64_request_initializer():
