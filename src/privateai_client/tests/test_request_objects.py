@@ -627,9 +627,9 @@ def test_timestamp_to_dict():
 def test_process_text_request_default_initializer():
     process_text_request = ProcessTextRequest(text=["hey"])
     assert process_text_request.text == ["hey"]
-    assert process_text_request.link_batch == False
-    assert type(process_text_request.entity_detection) == EntityDetection
-    assert type(process_text_request.processed_text) == ProcessedText
+    assert process_text_request.link_batch is None
+    assert process_text_request.entity_detection is None
+    assert process_text_request.processed_text is None
 
 
 def test_process_text_request_initializer():

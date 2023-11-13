@@ -1,11 +1,13 @@
 import inspect
-from typing import List, Union
+from typing import List, Optional, Union
 
 
 class BaseRequestObject:
     def to_dict(self):
         dict_obj = dict()
         for key, value in self.__dict__.items():
+            if value is None:
+                continue
             name = key if key[0] != "_" else key[1:]
             if self._issubclass(value):
                 dict_obj[name] = value.to_dict()
@@ -681,9 +683,9 @@ class ProcessTextRequest(BaseRequestObject):
     def __init__(
         self,
         text: List[str],
-        link_batch: bool = default_link_batch,
-        entity_detection: EntityDetection = EntityDetection(),
-        processed_text: ProcessedText = ProcessedText(),
+        link_batch: Optional[bool] = None,
+        entity_detection: Optional[EntityDetection] = None,
+        processed_text: Optional[ProcessedText] = None,
     ):
         self.text = text
         self.link_batch = link_batch
