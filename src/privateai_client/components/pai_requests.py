@@ -25,7 +25,6 @@ class PAIRequests:
         payload: dict = None,
     ):
         response = request_type(uri, json=payload, headers=self.headers)
-        response.raise_for_status()
         return response
 
 

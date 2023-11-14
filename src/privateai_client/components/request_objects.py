@@ -1,11 +1,13 @@
 import inspect
-from typing import List, Union
+from typing import List, Optional, Union
 
 
 class BaseRequestObject:
     def to_dict(self):
         dict_obj = dict()
         for key, value in self.__dict__.items():
+            if value is None:
+                continue
             name = key if key[0] != "_" else key[1:]
             if self._issubclass(value):
                 dict_obj[name] = value.to_dict()
@@ -584,6 +586,7 @@ class EntityDetection(BaseRequestObject):
         "high",
         "high_multilingual",
     ]
+    default_enable_non_max_suppression = False
 
     def __init__(
         self,
@@ -591,6 +594,7 @@ class EntityDetection(BaseRequestObject):
         entity_types: List[EntityTypeSelector] = [],
         filter: List[FilterSelector] = [],
         return_entity: bool = default_return_entity,
+        enable_non_max_suppression: bool = default_enable_non_max_suppression,
     ):
         if self._accuracy_validator(accuracy):
             self._accuracy = accuracy
@@ -600,6 +604,8 @@ class EntityDetection(BaseRequestObject):
             self.filter = filter
         if self._return_entity_validator(return_entity):
             self._return_entity = return_entity
+        if self._enable_non_max_suppression_validator(enable_non_max_suppression):
+            self._enable_non_max_suppression = enable_non_max_suppression
 
     @property
     def accuracy(self):
@@ -653,6 +659,13 @@ class EntityDetection(BaseRequestObject):
             raise ValueError("EntityDetection.return_entity must be of type bool")
         return True
 
+    def _enable_non_max_suppression_validator(self, var):
+        if type(var) is not bool:
+            raise ValueError(
+                "EntityDetection.enable_non_max_suppression must be of type bool"
+            )
+        return True
+
     @classmethod
     def fromdict(cls, values: dict):
         try:
@@ -681,9 +694,9 @@ class ProcessTextRequest(BaseRequestObject):
     def __init__(
         self,
         text: List[str],
-        link_batch: bool = default_link_batch,
-        entity_detection: EntityDetection = EntityDetection(),
-        processed_text: ProcessedText = ProcessedText(),
+        link_batch: Optional[bool] = None,
+        entity_detection: Optional[EntityDetection] = None,
+        processed_text: Optional[ProcessedText] = None,
     ):
         self.text = text
         self.link_batch = link_batch
@@ -712,9 +725,9 @@ class ProcessFileUriRequest(BaseRequestObject):
     def __init__(
         self,
         uri: str,
-        entity_detection: EntityDetection = EntityDetection(),
-        pdf_options: PDFOptions = PDFOptions(),
-        audio_options: AudioOptions = AudioOptions(),
+        entity_detection: Optional[EntityDetection] = None,
+        pdf_options: Optional[PDFOptions] = None,
+        audio_options: Optional[AudioOptions] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
@@ -745,9 +758,9 @@ class ProcessFileBase64Request(BaseRequestObject):
     def __init__(
         self,
         file: File,
-        entity_detection: EntityDetection = EntityDetection(),
-        pdf_options: PDFOptions = PDFOptions(),
-        audio_options: AudioOptions = AudioOptions(),
+        entity_detection: Optional[EntityDetection] = None,
+        pdf_options: Optional[PDFOptions] = None,
+        audio_options: Optional[AudioOptions] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection

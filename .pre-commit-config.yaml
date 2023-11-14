@@ -9,7 +9,6 @@ repos:
     hooks:
       - id: black
         name: Format code (black)
-        language_version: python3.8
         exclude: ^src/privateai_client/components/__init__.py
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
