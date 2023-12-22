@@ -17,6 +17,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = ["requests~=2.31.0"]
 
 [project.urls]
 "Homepage" = "https://github.com/privateai/pai-thin-client/"
