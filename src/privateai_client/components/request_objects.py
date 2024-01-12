@@ -6,7 +6,7 @@ class BaseRequestObject:
     def to_dict(self):
         dict_obj = dict()
         for key, value in self.__dict__.items():
-            if value is None:
+            if value in [None, [], {}]:
                 continue
             name = key if key[0] != "_" else key[1:]
             if self._issubclass(value):
@@ -657,11 +657,13 @@ class ProcessTextRequest(BaseRequestObject):
         link_batch: Optional[bool] = None,
         entity_detection: Optional[EntityDetection] = None,
         processed_text: Optional[ProcessedText] = None,
+        project_id: Optional[str] = None,
     ):
         self.text = text
         self.link_batch = link_batch
         self.entity_detection = entity_detection
         self.processed_text = processed_text
+        self.project_id = project_id
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -688,11 +690,13 @@ class ProcessFileUriRequest(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
+        project_id: Optional[str] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
         self.pdf_options = pdf_options
         self.audio_options = audio_options
+        self.project_id = project_id
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -721,11 +725,13 @@ class ProcessFileBase64Request(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
+        project_id: Optional[str] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection
         self.pdf_options = pdf_options
         self.audio_options = audio_options
+        self.project_id = project_id
 
     @classmethod
     def fromdict(cls, values: dict):
