@@ -22,6 +22,7 @@ dependencies = ["requests~=2.31.0"]
 [project.urls]
 "Homepage" = "https://github.com/privateai/pai-thin-client/"
 "Bug Tracker" = "https://github.com/privateai/pai-thin-client/issues"
+"Changelog" = "https://github.com/privateai/pai-thin-client/blob.main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "src/privateai_client/__about__.py"
