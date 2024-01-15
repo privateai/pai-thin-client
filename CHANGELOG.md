@@ -2,6 +2,7 @@
 [Unreleased]
 
 Added
+* Created CONTRIBUTING.md to help developers with making modifications to this repo
 
 Changed
 
