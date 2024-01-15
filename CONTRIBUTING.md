@@ -109,22 +109,29 @@ Follow the steps below to setup you development environment
 
 - Install the latest version of python 3.10. We recommend using a python environment manager such as [pyenv](https://github.com/pyenv/pyenv).
 - Clone the repository to your local computer.
-- Install the required development dependencies with the command `pip install -r requirements.dev.txt`
-- Install the pre-commit hook with the command `pre-commit install`
-- Run the tests by copying `./src/privateai_client/tests/.env.example` to `./src/privateai_client/tests/.env`, updating it with your test environment, and running the command `pytest`
+- Install the required development dependencies with the command `pip install -r requirements.dev.txt`.
+- Install the pre-commit hook with the command `pre-commit install`.
+- Run the tests by copying `./src/privateai_client/tests/.env.example` to `./src/privateai_client/tests/.env`, updating it with your test environment, and running the command `pytest`.
 
 
 ### Improving The Documentation
 
 - Update the [README.md](./README.md) if there are new features or enhancements to existing features, especially if there are changes to the interface.
-- Update the [CONTRIBUTING.md](./CONTRIBUTING.md) if there are changes to the build, test, issue, or feature processes
-- Update the [CHANGELOG.md](./CHANGELOG.md) with a list of Added, Changed, or Fixed items
+- Update the [CONTRIBUTING.md](./CONTRIBUTING.md) if there are changes to the build, test, issue, or feature processes.
+- Update the [CHANGELOG.md](./CHANGELOG.md) with a list of Added, Changed, or Fixed items.
 
 ### Commit Messages
 
-- Organize your commits into actions that complete a single task. For example, a commit that adds a new feature, a new integration test for the feature, and updates documentation is fine, but a bug fix for a separate issue should be in a separate commit
-- Commit messages should be prefixed with Added, Changed, or Fixed to simplify the change log
+- Organize your commits into actions that complete a single task. For example, a commit that adds a new feature, a new integration test for the feature, and updates documentation is fine, but a bug fix for a separate issue should be in a separate commit.
+- Commit messages should be prefixed with Added, Changed, or Fixed to simplify the change log.
 
+### Releases
+
+Follow the steps below to release a new version (maintainers only)
+
+- Update the [__about__.py](./src/privateai_client/__about__.py) with the latest version of the container.
+- Check that [CHANGELOG.md](./CHANGELOG.md) has all the commits since the previous release.
+- Update [CHANGELOG.md](./CHANGELOG.md) with a new section for the release version.
 
 ## Attribution
 This guide is based on the **contributing.md**. [Make your own](https://contributing.md/)!
