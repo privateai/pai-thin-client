@@ -7,6 +7,17 @@ Changed
 
 Fixed
 
+[3.6.2] - 2024-01-15
+
+Added
+* Created CONTRIBUTING.md to help developers with making modifications to this repo
+
+Changed
+
+Fixed
+* Typo for standard_high_multilingual model selection
+* Code format
+
 [3.6.1] - 2024-01-11
 
 Added
