@@ -7,6 +7,7 @@
 * Updated formatting of CHANGELOG.md
 
 ### Fixed
+* Updated links in CONTRIBUTING.md
 
 ## [3.6.2] - 2024-01-15
 
