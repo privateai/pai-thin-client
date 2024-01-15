@@ -6,6 +6,8 @@ Added
 Changed
 
 Fixed
+* Typo for standard_high_multilingual model selection
+* Code format
 
 [3.6.1] - 2024-01-11
 
