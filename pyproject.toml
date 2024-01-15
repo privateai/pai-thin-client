@@ -23,6 +23,7 @@ dependencies = ["requests~=2.31.0"]
 "Homepage" = "https://github.com/privateai/pai-thin-client/"
 "Bug Tracker" = "https://github.com/privateai/pai-thin-client/issues"
 "Changelog" = "https://github.com/privateai/pai-thin-client/blob/main/CHANGELOG.md"
+"Contributing" = "https://github.com/privateai/pai-thin-client/blob/main/CONTRIBUTING.md"
 
 [tool.hatch.version]
 path = "src/privateai_client/__about__.py"
