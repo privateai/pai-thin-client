@@ -843,7 +843,7 @@ class BleepRequest(BaseRequestObject):
         file: File,
         timestamps: List,
         bleep_frequency: int = None,
-        bleep_gain: Union[int, float] = None
+        bleep_gain: int = None
     ):
         self.file = file
         self.timestamps = timestamps
