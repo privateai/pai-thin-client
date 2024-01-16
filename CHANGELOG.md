@@ -9,6 +9,18 @@
 ### Fixed
 * Updated links in CONTRIBUTING.md
 
+
+## [3.6.3] - 2024-01-16
+
+### Added
+* Added support of 2 new paramters in `audio_options_obj` and `bleep_obj` objects:
+    * `bleep_gain` - Sets the gain level, in decibels (dB), for the bleep sound within the audio segment. 
+    * `bleep_frequency` - Configures the frequency of the sine wave used for the bleep sound in an audio segment.
+
+### Changed
+
+### Fixed
+
 ## [3.6.2] - 2024-01-15
 
 ### Added
