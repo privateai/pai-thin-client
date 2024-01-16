@@ -4,10 +4,8 @@
 ### Added
 
 ### Changed
-* Updated formatting of CHANGELOG.md
 
 ### Fixed
-* Updated links in CONTRIBUTING.md
 
 
 ## [3.6.3] - 2024-01-16
@@ -18,8 +16,10 @@
     * `bleep_frequency` - Configures the frequency of the sine wave used for the bleep sound in an audio segment.
 
 ### Changed
+* Updated formatting of CHANGELOG.md
 
 ### Fixed
+* Updated links in CONTRIBUTING.md
 
 ## [3.6.2] - 2024-01-15
 
