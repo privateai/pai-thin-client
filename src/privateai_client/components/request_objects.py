@@ -126,8 +126,7 @@ class AudioOptions(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError(
-                "ProcessedText can only accept the values 'bleep_start_padding', \
-                    'bleep_end_padding', 'bleep_frequency', and 'bleep_gain'"
+                "ProcessedText can only accept the values 'bleep_start_padding', 'bleep_end_padding', 'bleep_frequency', and 'bleep_gain'"
             )
 
 

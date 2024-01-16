@@ -505,9 +505,9 @@ def test_audio_options_initialize_fromdict():
 
 
 def test_audio_options_invalid_initialize_fromdict():
-    error_msg = "ProcessedText can only accept the values 'bleep_start_padding' and 'bleep_end_padding'"
+    error_msg = "ProcessedText can only accept the values 'bleep_start_padding', 'bleep_end_padding', 'bleep_frequency', and 'bleep_gain'"
     with pytest.raises(TypeError) as excinfo:
-        AudioOptions.fromdict({"bleep_start_padding": 0.2, "bleep_end_padding": 0.1, "junk": "value"})
+        AudioOptions.fromdict({"bleep_start_padding": 0.2, "bleep_end_padding": 0.1, "bleep_frequency": 10, "bleep_gain": 0, "junk": "value"})
     assert error_msg in str(excinfo.value)
 
 
@@ -515,9 +515,13 @@ def test_audio_options_setters():
     audio_options = AudioOptions()
     audio_options.bleep_end_padding = 1.0
     audio_options.bleep_start_padding = 2.0
+    audio_options.bleep_frequency = 100
+    audio_options.bleep_gain = -50
 
     assert audio_options.bleep_end_padding == 1.0
     assert audio_options.bleep_start_padding == 2.0
+    assert audio_options.bleep_frequency == 100
+    assert audio_options.bleep_gain == -50
 
 
 def test_audio_options_bleep_start_padding_validator():
@@ -945,7 +949,7 @@ def test_bleep_request_initialize_fromdict():
 
 
 def test_bleep_request_invalid_initialize_fromdict():
-    error_msg = "BleepRequest can only accept the values 'file'and 'timestamps'"
+    error_msg = "BleepRequest can only accept the values 'file', 'timestamps', 'bleep_frequency', and 'bleep_gain'"
     file = File(data="test", content_type="image/jpg")
     timestamps = [Timestamp(start=0.0, end=1.0)]
     with pytest.raises(TypeError) as excinfo:
@@ -953,6 +957,8 @@ def test_bleep_request_invalid_initialize_fromdict():
             {
                 "file": file.to_dict(),
                 "timestamps": [row.to_dict() for row in timestamps],
+                "bleep_gain": 2,
+                "bleep_frequency": 400,
                 "junk": "value",
             }
         )
