@@ -843,9 +843,13 @@ class BleepRequest(BaseRequestObject):
         self,
         file: File,
         timestamps: List,
+        bleep_frequency: int = None,
+        bleep_gain: Union[int, float] = None
     ):
         self.file = file
         self.timestamps = timestamps
+        self.bleep_frequency = bleep_frequency
+        self.bleep_gain = bleep_gain
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -863,7 +867,7 @@ class BleepRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "BleepRequest can only accept the values 'file'and 'timestamps'"
+                "BleepRequest can only accept the values 'file', 'timestamps', 'bleep_frequency', and 'bleep_gain'"
             )
 
 

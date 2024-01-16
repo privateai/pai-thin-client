@@ -173,3 +173,45 @@ def test_process_audio_file_base64():
         processed_file = resp.processed_file.encode("ascii")
         processed_file = base64.b64decode(processed_file, validate=True)
         redacted_file.write(processed_file)
+
+def test_bleep():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = f"test_audio.mp3"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type= "audio/mp3"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    # test creating bleep object from dict
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    timestamp = rq.timestamp_obj(start=1.0, end=2.0)
+    request_obj = rq.bleep_obj.fromdict(
+        {
+            "file": {"data": file_data, "content_type": "audio/mp3"},
+            "timestamps" : [
+                {"start": 1.0, "end": 2.2},
+                ],
+            "bleep_gain": -50,
+            "bleep_frequency": 600
+            },
+        )
+
+    resp = client.bleep(request_object=request_obj)
+
+    with open(os.path.join(test_dir, "test_files", f"redacted-1-{file_name}"), 'wb') as redacted_file:
+        processed_file = resp.bleeped_file.encode("ascii")
+        processed_file = base64.b64decode(processed_file, validate=True)
+        redacted_file.write(processed_file)
+
+    # test creating bleep object without dict
+    request_obj = rq.bleep_obj(file=file_obj, timestamps=[timestamp], bleep_frequency=500, bleep_gain=-30)
+    resp = client.bleep(request_object=request_obj)
+
+    with open(os.path.join(test_dir, "test_files", f"redacted-2-{file_name}"), 'wb') as redacted_file:
+        processed_file = resp.bleeped_file.encode("ascii")
+        processed_file = base64.b64decode(processed_file, validate=True)
+        redacted_file.write(processed_file)
