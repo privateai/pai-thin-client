@@ -490,8 +490,8 @@ def test_audio_options_default_initializer():
     audio_options = AudioOptions()
     assert audio_options.bleep_end_padding == 0.5
     assert audio_options.bleep_start_padding == 0.5
-    assert audio_options.bleep_frequency == 600
-    assert audio_options.bleep_gain == -3
+    assert audio_options.bleep_frequency == None
+    assert audio_options.bleep_gain == None
 
 
 def test_audio_options_initializer():
@@ -500,7 +500,14 @@ def test_audio_options_initializer():
     assert audio_options.bleep_end_padding == 300.0
     assert audio_options.bleep_gain == -2
     assert audio_options.bleep_frequency == 250
+    
 
+def test_audio_options_initializer_without_bleep_gain_and_bleep_frequency():
+    audio_options = AudioOptions(bleep_start_padding=200.0, bleep_end_padding=300.0)
+    assert audio_options.bleep_start_padding == 200.0
+    assert audio_options.bleep_end_padding == 300.0
+    assert audio_options.bleep_gain == None
+    assert audio_options.bleep_frequency == None
 
 def test_audio_options_initialize_fromdict():
     audio_options = AudioOptions.fromdict({"bleep_start_padding": 0.3, "bleep_end_padding": 0.7, "bleep_gain": -2, "bleep_frequency": 250})
@@ -560,8 +567,11 @@ def test_audio_options_to_dict():
     audio_options = AudioOptions().to_dict()
     assert audio_options["bleep_end_padding"] == 0.5
     assert audio_options["bleep_start_padding"] == 0.5
-    assert audio_options["bleep_gain"] == -3
-    assert audio_options["bleep_frequency"] == 600
+    
+    with pytest.raises(KeyError):
+        assert audio_options["bleep_gain"] == -3
+    with pytest.raises(KeyError):
+        assert audio_options["bleep_frequency"] == 600
 
 
 # Timestamp Tests

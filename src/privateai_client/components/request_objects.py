@@ -33,15 +33,15 @@ class BaseRequestObject:
 class AudioOptions(BaseRequestObject):
     default_bleep_start_padding: float = 0.5
     default_bleep_end_padding: float = 0.5
-    default_bleep_frequency: int = 600
-    default_bleep_gain: int =  -3
+    default_bleep_frequency: Optional[int] = None
+    default_bleep_gain: Optional[int] =  None
 
     def __init__(
         self,
         bleep_start_padding: float = default_bleep_start_padding,
         bleep_end_padding: float = default_bleep_end_padding,
-        bleep_frequency: int = default_bleep_frequency,
-        bleep_gain: int = default_bleep_gain
+        bleep_frequency: Optional[int] = default_bleep_frequency,
+        bleep_gain: Optional[int] = default_bleep_gain
     ):
         if self._bleep_start_padding_validator(bleep_start_padding):
             self._bleep_start_padding = bleep_start_padding
@@ -107,16 +107,16 @@ class AudioOptions(BaseRequestObject):
         return True
 
     def _bleep_frequency_validator(self, var):
-        if type(var) is not int:
+        if type(var) is not int and var is not None:
             raise ValueError(
-                f"AudioOptions.bleep_frequency must be of type int, but got {type(var)}"
+                f"AudioOptions.bleep_frequency must be of type int or None, but got {type(var)}"
             )
         return True
 
     def _bleep_gain_validator(self, var):
-        if type(var) is not int:
+        if type(var) is not int and var is not None:
             raise ValueError(
-                f"AudioOptions.bleep_gain must be of type int, but got {type(var)}"
+                f"AudioOptions.bleep_gain must be of type int or None, but got {type(var)}"
             )
         return True
 
@@ -842,8 +842,8 @@ class BleepRequest(BaseRequestObject):
         self,
         file: File,
         timestamps: List,
-        bleep_frequency: int = None,
-        bleep_gain: int = None
+        bleep_frequency: Optional[int] = None,
+        bleep_gain: Optional[int] = None
     ):
         self.file = file
         self.timestamps = timestamps
