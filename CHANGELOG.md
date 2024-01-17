@@ -8,7 +8,7 @@
 ### Fixed
 
 
-## [3.6.3] - 2024-01-16
+## [3.6.3] - 2024-01-18
 
 ### Added
 * Added support of 2 new paramters in `audio_options_obj` and `bleep_obj` objects:
