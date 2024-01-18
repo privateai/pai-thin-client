@@ -33,16 +33,24 @@ class BaseRequestObject:
 class AudioOptions(BaseRequestObject):
     default_bleep_start_padding: float = 0.5
     default_bleep_end_padding: float = 0.5
+    default_bleep_frequency: Optional[int] = None
+    default_bleep_gain: Optional[int] =  None
 
     def __init__(
         self,
         bleep_start_padding: float = default_bleep_start_padding,
         bleep_end_padding: float = default_bleep_end_padding,
+        bleep_frequency: Optional[int] = default_bleep_frequency,
+        bleep_gain: Optional[int] = default_bleep_gain
     ):
         if self._bleep_start_padding_validator(bleep_start_padding):
             self._bleep_start_padding = bleep_start_padding
         if self._bleep_end_padding_validator(bleep_end_padding):
             self._bleep_end_padding = bleep_end_padding
+        if self._bleep_frequency_validator(bleep_frequency):
+            self._bleep_frequency = bleep_frequency
+        if self._bleep_gain_validator(bleep_gain):
+            self._bleep_gain = bleep_gain
 
     @property
     def bleep_start_padding(self):
@@ -51,6 +59,14 @@ class AudioOptions(BaseRequestObject):
     @property
     def bleep_end_padding(self):
         return self._bleep_end_padding
+
+    @property
+    def bleep_frequency(self):
+        return self._bleep_frequency
+
+    @property
+    def bleep_gain(self):
+        return self._bleep_gain
 
     @bleep_start_padding.setter
     def bleep_start_padding(self, var):
@@ -61,6 +77,16 @@ class AudioOptions(BaseRequestObject):
     def bleep_end_padding(self, var):
         if self._bleep_end_padding_validator(var):
             self._bleep_end_padding = var
+
+    @bleep_frequency.setter
+    def bleep_frequency(self, var):
+        if self._bleep_frequency_validator(var):
+            self._bleep_frequency = var
+
+    @bleep_gain.setter
+    def bleep_gain(self, var):
+        if self._bleep_gain_validator(var):
+            self._bleep_gain = var
 
     def _bleep_start_padding_validator(self, var):
         if type(var) is not float:
@@ -80,13 +106,27 @@ class AudioOptions(BaseRequestObject):
             raise ValueError("AudioOptions.bleep_end_padding must be positive")
         return True
 
+    def _bleep_frequency_validator(self, var):
+        if type(var) is not int and var is not None:
+            raise ValueError(
+                f"AudioOptions.bleep_frequency must be of type int or None, but got {type(var)}"
+            )
+        return True
+
+    def _bleep_gain_validator(self, var):
+        if type(var) is not int and var is not None:
+            raise ValueError(
+                f"AudioOptions.bleep_gain must be of type int or None, but got {type(var)}"
+            )
+        return True
+
     @classmethod
     def fromdict(cls, values: dict):
         try:
             return cls._fromdict(values)
         except TypeError:
             raise TypeError(
-                "ProcessedText can only accept the values 'bleep_start_padding' and 'bleep_end_padding'"
+                "ProcessedText can only accept the values 'bleep_start_padding', 'bleep_end_padding', 'bleep_frequency', and 'bleep_gain'"
             )
 
 
@@ -802,9 +842,13 @@ class BleepRequest(BaseRequestObject):
         self,
         file: File,
         timestamps: List,
+        bleep_frequency: Optional[int] = None,
+        bleep_gain: Optional[int] = None
     ):
         self.file = file
         self.timestamps = timestamps
+        self.bleep_frequency = bleep_frequency
+        self.bleep_gain = bleep_gain
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -822,7 +866,7 @@ class BleepRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "BleepRequest can only accept the values 'file'and 'timestamps'"
+                "BleepRequest can only accept the values 'file', 'timestamps', 'bleep_frequency', and 'bleep_gain'"
             )
 
 

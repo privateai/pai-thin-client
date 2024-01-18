@@ -490,24 +490,37 @@ def test_audio_options_default_initializer():
     audio_options = AudioOptions()
     assert audio_options.bleep_end_padding == 0.5
     assert audio_options.bleep_start_padding == 0.5
+    assert audio_options.bleep_frequency == None
+    assert audio_options.bleep_gain == None
 
 
 def test_audio_options_initializer():
+    audio_options = AudioOptions(bleep_start_padding=200.0, bleep_end_padding=300.0, bleep_gain=-2, bleep_frequency=250)
+    assert audio_options.bleep_start_padding == 200.0
+    assert audio_options.bleep_end_padding == 300.0
+    assert audio_options.bleep_gain == -2
+    assert audio_options.bleep_frequency == 250
+    
+
+def test_audio_options_initializer_without_bleep_gain_and_bleep_frequency():
     audio_options = AudioOptions(bleep_start_padding=200.0, bleep_end_padding=300.0)
     assert audio_options.bleep_start_padding == 200.0
     assert audio_options.bleep_end_padding == 300.0
-
+    assert audio_options.bleep_gain == None
+    assert audio_options.bleep_frequency == None
 
 def test_audio_options_initialize_fromdict():
-    audio_options = AudioOptions.fromdict({"bleep_start_padding": 0.3, "bleep_end_padding": 0.7})
+    audio_options = AudioOptions.fromdict({"bleep_start_padding": 0.3, "bleep_end_padding": 0.7, "bleep_gain": -2, "bleep_frequency": 250})
     assert audio_options.bleep_start_padding == 0.3
     assert audio_options.bleep_end_padding == 0.7
+    assert audio_options.bleep_gain == -2
+    assert audio_options.bleep_frequency == 250
 
 
 def test_audio_options_invalid_initialize_fromdict():
-    error_msg = "ProcessedText can only accept the values 'bleep_start_padding' and 'bleep_end_padding'"
+    error_msg = "ProcessedText can only accept the values 'bleep_start_padding', 'bleep_end_padding', 'bleep_frequency', and 'bleep_gain'"
     with pytest.raises(TypeError) as excinfo:
-        AudioOptions.fromdict({"bleep_start_padding": 0.2, "bleep_end_padding": 0.1, "junk": "value"})
+        AudioOptions.fromdict({"bleep_start_padding": 0.2, "bleep_end_padding": 0.1, "bleep_frequency": 10, "bleep_gain": 0, "junk": "value"})
     assert error_msg in str(excinfo.value)
 
 
@@ -515,9 +528,13 @@ def test_audio_options_setters():
     audio_options = AudioOptions()
     audio_options.bleep_end_padding = 1.0
     audio_options.bleep_start_padding = 2.0
+    audio_options.bleep_frequency = 100
+    audio_options.bleep_gain = -50
 
     assert audio_options.bleep_end_padding == 1.0
     assert audio_options.bleep_start_padding == 2.0
+    assert audio_options.bleep_frequency == 100
+    assert audio_options.bleep_gain == -50
 
 
 def test_audio_options_bleep_start_padding_validator():
@@ -532,12 +549,29 @@ def test_audio_options_bleep_end_padding_validator():
     with pytest.raises(ValueError) as excinfo:
         AudioOptions().bleep_end_padding = "junk"
     assert error_msg in str(excinfo.value)
+    
+def test_audio_options_bleep_gain_validator():
+    error_msg = "AudioOptions.bleep_gain must be of type int"
+    with pytest.raises(ValueError) as excinfo:
+        AudioOptions().bleep_gain = "junk"
+    assert error_msg in str(excinfo.value)
+    
+def test_audio_options_bleep_frequency_validator():
+    error_msg = "AudioOptions.bleep_frequency must be of type int"
+    with pytest.raises(ValueError) as excinfo:
+        AudioOptions().bleep_frequency = "junk"
+    assert error_msg in str(excinfo.value)
 
 
 def test_audio_options_to_dict():
     audio_options = AudioOptions().to_dict()
     assert audio_options["bleep_end_padding"] == 0.5
     assert audio_options["bleep_start_padding"] == 0.5
+    
+    with pytest.raises(KeyError):
+        assert audio_options["bleep_gain"] == -3
+    with pytest.raises(KeyError):
+        assert audio_options["bleep_frequency"] == 600
 
 
 # Timestamp Tests
@@ -732,7 +766,7 @@ def test_process_file_uri_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -743,6 +777,8 @@ def test_process_file_uri_request_initializer():
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
     assert process_file_uri_obj.pdf_options.density == 100
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
+    assert process_file_uri_obj.audio_options.bleep_frequency == 200
+    assert process_file_uri_obj.audio_options.bleep_gain == -2
 
 
 def test_process_file_uri_request_initialize_fromdict():
@@ -755,7 +791,7 @@ def test_process_file_uri_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
         {
             "uri": "this/location/right/here.png",
@@ -768,6 +804,8 @@ def test_process_file_uri_request_initialize_fromdict():
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
     assert process_file_uri_obj.pdf_options.density == 100
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
+    assert process_file_uri_obj.audio_options.bleep_frequency == 200
+    assert process_file_uri_obj.audio_options.bleep_gain == -2
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
@@ -783,7 +821,7 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     with pytest.raises(TypeError) as excinfo:
         ProcessFileUriRequest.fromdict(
             {
@@ -807,7 +845,7 @@ def test_process_file_uri_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -818,6 +856,8 @@ def test_process_file_uri_request_to_dict():
     assert process_file_uri_obj["entity_detection"]["accuracy"] == "standard"
     assert process_file_uri_obj["pdf_options"]["density"] == 100
     assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2.0
+    assert process_file_uri_obj["audio_options"]["bleep_frequency"] == 200
+    assert process_file_uri_obj["audio_options"]["bleep_gain"] == -2
 
 
 # Process File Base64 Request Tests
@@ -839,7 +879,7 @@ def test_process_file_base64_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -850,6 +890,8 @@ def test_process_file_base64_request_initializer():
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
     assert process_file_base64_request_obj.pdf_options.density == 100
     assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
+    assert process_file_base64_request_obj.audio_options.bleep_frequency == 200
+    assert process_file_base64_request_obj.audio_options.bleep_gain == -2
 
 
 def test_process_file_base64_request_initialize_fromdict():
@@ -863,7 +905,7 @@ def test_process_file_base64_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
         {
             "file": file.to_dict(),
@@ -876,6 +918,8 @@ def test_process_file_base64_request_initialize_fromdict():
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
     assert process_file_base64_request_obj.pdf_options.density == 100
     assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
+    assert process_file_base64_request_obj.audio_options.bleep_frequency == 200
+    assert process_file_base64_request_obj.audio_options.bleep_gain == -2
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
@@ -890,7 +934,7 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     with pytest.raises(TypeError) as excinfo:
         ProcessFileBase64Request.fromdict(
             {
@@ -914,7 +958,7 @@ def test_process_file_base64_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0)
+    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -925,6 +969,8 @@ def test_process_file_base64_request_to_dict():
     assert process_file_base64_request_obj["entity_detection"]["accuracy"] == "standard"
     assert process_file_base64_request_obj["pdf_options"]["density"] == 100
     assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.0
+    assert process_file_base64_request_obj["audio_options"]["bleep_frequency"] == 200
+    assert process_file_base64_request_obj["audio_options"]["bleep_gain"] == -2
 
 
 # Bleep Request Tests
@@ -945,7 +991,7 @@ def test_bleep_request_initialize_fromdict():
 
 
 def test_bleep_request_invalid_initialize_fromdict():
-    error_msg = "BleepRequest can only accept the values 'file'and 'timestamps'"
+    error_msg = "BleepRequest can only accept the values 'file', 'timestamps', 'bleep_frequency', and 'bleep_gain'"
     file = File(data="test", content_type="image/jpg")
     timestamps = [Timestamp(start=0.0, end=1.0)]
     with pytest.raises(TypeError) as excinfo:
@@ -953,6 +999,8 @@ def test_bleep_request_invalid_initialize_fromdict():
             {
                 "file": file.to_dict(),
                 "timestamps": [row.to_dict() for row in timestamps],
+                "bleep_gain": 2,
+                "bleep_frequency": 400,
                 "junk": "value",
             }
         )

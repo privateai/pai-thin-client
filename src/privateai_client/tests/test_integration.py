@@ -151,3 +151,41 @@ def test_process_file_base64():
     request_obj = rq.file_base64_obj(file=file_obj)
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
+
+def test_process_audio_file_base64():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = "test_audio.mp3"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type= "audio/mp3"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    audio_option_obj = rq.audio_options_obj(bleep_gain=-50, bleep_frequency=300)
+    request_obj = rq.file_base64_obj(file=file_obj, audio_options=audio_option_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+def test_bleep():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = "test_audio.mp3"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type= "audio/mp3"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    timestamp = rq.timestamp_obj(start=1.0, end=2.0)
+
+    request_obj = rq.bleep_obj(file=file_obj, timestamps=[timestamp], bleep_frequency=500, bleep_gain=-30)
+    resp = client.bleep(request_object=request_obj)
+    assert resp.ok
+    
