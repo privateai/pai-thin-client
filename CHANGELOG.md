@@ -7,6 +7,14 @@
 
 ### Fixed
 
+## [3.7.1] - 2024-02-01
+
+### Added
+- Added "ALLOW_TEXT" as a valid type to filter objects
+
+### Changed
+
+### Fixed
 
 ## [3.7.0] - 2024-02-01
 

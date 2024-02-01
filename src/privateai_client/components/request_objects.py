@@ -12,9 +12,7 @@ class BaseRequestObject:
             if self._issubclass(value):
                 dict_obj[name] = value.to_dict()
             elif type(value) is list:
-                dict_obj[name] = [
-                    row.to_dict() if self._issubclass(row) else row for row in value
-                ]
+                dict_obj[name] = [row.to_dict() if self._issubclass(row) else row for row in value]
             elif not key.startswith("__") and not callable(key):
                 dict_obj[name] = value
         return dict_obj
@@ -34,14 +32,14 @@ class AudioOptions(BaseRequestObject):
     default_bleep_start_padding: float = 0.5
     default_bleep_end_padding: float = 0.5
     default_bleep_frequency: Optional[int] = None
-    default_bleep_gain: Optional[int] =  None
+    default_bleep_gain: Optional[int] = None
 
     def __init__(
         self,
         bleep_start_padding: float = default_bleep_start_padding,
         bleep_end_padding: float = default_bleep_end_padding,
         bleep_frequency: Optional[int] = default_bleep_frequency,
-        bleep_gain: Optional[int] = default_bleep_gain
+        bleep_gain: Optional[int] = default_bleep_gain,
     ):
         if self._bleep_start_padding_validator(bleep_start_padding):
             self._bleep_start_padding = bleep_start_padding
@@ -90,34 +88,26 @@ class AudioOptions(BaseRequestObject):
 
     def _bleep_start_padding_validator(self, var):
         if type(var) is not float:
-            raise ValueError(
-                f"AudioOptions.bleep_start_padding must be of type float, but got {type(var)}"
-            )
+            raise ValueError(f"AudioOptions.bleep_start_padding must be of type float, but got {type(var)}")
         if var < 0:
             raise ValueError("AudioOptions.bleep_start_padding must be positive")
         return True
 
     def _bleep_end_padding_validator(self, var):
         if type(var) is not float:
-            raise ValueError(
-                f"AudioOptions.bleep_end_padding must be of type float, but got {type(var)}"
-            )
+            raise ValueError(f"AudioOptions.bleep_end_padding must be of type float, but got {type(var)}")
         if var < 0:
             raise ValueError("AudioOptions.bleep_end_padding must be positive")
         return True
 
     def _bleep_frequency_validator(self, var):
         if type(var) is not int and var is not None:
-            raise ValueError(
-                f"AudioOptions.bleep_frequency must be of type int or None, but got {type(var)}"
-            )
+            raise ValueError(f"AudioOptions.bleep_frequency must be of type int or None, but got {type(var)}")
         return True
 
     def _bleep_gain_validator(self, var):
         if type(var) is not int and var is not None:
-            raise ValueError(
-                f"AudioOptions.bleep_gain must be of type int or None, but got {type(var)}"
-            )
+            raise ValueError(f"AudioOptions.bleep_gain must be of type int or None, but got {type(var)}")
         return True
 
     @classmethod
@@ -157,9 +147,7 @@ class Entity(BaseRequestObject):
 
     def _processed_text_validator(self, var):
         if type(var) is not str:
-            raise TypeError(
-                f"{var} is not valid. Entity.processed_text must be of type string"
-            )
+            raise TypeError(f"{var} is not valid. Entity.processed_text must be of type string")
         return True
 
     def _text_validator(self, var):
@@ -172,9 +160,7 @@ class Entity(BaseRequestObject):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError(
-                "Entity can only accept the values 'processed_text' and 'text'"
-            )
+            raise TypeError("Entity can only accept the values 'processed_text' and 'text'")
 
 
 class EntityTypeSelector(BaseRequestObject):
@@ -212,9 +198,7 @@ class EntityTypeSelector(BaseRequestObject):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError(
-                "EntityTypeSelector can only accept the values 'type' and 'value'"
-            )
+            raise TypeError("EntityTypeSelector can only accept the values 'type' and 'value'")
 
 
 class File(BaseRequestObject):
@@ -289,7 +273,7 @@ class File(BaseRequestObject):
 
 
 class FilterSelector(BaseRequestObject):
-    valid_types = ["ALLOW", "BLOCK"]
+    valid_types = ["ALLOW", "BLOCK", "ALLOW_TEXT"]
     default_threshold = 1
 
     def __init__(
@@ -320,17 +304,13 @@ class FilterSelector(BaseRequestObject):
     @property
     def entity_type(self):
         if self.type != "BLOCK":
-            raise AttributeError(
-                f"FilterSelector of type {self.type} does not contain entity_type"
-            )
+            raise AttributeError(f"FilterSelector of type {self.type} does not contain entity_type")
         return self._entity_type
 
     @property
     def threshold(self):
         if self.type != "BLOCK":
-            raise AttributeError(
-                f"FilterSelector of type {self.type} does not contain threshold"
-            )
+            raise AttributeError(f"FilterSelector of type {self.type} does not contain threshold")
         return self._threshold
 
     @type.setter
@@ -380,9 +360,7 @@ class FilterSelector(BaseRequestObject):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError(
-                "FilterSelector can only accept the values 'type' and 'pattern'"
-            )
+            raise TypeError("FilterSelector can only accept the values 'type' and 'pattern'")
 
 
 class PDFOptions(BaseRequestObject):
@@ -443,9 +421,7 @@ class ProcessedMarkerText(BaseRequestObject):
     ]
 
     def __init__(self, pattern: str = default_pattern):
-        for attribute in (
-            ProcessedMaskText.attributes + ProcessedSyntheticText.attributes
-        ):
+        for attribute in ProcessedMaskText.attributes + ProcessedSyntheticText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "MARKER"
         if self._pattern_validator(pattern):
@@ -472,9 +448,7 @@ class ProcessedMaskText(BaseRequestObject):
     attributes = ["_mask_character"]
 
     def __init__(self, mask_character: str = "#"):
-        for attribute in (
-            ProcessedMarkerText.attributes + ProcessedSyntheticText.attributes
-        ):
+        for attribute in ProcessedMarkerText.attributes + ProcessedSyntheticText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
         if self._mask_character_validator(mask_character):
             self._mask_character = mask_character
@@ -491,9 +465,7 @@ class ProcessedMaskText(BaseRequestObject):
 
     def _mask_character_validator(self, var):
         if len(var) != 1:
-            raise ValueError(
-                f"mask_character must have only one character. {var} has {len(var)} characters."
-            )
+            raise ValueError(f"mask_character must have only one character. {var} has {len(var)} characters.")
         return True
 
 
@@ -559,9 +531,7 @@ class ProcessedText(ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticTe
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError(
-                "ProcessedText can only accept the values 'type' and 'pattern'"
-            )
+            raise TypeError("ProcessedText can only accept the values 'type' and 'pattern'")
 
     @property
     def type(self):
@@ -676,24 +646,16 @@ class EntityDetection(BaseRequestObject):
 
     def _entity_types_validator(self, var):
         if type(var) is not list:
-            raise TypeError(
-                f"{var} is not valid. EntityDetection.entity_types can only be a list"
-            )
+            raise TypeError(f"{var} is not valid. EntityDetection.entity_types can only be a list")
         elif var and not all(isinstance(row, EntityTypeSelector) for row in var):
-            raise ValueError(
-                "EntityDetection.entity_types can only contain EntityTypeSelector objects"
-            )
+            raise ValueError("EntityDetection.entity_types can only contain EntityTypeSelector objects")
         return True
 
     def _filter_validator(self, var):
         if type(var) is not list:
-            raise ValueError(
-                f"{var} is not valid. EntityDetection.filter can only be a list"
-            )
+            raise ValueError(f"{var} is not valid. EntityDetection.filter can only be a list")
         elif var and not all(isinstance(x, FilterSelector) for x in var):
-            raise ValueError(
-                "EntityDetection.filter can only contain FilterSelector objects"
-            )
+            raise ValueError("EntityDetection.filter can only contain FilterSelector objects")
         return True
 
     def _return_entity_validator(self, var):
@@ -703,9 +665,7 @@ class EntityDetection(BaseRequestObject):
 
     def _enable_non_max_suppression_validator(self, var):
         if type(var) is not bool:
-            raise ValueError(
-                "EntityDetection.enable_non_max_suppression must be of type bool"
-            )
+            raise ValueError("EntityDetection.enable_non_max_suppression must be of type bool")
         return True
 
     @classmethod
@@ -714,13 +674,9 @@ class EntityDetection(BaseRequestObject):
             initializer_dict = {}
             for key, value in values.items():
                 if key == "entity_types":
-                    initializer_dict[key] = [
-                        EntityTypeSelector.fromdict(row) for row in value
-                    ]
+                    initializer_dict[key] = [EntityTypeSelector.fromdict(row) for row in value]
                 elif key == "filter":
-                    initializer_dict[key] = [
-                        FilterSelector.fromdict(row) for row in value
-                    ]
+                    initializer_dict[key] = [FilterSelector.fromdict(row) for row in value]
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
@@ -839,11 +795,7 @@ class ProcessFileBase64Request(BaseRequestObject):
 
 class BleepRequest(BaseRequestObject):
     def __init__(
-        self,
-        file: File,
-        timestamps: List,
-        bleep_frequency: Optional[int] = None,
-        bleep_gain: Optional[int] = None
+        self, file: File, timestamps: List, bleep_frequency: Optional[int] = None, bleep_gain: Optional[int] = None
     ):
         self.file = file
         self.timestamps = timestamps
@@ -858,9 +810,7 @@ class BleepRequest(BaseRequestObject):
                 if key == "file":
                     initializer_dict[key] = File.fromdict(value)
                 elif key == "timestamps":
-                    initializer_dict[key] = [
-                        Timestamp.fromdict(entry) for entry in value
-                    ]
+                    initializer_dict[key] = [Timestamp.fromdict(entry) for entry in value]
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
@@ -889,9 +839,7 @@ class ReidentifyTextRequest(BaseRequestObject):
             initializer_dict = {}
             for key, value in values.items():
                 if key == "entities":
-                    initializer_dict[key] = [
-                        Entity.fromdict(entity) for entity in values[key]
-                    ]
+                    initializer_dict[key] = [Entity.fromdict(entity) for entity in values[key]]
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
