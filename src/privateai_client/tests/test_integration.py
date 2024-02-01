@@ -67,6 +67,14 @@ def test_entity_detection_with_block_filter():
     assert resp.ok
 
 
+def test_entity_detection_with_allow_text_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW_TEXT", pattern="[A-Za-z0-9]*")
+    req = rq.process_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj(filter=[filter]))
+    resp = client.process_text(req)
+    assert resp.ok
+
+
 def test_full_entity_detection():
     client = _get_client()
     filter = rq.filter_selector_obj(type="ALLOW", pattern="[A-Za-z0-9]*")
@@ -152,13 +160,14 @@ def test_process_file_base64():
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
+
 def test_process_audio_file_base64():
     client = _get_client()
 
     test_dir = "/".join(__file__.split("/")[:-1])
     file_name = "test_audio.mp3"
     filepath = os.path.join(f"{test_dir}", "test_files", file_name)
-    file_type= "audio/mp3"
+    file_type = "audio/mp3"
 
     with open(filepath, "rb") as b64_file:
         file_data = base64.b64encode(b64_file.read())
@@ -170,13 +179,14 @@ def test_process_audio_file_base64():
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
+
 def test_bleep():
     client = _get_client()
 
     test_dir = "/".join(__file__.split("/")[:-1])
     file_name = "test_audio.mp3"
     filepath = os.path.join(f"{test_dir}", "test_files", file_name)
-    file_type= "audio/mp3"
+    file_type = "audio/mp3"
 
     with open(filepath, "rb") as b64_file:
         file_data = base64.b64encode(b64_file.read())
@@ -188,4 +198,3 @@ def test_bleep():
     request_obj = rq.bleep_obj(file=file_obj, timestamps=[timestamp], bleep_frequency=500, bleep_gain=-30)
     resp = client.bleep(request_object=request_obj)
     assert resp.ok
-    

@@ -65,6 +65,14 @@ def test_filter_selector_initializer2():
     assert filter_selector.threshold == 1
 
 
+def test_filter_selector_initializer():
+    test_type = "ALLOW_TEXT"
+    test_pattern = "[A-Z]"
+    filter_selector = FilterSelector(type=test_type, pattern=test_pattern)
+    assert filter_selector.type == test_type
+    assert filter_selector.pattern == test_pattern
+
+
 def test_filter_selector_initialize_fromdict():
     test_type = "ALLOW"
     test_pattern = "[A-Z]"
@@ -500,7 +508,7 @@ def test_audio_options_initializer():
     assert audio_options.bleep_end_padding == 300.0
     assert audio_options.bleep_gain == -2
     assert audio_options.bleep_frequency == 250
-    
+
 
 def test_audio_options_initializer_without_bleep_gain_and_bleep_frequency():
     audio_options = AudioOptions(bleep_start_padding=200.0, bleep_end_padding=300.0)
@@ -509,8 +517,11 @@ def test_audio_options_initializer_without_bleep_gain_and_bleep_frequency():
     assert audio_options.bleep_gain == None
     assert audio_options.bleep_frequency == None
 
+
 def test_audio_options_initialize_fromdict():
-    audio_options = AudioOptions.fromdict({"bleep_start_padding": 0.3, "bleep_end_padding": 0.7, "bleep_gain": -2, "bleep_frequency": 250})
+    audio_options = AudioOptions.fromdict(
+        {"bleep_start_padding": 0.3, "bleep_end_padding": 0.7, "bleep_gain": -2, "bleep_frequency": 250}
+    )
     assert audio_options.bleep_start_padding == 0.3
     assert audio_options.bleep_end_padding == 0.7
     assert audio_options.bleep_gain == -2
@@ -520,7 +531,15 @@ def test_audio_options_initialize_fromdict():
 def test_audio_options_invalid_initialize_fromdict():
     error_msg = "ProcessedText can only accept the values 'bleep_start_padding', 'bleep_end_padding', 'bleep_frequency', and 'bleep_gain'"
     with pytest.raises(TypeError) as excinfo:
-        AudioOptions.fromdict({"bleep_start_padding": 0.2, "bleep_end_padding": 0.1, "bleep_frequency": 10, "bleep_gain": 0, "junk": "value"})
+        AudioOptions.fromdict(
+            {
+                "bleep_start_padding": 0.2,
+                "bleep_end_padding": 0.1,
+                "bleep_frequency": 10,
+                "bleep_gain": 0,
+                "junk": "value",
+            }
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -549,13 +568,15 @@ def test_audio_options_bleep_end_padding_validator():
     with pytest.raises(ValueError) as excinfo:
         AudioOptions().bleep_end_padding = "junk"
     assert error_msg in str(excinfo.value)
-    
+
+
 def test_audio_options_bleep_gain_validator():
     error_msg = "AudioOptions.bleep_gain must be of type int"
     with pytest.raises(ValueError) as excinfo:
         AudioOptions().bleep_gain = "junk"
     assert error_msg in str(excinfo.value)
-    
+
+
 def test_audio_options_bleep_frequency_validator():
     error_msg = "AudioOptions.bleep_frequency must be of type int"
     with pytest.raises(ValueError) as excinfo:
@@ -567,7 +588,7 @@ def test_audio_options_to_dict():
     audio_options = AudioOptions().to_dict()
     assert audio_options["bleep_end_padding"] == 0.5
     assert audio_options["bleep_start_padding"] == 0.5
-    
+
     with pytest.raises(KeyError):
         assert audio_options["bleep_gain"] == -3
     with pytest.raises(KeyError):
