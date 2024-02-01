@@ -8,6 +8,15 @@
 ### Fixed
 
 
+## [3.7.0] - 2024-02-01
+
+### Added
+
+### Changed
+
+### Fixed
+- Removed unused imports from the client
+
 ## [3.6.3] - 2024-01-18
 
 ### Added
