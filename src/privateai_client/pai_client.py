@@ -1,10 +1,8 @@
 import logging
 from typing import Union
 
-from requests import HTTPError
-
-from .components import *
 from .__about__ import __version__
+from .components import *
 
 
 class PAIClient:
@@ -37,24 +35,22 @@ class PAIClient:
         elif auth_type == "bearer_token":
             auth_header = {"Authorization": f"Bearer {auth_val}"}
         else:
-            raise ValueError(
-                f"{auth_type} is not currently a supported method of authorization"
-            )
+            raise ValueError(f"{auth_type} is not currently a supported method of authorization")
         for subclass in [self.get, self.post]:
             subclass.headers = {**auth_header, **subclass.base_header}
 
     def _version_warning(self) -> None:
-
         # only compare major and minor version numbers
-        parsed_container_version = self._container_version.split('.')[:2]
-        parsed_client_version = __version__.split('.')[:2]
+        parsed_container_version = self._container_version.split(".")[:2]
+        parsed_client_version = __version__.split(".")[:2]
 
         if parsed_container_version != parsed_client_version:
-            logging.warning(f"Version mismatch: privateai_client {__version__} may be incompatible with PAI container "
-                            f"{self._container_version}. Please install the appropriate client version!")
+            logging.warning(
+                f"Version mismatch: privateai_client {__version__} may be incompatible with PAI container "
+                f"{self._container_version}. Please install the appropriate client version!"
+            )
 
     def check_version_compatibility(self) -> None:
-
         if self._container_version is None:
             self.get_version()
         else:
@@ -111,9 +107,7 @@ class PAIClient:
             self.check_version_compatibility()
             response = TextResponse(self.post.process_text(request_object))
         else:
-            raise ValueError(
-                "request_object can only be a dictionary or a ProcessTextRequest object"
-            )
+            raise ValueError("request_object can only be a dictionary or a ProcessTextRequest object")
         return response
 
     def reidentify_text(self, request_object: Union[dict, ReidentifyTextRequest]):
@@ -122,16 +116,12 @@ class PAIClient:
         """
         if type(request_object) is ReidentifyTextRequest:
             self.check_version_compatibility()
-            response = ReidentifyTextResponse(
-                self.post.reidentify_text(request_object.to_dict())
-            )
+            response = ReidentifyTextResponse(self.post.reidentify_text(request_object.to_dict()))
         elif type(request_object) is dict:
             self.check_version_compatibility()
             response = ReidentifyTextResponse(self.post.reidentify_text(request_object))
         else:
-            raise ValueError(
-                "request_object can only be a dictionary or a ReidentifyTextRequest object"
-            )
+            raise ValueError("request_object can only be a dictionary or a ReidentifyTextRequest object")
         return response
 
     def process_files_uri(self, request_object: Union[dict, ProcessFileUriRequest]):
@@ -140,38 +130,26 @@ class PAIClient:
         """
         if type(request_object) is ProcessFileUriRequest:
             self.check_version_compatibility()
-            response = FilesUriResponse(
-                self.post.process_files_uri(request_object.to_dict())
-            )
+            response = FilesUriResponse(self.post.process_files_uri(request_object.to_dict()))
         elif type(request_object) is dict:
             self.check_version_compatibility()
             response = FilesUriResponse(self.post.process_files_uri(request_object))
         else:
-            raise ValueError(
-                "request_object can only be a dictionary or a ProcessFileUriRequest object"
-            )
+            raise ValueError("request_object can only be a dictionary or a ProcessFileUriRequest object")
         return response
 
-    def process_files_base64(
-        self, request_object: Union[dict, ProcessFileBase64Request]
-    ):
+    def process_files_base64(self, request_object: Union[dict, ProcessFileBase64Request]):
         """
         Used to deidentify base64 files
         """
         if type(request_object) is ProcessFileBase64Request:
             self.check_version_compatibility()
-            response = FilesBase64Response(
-                self.post.process_files_base64(request_object.to_dict())
-            )
+            response = FilesBase64Response(self.post.process_files_base64(request_object.to_dict()))
         elif type(request_object) is dict:
             self.check_version_compatibility()
-            response = FilesBase64Response(
-                self.post.process_files_base64(request_object)
-            )
+            response = FilesBase64Response(self.post.process_files_base64(request_object))
         else:
-            raise ValueError(
-                "request_object can only be a dictionary or a ProcessFileBase64Request object"
-            )
+            raise ValueError("request_object can only be a dictionary or a ProcessFileBase64Request object")
         return response
 
     def bleep(self, request_object: Union[dict, BleepRequest]):
@@ -185,7 +163,5 @@ class PAIClient:
             self.check_version_compatibility()
             response = BleepResponse(self.post.bleep(request_object))
         else:
-            raise ValueError(
-                "request_object can only be a dictionary or a BleepRequest object"
-            )
+            raise ValueError("request_object can only be a dictionary or a BleepRequest object")
         return response
