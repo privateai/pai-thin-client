@@ -7,6 +7,16 @@
 
 ### Fixed
 
+## [3.7.2] - 2024-03-04
+
+### Added
+
+### Changed
+- Minor formatting
+
+### Fixed
+- Added "UNIQUE_HASHED_ENTITY_TYPE" to valid marker patterns
+
 ## [3.7.1] - 2024-02-01
 
 ### Added
