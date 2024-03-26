@@ -442,22 +442,24 @@ def test_pdf_options_default_initializer():
     pdf_options = PDFOptions()
     assert pdf_options.density == 200
     assert pdf_options.max_resolution == 3000
+    assert pdf_options.enable_pdf_text_layer is True
 
 
 def test_pdf_options_initializer():
-    pdf_options = PDFOptions(density=300, max_resolution=500)
+    pdf_options = PDFOptions(density=300, max_resolution=500, enable_pdf_text_layer=False)
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
+    assert pdf_options.enable_pdf_text_layer is False
 
 
 def test_pdf_options_initialize_fromdict():
-    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500})
+    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500, 'enable_pdf_text_layer': True})
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
-
+    assert pdf_options.enable_pdf_text_layer is True
 
 def test_pdf_options_invalid_initialize_fromdict():
-    error_msg = "PDFOptions can only accept 'density'"
+    error_msg = "PDFOptions can only accept 'density', 'max_resolution' and 'enable_pdf_text_layer'"
     with pytest.raises(TypeError) as excinfo:
         PDFOptions.fromdict({"density": 300, "max_resolution": 500, "junk": "value"})
     assert error_msg in str(excinfo.value)
@@ -469,6 +471,8 @@ def test_pdf_options_setters():
     assert pdf_options.density == 10
     pdf_options.max_resolution = 10
     assert pdf_options.max_resolution == 10
+    pdf_options.enable_pdf_text_layer = False
+    assert pdf_options.enable_pdf_text_layer is False
 
 
 def test_pdf_options_density_validator():
@@ -487,10 +491,19 @@ def test_pdf_options_max_resolution_validator():
     assert error_msg in str(excinfo.value)
 
 
+def test_pdf_options_enable_pdf_text_layer_validator():
+    error_msg = "PDFOptions.enable_pdf_text_layer must be of type bool"
+    pdf_options = PDFOptions()
+    with pytest.raises(ValueError) as excinfo:
+        pdf_options.enable_pdf_text_layer = "junk"
+    assert error_msg in str(excinfo.value)
+
+
 def test_pdf_options_to_dict():
     pdf_options = PDFOptions().to_dict()
     assert pdf_options["density"] == 200
     assert pdf_options["max_resolution"] == 3000
+    assert pdf_options["enable_pdf_text_layer"] is True
 
 
 # Audio Options Tests

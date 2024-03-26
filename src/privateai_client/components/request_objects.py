@@ -388,14 +388,17 @@ class FilterSelector(BaseRequestObject):
 class PDFOptions(BaseRequestObject):
     default_density = 200
     default_max_resolution = 3000
+    default_enable_pdf_text_layer: bool = True
 
     def __init__(
         self,
         density: int = default_density,
         max_resolution: int = default_max_resolution,
+        enable_pdf_text_layer: bool = default_enable_pdf_text_layer
     ):
         self._density = density
         self._max_resolution = max_resolution
+        self._enable_pdf_text_layer = enable_pdf_text_layer
 
     @property
     def density(self):
@@ -404,6 +407,10 @@ class PDFOptions(BaseRequestObject):
     @property
     def max_resolution(self):
         return self._max_resolution
+
+    @property
+    def enable_pdf_text_layer(self):
+        return self._enable_pdf_text_layer
 
     @density.setter
     def density(self, var):
@@ -415,6 +422,11 @@ class PDFOptions(BaseRequestObject):
         if self._max_resolution_validator(var):
             self._max_resolution = var
 
+    @enable_pdf_text_layer.setter
+    def enable_pdf_text_layer(self, var):
+        if self._enable_pdf_text_layer_validator(var):
+            self._enable_pdf_text_layer = var
+
     def _density_validator(self, var):
         if type(var) is not int:
             raise ValueError("PDFOptions.density must be of type int and >0")
@@ -425,12 +437,17 @@ class PDFOptions(BaseRequestObject):
             raise ValueError("PDFOptions.max_resolution must be of type int and >0")
         return True
 
+    def _enable_pdf_text_layer_validator(self, var):
+        if type(var) is not bool:
+            raise ValueError("PDFOptions.enable_pdf_text_layer must be of type bool")
+        return True
+
     @classmethod
     def fromdict(cls, values: dict):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError("PDFOptions can only accept 'density'")
+            raise TypeError("PDFOptions can only accept 'density', 'max_resolution' and 'enable_pdf_text_layer'")
 
 
 class ProcessedMarkerText(BaseRequestObject):
