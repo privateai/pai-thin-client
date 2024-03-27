@@ -7,6 +7,15 @@
 
 ### Fixed
 
+## [3.8.0] - 2024-03-27
+
+### Added
+- Added support for the "enable_pdf_text_layer" PDFOption
+
+### Changed
+
+### Fixed
+
 ## [3.7.2] - 2024-03-04
 
 ### Added
