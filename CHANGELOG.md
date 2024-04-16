@@ -7,6 +7,15 @@
 
 ### Fixed
 
+## [3.8.1] - 2024-04-16
+
+### Added
+- Added marker_langauge options to processed text to enable new features in 3.8
+
+### Changed
+
+### Fixed
+
 ## [3.8.0] - 2024-03-27
 
 ### Added
