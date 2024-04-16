@@ -100,6 +100,15 @@ def test_processed_text_marker():
     assert resp.ok
 
 
+def test_processed_text_marker_language():
+    client = _get_client()
+    req = rq.process_text_obj(
+        text=["Hey there!"], processed_text=rq.processed_text_obj(type="MARKER", marker_language="de")
+    )
+    resp = client.process_text(req)
+    assert resp.ok
+
+
 def test_processed_text_mask():
     client = _get_client()
     req = rq.process_text_obj(text=["Hey there!"], processed_text=rq.processed_text_obj(type="MASK"))

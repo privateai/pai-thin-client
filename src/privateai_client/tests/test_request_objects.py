@@ -391,7 +391,9 @@ def test_processed_text_initializer():
 
 
 def test_processed_text_initialize_fromdict():
-    processed_text = ProcessedText.fromdict({"type": "MARKER", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+    processed_text = ProcessedText.fromdict(
+        {"type": "MARKER", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]", "marker_language": "fr"}
+    )
     assert processed_text.type == "MARKER"
     assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
 
@@ -403,6 +405,7 @@ def test_processed_text_invalid_initialize_fromdict():
             {
                 "type": "MARKER",
                 "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]",
+                "marker_language": "en",
                 "junk": "value",
             }
         )
@@ -413,8 +416,10 @@ def test_processed_text_setters():
     processed_text = ProcessedText()
     processed_text.type = "MASK"
     processed_text.pattern = "*ALL_ENTITY_TYPES*"
+    processed_text.marker_language = "de"
     assert processed_text.type == "MASK"
     assert processed_text.pattern == "*ALL_ENTITY_TYPES*"
+    assert processed_text.marker_language == "de"
 
 
 def test_processed_text_type_validator():
@@ -428,6 +433,13 @@ def test_processed_text_pattern_validator():
     error_msg = "junk is not valid. ProcessedText.pattern can only be one of the following: "
     with pytest.raises(ValueError) as excinfo:
         ProcessedText.fromdict({"type": "MARKER", "pattern": "junk"})
+    assert error_msg in str(excinfo.value)
+
+
+def test_processed_text_marker_language_validator():
+    error_msg = "junk is not valid. ProcessedText.marker_language can only be one of the following: "
+    with pytest.raises(ValueError) as excinfo:
+        ProcessedText.fromdict({"type": "MARKER", "marker_language": "junk"})
     assert error_msg in str(excinfo.value)
 
 
@@ -453,10 +465,11 @@ def test_pdf_options_initializer():
 
 
 def test_pdf_options_initialize_fromdict():
-    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500, 'enable_pdf_text_layer': True})
+    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500, "enable_pdf_text_layer": True})
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is True
+
 
 def test_pdf_options_invalid_initialize_fromdict():
     error_msg = "PDFOptions can only accept 'density', 'max_resolution' and 'enable_pdf_text_layer'"
