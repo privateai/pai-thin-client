@@ -437,7 +437,7 @@ class ProcessedMarkerText(BaseRequestObject):
         "UNIQUE_NUMBERED_ENTITY_TYPE",
         "UNIQUE_HASHED_ENTITY_TYPE",
     ]
-    default_marker_language = "auto"
+    default_marker_language = "en"
     valid_marker_languages = ["auto", "en", "fr", "de", "ja", "ko", "nl", "ru", "uk"]
 
     def __init__(self, pattern: str = default_pattern, marker_language: str = default_marker_language):
