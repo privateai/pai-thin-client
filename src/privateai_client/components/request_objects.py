@@ -759,7 +759,7 @@ class ProcessTextRequest(BaseRequestObject):
             )
 
 
-class NERTextRequest(BaseRequestObject):
+class NerTextRequest(BaseRequestObject):
     default_link_batch = False
 
     def __init__(
@@ -786,7 +786,7 @@ class NERTextRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "NERTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
+                "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
             )
 
 

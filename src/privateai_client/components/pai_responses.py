@@ -147,9 +147,9 @@ class DemiTextResponse(BaseResponse):
         return ReidentifyTextRequest(self.processed_text, entities)
 
 
-class NERTextResponse(BaseResponse):
+class NerTextResponse(BaseResponse):
     def __init__(self, response_object: Response = None):
-        super(NERTextResponse, self).__init__(response_object, True)
+        super(NerTextResponse, self).__init__(response_object, True)
 
     @property
     def entities(self):
