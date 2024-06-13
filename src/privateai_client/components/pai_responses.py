@@ -147,6 +147,27 @@ class DemiTextResponse(BaseResponse):
         return ReidentifyTextRequest(self.processed_text, entities)
 
 
+class NERTextResponse(BaseResponse):
+    def __init__(self, response_object: Response = None):
+        super(NERTextResponse, self).__init__(response_object, True)
+
+    @property
+    def entities(self):
+        return self.get_attribute_entries("entities")
+
+    @property
+    def entities_present(self):
+        return self.get_attribute_entries("entities_present")
+    
+    @property
+    def characters_processed(self):
+        return self.get_attribute_entries("characters_processed")
+
+    @property
+    def languages_detected(self):
+        return self.get_attribute_entries("languages_detected")
+
+
 class TextResponse(DemiTextResponse):
     def __init__(self, response_object: Response = None):
         super(TextResponse, self).__init__(response_object)
