@@ -165,3 +165,17 @@ class PAIClient:
         else:
             raise ValueError("request_object can only be a dictionary or a BleepRequest object")
         return response
+
+    def ner_text(self, request_object: Union[dict, NerTextRequest]):
+        """
+        Used to deidentify text
+        """
+        if type(request_object) is NerTextRequest:
+            self.check_version_compatibility()
+            response = NerTextResponse(self.post.ner_text(request_object.to_dict()))
+        elif type(request_object) is dict:
+            self.check_version_compatibility()
+            response = NerTextResponse(self.post.ner_text(request_object))
+        else:
+            raise ValueError("request_object can only be a dictionary or a NerTextRequest object")
+        return response

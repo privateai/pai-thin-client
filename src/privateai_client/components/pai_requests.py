@@ -58,11 +58,6 @@ class PAIPostRequests(PAIRequests):
         return self.make_request(
             self.request_type, self.uris.process_text, request_object
         )
-    
-    def process_ner_text(self, request_object):
-        return self.make_request(
-            self.request_type, self.uris.process_ner_text, request_object
-        )
 
     def process_files_uri(self, request_object):
         return self.make_request(
@@ -80,4 +75,9 @@ class PAIPostRequests(PAIRequests):
     def reidentify_text(self, request_object):
         return self.make_request(
             self.request_type, self.uris.reidentify_text, request_object
+        )
+
+    def ner_text(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.ner_text, request_object
         )

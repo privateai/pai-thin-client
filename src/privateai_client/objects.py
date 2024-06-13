@@ -6,6 +6,7 @@ class request_objects:
     file_uri_obj = req_objects.ProcessFileUriRequest
     file_base64_obj = req_objects.ProcessFileBase64Request
     process_text_obj = req_objects.ProcessTextRequest
+    ner_text_obj = req_objects.NerTextRequest
     audio_options_obj = req_objects.AudioOptions
     entity = req_objects.Entity
     entity_type_selector_obj = req_objects.EntityTypeSelector
