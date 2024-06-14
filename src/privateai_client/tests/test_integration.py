@@ -207,3 +207,68 @@ def test_bleep():
     request_obj = rq.bleep_obj(file=file_obj, timestamps=[timestamp], bleep_frequency=500, bleep_gain=-30)
     resp = client.bleep(request_object=request_obj)
     assert resp.ok
+
+
+def test_ner_text_only():
+    client = _get_client()
+    req = rq.ner_text_obj(text=["Hey there!"])
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_entity_detection_default():
+    client = _get_client()
+    req = rq.ner_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj())
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_entity_detection_with_enable_entity_types():
+    client = _get_client()
+    selector = rq.entity_type_selector_obj(type="ENABLE", value=["HIPAA"])
+    req = rq.ner_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj(entity_types=[selector]))
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_entity_detection_with_disable_entity_types():
+    client = _get_client()
+    selector = rq.entity_type_selector_obj(type="DISABLE", value=["HIPAA"])
+    req = rq.ner_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj(entity_types=[selector]))
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_entity_detection_with_allow_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW", pattern="[A-Za-z0-9]*")
+    req = rq.ner_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj(filter=[filter]))
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_entity_detection_with_block_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="BLOCK", pattern="[A-Za-z0-9]*", entity_type="ANY_TEXT")
+    req = rq.ner_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj(filter=[filter]))
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_entity_detection_with_allow_text_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW_TEXT", pattern="[A-Za-z0-9]*")
+    req = rq.ner_text_obj(text=["Hey there!"], entity_detection=rq.entity_detection_obj(filter=[filter]))
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_full_entity_detection():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW", pattern="[A-Za-z0-9]*")
+    selector = rq.entity_type_selector_obj(type="ENABLE", value=["HIPAA"])
+    req = rq.ner_text_obj(
+        text=["Hey there!"], entity_detection=rq.entity_detection_obj(filter=[filter], entity_types=[selector])
+    )
+    resp = client.ner_text(req)
+    assert resp.ok
