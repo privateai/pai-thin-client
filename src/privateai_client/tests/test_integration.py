@@ -170,6 +170,30 @@ def test_process_file_base64():
     assert resp.ok
 
 
+def test_process_pptx_file_base64():
+    client = _get_client()
+    test_dir = "/".join(__file__.split("/")[:-1])
+    with open(f"{test_dir}/test_files/demo-simple.pptx", "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+    file_obj = rq.file_obj(data=file_data, content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+    request_obj = rq.file_base64_obj(file=file_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_process_dcm_file_base64():
+    client = _get_client()
+    test_dir = "/".join(__file__.split("/")[:-1])
+    with open(f"{test_dir}/test_files/demo-sequence.dcm", "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+    file_obj = rq.file_obj(data=file_data, content_type="application/dicom")
+    request_obj = rq.file_base64_obj(file=file_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
 def test_process_audio_file_base64():
     client = _get_client()
 
