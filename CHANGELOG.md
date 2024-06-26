@@ -2,6 +2,14 @@
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [3.8.2]
+
+### Added
 - Added pptx, ppt and dcm as valid_content_types
 
 ### Changed
