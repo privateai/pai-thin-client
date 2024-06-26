@@ -7,7 +7,7 @@
 
 ### Fixed
 
-## [3.8.2]
+## [3.8.2] - 2024-6-26
 
 ### Added
 - Added pptx, ppt and dcm as valid_content_types
