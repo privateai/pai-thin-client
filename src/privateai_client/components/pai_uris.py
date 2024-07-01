@@ -66,6 +66,10 @@ class PAIURIs:
         )
 
     @property
+    def ner_text(self):
+        return self._create_uri(self.pai_uri, self.api_version, "ner", "text")
+
+    @property
     def version(self):
         return self._create_uri(self.pai_uri, "")
 
