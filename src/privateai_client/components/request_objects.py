@@ -728,8 +728,6 @@ class EntityDetection(BaseRequestObject):
 
 
 class ProcessTextRequest(BaseRequestObject):
-    default_link_batch = False
-
     def __init__(
         self,
         text: List[str],
@@ -763,8 +761,6 @@ class ProcessTextRequest(BaseRequestObject):
 
 
 class NerTextRequest(BaseRequestObject):
-    default_link_batch = False
-
     def __init__(
         self,
         text: List[str],
