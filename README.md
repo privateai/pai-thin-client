@@ -24,8 +24,6 @@ pip install privateai_client
 from privateai_client import PAIClient
 from privateai_client import request_objects
 
-url="http://localhost:8080"
-
 client = PAIClient(url="http://localhost:8080")
 text_request = request_objects.process_text_obj(text=["My sample name is John Smith"])
 response = client.process_text(text_request)
@@ -165,7 +163,7 @@ Request objects are a simple way of creating request bodies without the tediousn
 ```python
 from privateai_client import request_objects
 
-sample_obj = request_objects.file_url_obj(uri='path/to/file.jpg')
+sample_obj = request_objects.file_uri_obj(uri='path/to/file.jpg')
 sample_obj.uri
 ```
 
@@ -267,7 +265,7 @@ for file_name in os.listdir(file_dir):
     filepath = os.path.join(file_dir, file_name)
     if not os.path.isfile(filepath):
         continue
-    req_obj = request_objects.file_url_obj(uri=filepath)
+    req_obj = request_objects.file_uri_obj(uri=filepath)
     # NOTE this method of file processing requires the container to have an the input and output directories mounted
     resp = client.process_files_uri(req_obj)
 ```
