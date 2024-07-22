@@ -728,8 +728,6 @@ class EntityDetection(BaseRequestObject):
 
 
 class ProcessTextRequest(BaseRequestObject):
-    default_link_batch = False
-
     def __init__(
         self,
         text: List[str],
@@ -759,6 +757,35 @@ class ProcessTextRequest(BaseRequestObject):
         except TypeError:
             raise TypeError(
                 "ProcessTextRequest can only accept the values 'text', 'link_batch', 'entity_detection' and 'process_text'"
+            )
+
+
+class NerTextRequest(BaseRequestObject):
+    def __init__(
+        self,
+        text: List[str],
+        link_batch: Optional[bool] = None,
+        entity_detection: Optional[EntityDetection] = None,
+        project_id: Optional[str] = None,
+    ):
+        self.text = text
+        self.link_batch = link_batch
+        self.entity_detection = entity_detection
+        self.project_id = project_id
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entity_detection":
+                    initializer_dict[key] = EntityDetection.fromdict(value)
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
             )
 
 

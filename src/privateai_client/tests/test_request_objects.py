@@ -794,6 +794,118 @@ def test_process_text_request_to_dict():
     assert process_text_request["processed_text"]["pattern"] == processed_text.pattern
 
 
+# NER Text Request Tests
+def test_ner_text_request_default_initializer():
+    ner_text_request = NerTextRequest(text=["hey"])
+    assert ner_text_request.text == ["hey"]
+    assert ner_text_request.link_batch is None
+    assert ner_text_request.entity_detection is None
+
+
+def test_ner_text_request_initializer():
+    text = ["hey!"]
+    link_batch = True
+    entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
+    filter = FilterSelector(type="ALLOW", pattern="hey")
+    entity_detection = EntityDetection(
+        accuracy="standard",
+        entity_types=[entity_type],
+        filter=[filter],
+        return_entity=False,
+    )
+
+    ner_text_request = NerTextRequest(
+        text=text,
+        link_batch=link_batch,
+        entity_detection=entity_detection,
+    )
+
+    assert ner_text_request.text == text
+    assert ner_text_request.link_batch == link_batch
+    assert ner_text_request.entity_detection.accuracy == entity_detection.accuracy
+    assert ner_text_request.entity_detection.entity_types[0].type == entity_type.type
+    assert ner_text_request.entity_detection.entity_types[0].value == entity_type.value
+    assert ner_text_request.entity_detection.filter[0].type == filter.type
+    assert ner_text_request.entity_detection.filter[0].pattern == filter.pattern
+
+
+def test_ner_text_request_initialize_fromdict():
+    request_obj = {
+        "text": ["hey!"],
+        "link_batch": False,
+        "entity_detection": {
+            "accuracy": "standard",
+            "entity_types": [{"type": "DISABLE", "value": ["LOCATION"]}],
+            "filter": [{"type": "BLOCK", "pattern": "Roger", "entity_type": "TEST"}],
+            "return_entity": False,
+        },
+    }
+    ner_text_request = NerTextRequest.fromdict(request_obj)
+    assert ner_text_request.text == request_obj["text"]
+    assert ner_text_request.link_batch == request_obj["link_batch"]
+    assert ner_text_request.entity_detection.accuracy == request_obj["entity_detection"]["accuracy"]
+    assert (
+        ner_text_request.entity_detection.entity_types[0].type
+        == request_obj["entity_detection"]["entity_types"][0]["type"]
+    )
+    assert (
+        ner_text_request.entity_detection.entity_types[0].value
+        == request_obj["entity_detection"]["entity_types"][0]["value"]
+    )
+    assert ner_text_request.entity_detection.filter[0].type == request_obj["entity_detection"]["filter"][0]["type"]
+    assert (
+        ner_text_request.entity_detection.filter[0].pattern
+        == request_obj["entity_detection"]["filter"][0]["pattern"]
+    )
+
+
+def test_ner_text_request_invalid_initialize_fromdict():
+    error_msg = (
+        "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
+    )
+    request_obj = {
+        "text": ["hey!"],
+        "link_batch": False,
+        "entity_detection": {
+            "accuracy": "standard",
+            "entity_types": [{"type": "DISABLE", "value": ["LOCATION"]}],
+            "filter": [{"type": "BLOCK", "pattern": "Roger"}],
+            "return_entity": False,
+        },
+        "junk": "value",
+    }
+    with pytest.raises(TypeError) as excinfo:
+        NerTextRequest.fromdict(request_obj)
+    assert error_msg in str(excinfo.value)
+
+
+def test_ner_text_request_to_dict():
+    text = ["hey!"]
+    link_batch = True
+    entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
+    filter = FilterSelector(type="ALLOW", pattern="hey")
+    entity_detection = EntityDetection(
+        accuracy="standard",
+        entity_types=[entity_type],
+        filter=[filter],
+        return_entity=False,
+    )
+
+    ner_text_request = NerTextRequest(
+        text=text,
+        link_batch=link_batch,
+        entity_detection=entity_detection,
+    ).to_dict()
+    print(ner_text_request)
+    assert ner_text_request["text"] == text
+    assert ner_text_request["link_batch"] == link_batch
+    assert ner_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
+    assert ner_text_request["entity_detection"]["entity_types"][0]["type"] == entity_type.type
+    assert ner_text_request["entity_detection"]["entity_types"][0]["value"] == entity_type.value
+    assert ner_text_request["entity_detection"]["filter"][0]["type"] == filter.type
+    assert ner_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+
+
 # Process File URI Request Tests
 def test_process_file_uri_request_default_initializer():
     process_file_uri_obj = ProcessFileUriRequest(uri="this/location/right/here.png")
