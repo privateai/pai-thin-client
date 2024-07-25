@@ -7,6 +7,14 @@
 
 ### Fixed
 
+## [3.9.0]
+
+### Added
+- Added NER route support
+### Changed
+
+### Fixed
+
 ## [3.8.2] - 2024-06-26
 
 ### Added
