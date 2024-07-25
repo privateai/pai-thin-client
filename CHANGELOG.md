@@ -19,13 +19,10 @@
 
 ### Added
 - Added pptx, ppt and dcm as valid_content_types.
-- Added support for NER route, `NerTextRequest` and `NerTextResponse` classes.
-- Added Unit and Integration tests for NER.
 
 ### Changed
 
 ### Fixed
-- Removed outdated `default_link_batch` parameter.
 
 ## [3.8.1] - 2024-04-16
 
