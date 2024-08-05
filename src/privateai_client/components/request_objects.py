@@ -1,6 +1,6 @@
 import inspect
 from typing import List, Optional, Union
-
+from enum import Enum
 
 class BaseRequestObject:
     def to_dict(self):
@@ -120,6 +120,69 @@ class AudioOptions(BaseRequestObject):
             )
 
 
+class MaskMode(Enum):
+    BLUR = 'blur'
+    PIXELATE = 'pixelate'
+    BLACK = 'black'
+
+class ImageOptions:
+    default_masking_method: MaskMode = MaskMode.BLUR
+    default_palette: bool = False
+
+    def __init__(
+        self,
+        masking_method: MaskMode = default_masking_method,
+        palette: Optional[bool] = default_palette,
+    ):
+        if self._masking_method_validator(masking_method):
+            self._masking_method = masking_method
+        if self._palette_validator(palette):
+            self._palette = palette
+
+    @property
+    def masking_method(self):
+        return self._masking_method
+
+    @property
+    def palette(self):
+        return self._palette
+
+    @masking_method.setter
+    def masking_method(self, var):
+        if self._masking_method_validator(var):
+            self._masking_method = var
+
+    @palette.setter
+    def palette(self, var):
+        if self._palette_validator(var):
+            self._palette = var
+
+    def _masking_method_validator(self, var):
+        if not isinstance(var, MaskMode):
+            raise ValueError(f"ImageOptions.masking_method must be of type MaskMode, but got {type(var)}")
+        return True
+
+    def _palette_validator(self, var):
+        if not isinstance(var, bool):
+            raise ValueError(f"ImageOptions.palette must be of type bool, but got {type(var)}")
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError(
+                "ImageOptions can only accept the values 'masking_method' and 'palette'"
+            )
+
+    @classmethod
+    def _fromdict(cls, values: dict):
+        return cls(
+            masking_method=values.get('masking_method', cls.default_masking_method),
+            palette=values.get('palette', cls.default_palette),
+        )
+        
 class Entity(BaseRequestObject):
     def __init__(self, processed_text: str, text: str):
         if self._processed_text_validator(processed_text):
@@ -209,7 +272,7 @@ class File(BaseRequestObject):
         "application/pdf",
         "application/vnd.ms-excel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "application/xml",
         "message/rfc822",
