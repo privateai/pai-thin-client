@@ -120,10 +120,9 @@ class AudioOptions(BaseRequestObject):
             )
 
 
-class MaskMode(Enum):
+class MaskMode(str, Enum):
     BLUR = 'blur'
-    PIXELATE = 'pixelate'
-    BLACK = 'black'
+    BLACK_BOX = 'blackbox'
 
 class ImageOptions:
     default_masking_method: MaskMode = MaskMode.BLUR
