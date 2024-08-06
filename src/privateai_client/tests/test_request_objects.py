@@ -621,6 +621,69 @@ def test_audio_options_to_dict():
         assert audio_options["bleep_frequency"] == 600
 
 
+# Image Options Tests
+def test_image_options_default_initializer():
+    image_options = ImageOptions()
+    assert image_options.masking_method == 'blur'
+    assert image_options.palette == False
+
+
+def test_image_options_initializer():
+    image_options = ImageOptions(masking_method='blackbox', palette=True)
+    assert image_options.masking_method == 'blackbox'
+    assert image_options.palette == True
+
+
+def test_image_options_initializer_without_palette():
+    image_options = ImageOptions(masking_method='blur')
+    assert image_options.masking_method == 'blur'
+    assert image_options.palette == False
+
+
+def test_image_options_initialize_fromdict():
+    image_options = ImageOptions.fromdict(
+        {"masking_method": 'blur', "palette": True}
+    )
+    assert image_options.masking_method == 'blur'
+    assert image_options.palette == True
+
+
+def test_image_options_invalid_initialize_fromdict():
+    error_msg = "ImageOptions can only accept the values 'masking_method' and 'palette'"
+    with pytest.raises(TypeError) as excinfo:
+        ImageOptions.fromdict(
+            {
+                "masking_method": 'blur',
+                "palette": True,
+                "junk": "value",
+            }
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_image_options_setters():
+    image_options = ImageOptions()
+    image_options.masking_method = 'blur'
+    image_options.palette = True
+
+    assert image_options.masking_method == 'blur'
+    assert image_options.palette == True
+
+
+def test_image_options_masking_method_validator():
+    error_msg = "ImageOptions.masking_method must be one of ['blur', 'blackbox'], but got junk"
+    with pytest.raises(ValueError) as excinfo:
+        ImageOptions().masking_method = "junk"
+    assert error_msg in str(excinfo.value)
+
+
+def test_image_options_palette_validator():
+    error_msg = "ImageOptions.palette must be of type bool, but got <class 'str'>"
+    with pytest.raises(ValueError) as excinfo:
+        ImageOptions().palette = "junk"
+    assert error_msg in str(excinfo.value)
+
+    
 # Timestamp Tests
 def test_timestamp_initializer():
     timestamp = Timestamp(start=2.0, end=3.0)
@@ -969,7 +1032,7 @@ def test_process_file_uri_request_initialize_fromdict():
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
     error_msg = (
-        "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options and 'audio_options'"
+        "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options' and 'image_options'"
     )
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
@@ -1082,7 +1145,7 @@ def test_process_file_base64_request_initialize_fromdict():
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options and 'audio_options'"
+    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options' and 'image_options'"
     file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")

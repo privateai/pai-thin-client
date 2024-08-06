@@ -121,7 +121,7 @@ class AudioOptions(BaseRequestObject):
 
 
 class ImageOptions(BaseRequestObject):
-    default_masking_method: str = 'blackbox'
+    default_masking_method: str = 'blur'
     default_palette: bool = False
     VALID_MASK_MODES = ['blur', 'blackbox']
 
@@ -172,12 +172,6 @@ class ImageOptions(BaseRequestObject):
                 "ImageOptions can only accept the values 'masking_method' and 'palette'"
             )
 
-    @classmethod
-    def _fromdict(cls, values: dict):
-        return cls(
-            masking_method=values.get('masking_method', cls.default_masking_method),
-            palette=values.get('palette', cls.default_palette),
-        )
     
         
 class Entity(BaseRequestObject):
