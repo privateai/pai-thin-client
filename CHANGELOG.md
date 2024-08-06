@@ -11,6 +11,8 @@
 
 ### Added
 - Added NER route support
+- Added `image_options` support
+    - Using `image_options_obj`, the `masking_method` can be set to `blur` or `blackbox`.
 ### Changed
 
 ### Fixed
