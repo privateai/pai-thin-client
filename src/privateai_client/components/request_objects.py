@@ -877,7 +877,7 @@ class ProcessFileUriRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options' and 'image_options'"
+                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
             )
 
 
@@ -918,7 +918,7 @@ class ProcessFileBase64Request(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options' and 'image_options'"
+                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
             )
 
 

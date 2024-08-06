@@ -1032,7 +1032,7 @@ def test_process_file_uri_request_initialize_fromdict():
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
     error_msg = (
-        "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options' and 'image_options'"
+        "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
     )
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
@@ -1145,7 +1145,7 @@ def test_process_file_base64_request_initialize_fromdict():
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options' and 'image_options'"
+    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
     file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
