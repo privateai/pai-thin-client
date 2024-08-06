@@ -120,17 +120,14 @@ class AudioOptions(BaseRequestObject):
             )
 
 
-class MaskMode(str, Enum):
-    BLUR = 'blur'
-    BLACK_BOX = 'blackbox'
-
-class ImageOptions:
-    default_masking_method: MaskMode = MaskMode.BLUR
+class ImageOptions(BaseRequestObject):
+    default_masking_method: str = 'blackbox'
     default_palette: bool = False
+    VALID_MASK_MODES = ['blur', 'blackbox']
 
     def __init__(
         self,
-        masking_method: MaskMode = default_masking_method,
+        masking_method: str = default_masking_method,
         palette: Optional[bool] = default_palette,
     ):
         if self._masking_method_validator(masking_method):
@@ -157,8 +154,8 @@ class ImageOptions:
             self._palette = var
 
     def _masking_method_validator(self, var):
-        if not isinstance(var, MaskMode):
-            raise ValueError(f"ImageOptions.masking_method must be of type MaskMode, but got {type(var)}")
+        if var not in self.VALID_MASK_MODES:
+            raise ValueError(f"ImageOptions.masking_method must be one of {self.VALID_MASK_MODES}, but got {var}")
         return True
 
     def _palette_validator(self, var):
@@ -181,6 +178,7 @@ class ImageOptions:
             masking_method=values.get('masking_method', cls.default_masking_method),
             palette=values.get('palette', cls.default_palette),
         )
+    
         
 class Entity(BaseRequestObject):
     def __init__(self, processed_text: str, text: str):
@@ -858,12 +856,14 @@ class ProcessFileUriRequest(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
+        image_options: Optional[ImageOptions] = None,
         project_id: Optional[str] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
         self.pdf_options = pdf_options
         self.audio_options = audio_options
+        self.image_options = image_options
         self.project_id = project_id
 
     @classmethod
@@ -877,12 +877,14 @@ class ProcessFileUriRequest(BaseRequestObject):
                     initializer_dict[key] = PDFOptions.fromdict(value)
                 elif key == "audio_options":
                     initializer_dict[key] = AudioOptions.fromdict(value)
+                elif key == "image_options":
+                    initializer_dict[key] = ImageOptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options and 'audio_options'"
+                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options, 'audio_options' and 'image_options'"
             )
 
 
@@ -893,12 +895,14 @@ class ProcessFileBase64Request(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
+        image_options: Optional[ImageOptions] = None,
         project_id: Optional[str] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection
         self.pdf_options = pdf_options
         self.audio_options = audio_options
+        self.image_options = image_options
         self.project_id = project_id
 
     @classmethod
@@ -914,12 +918,14 @@ class ProcessFileBase64Request(BaseRequestObject):
                     initializer_dict[key] = PDFOptions.fromdict(value)
                 elif key == "audio_options":
                     initializer_dict[key] = AudioOptions.fromdict(value)
+                elif key == "image_options":
+                    initializer_dict[key] = ImageOptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options and 'audio_options'"
+                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options, 'audio_options' and 'image_options'"
             )
 
 
