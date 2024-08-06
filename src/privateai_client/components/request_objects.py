@@ -172,8 +172,7 @@ class ImageOptions(BaseRequestObject):
                 "ImageOptions can only accept the values 'masking_method' and 'palette'"
             )
 
-    
-        
+
 class Entity(BaseRequestObject):
     def __init__(self, processed_text: str, text: str):
         if self._processed_text_validator(processed_text):
