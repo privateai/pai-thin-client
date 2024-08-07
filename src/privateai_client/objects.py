@@ -8,6 +8,7 @@ class request_objects:
     process_text_obj = req_objects.ProcessTextRequest
     ner_text_obj = req_objects.NerTextRequest
     audio_options_obj = req_objects.AudioOptions
+    image_options_obj = req_objects.ImageOptions
     entity = req_objects.Entity
     entity_type_selector_obj = req_objects.EntityTypeSelector
     entity_detection_obj = req_objects.EntityDetection
