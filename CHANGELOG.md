@@ -4,6 +4,7 @@
 ### Added
 
 ### Changed
+- Bumped requests from 2.31.0 to 2.32.3
 
 ### Fixed
 
@@ -13,6 +14,7 @@
 - Added NER route support
 - Added `image_options` support
     - Using `image_options_obj`, the `masking_method` can be set to `blur` or `blackbox`.
+
 ### Changed
 
 ### Fixed
