@@ -5,6 +5,7 @@
 
 ### Changed
 - Bumped requests from 2.31.0 to 2.32.3
+- Removed reference to the app version from client uris
 
 ### Fixed
 
