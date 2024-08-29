@@ -9,9 +9,7 @@ class PAIURIs:
             self.valid_schemes = ["http", "https"]
             scheme = scheme.split("://")[0]
             if scheme not in self.valid_schemes:
-                raise ValueError(
-                    f"Scheme must be one of the following: {', '.join(self.valid_schemes)}"
-                )
+                raise ValueError(f"Scheme must be one of the following: {', '.join(self.valid_schemes)}")
             port = f":{port}" if port else ""
             self._pai_uri = f"{scheme}://{host}{port}"
         else:
@@ -24,12 +22,8 @@ class PAIURIs:
         return self._pai_uri
 
     @property
-    def api_version(self):
-        return "v3"
-
-    @property
     def bleep(self):
-        return self._create_uri(self.pai_uri, self.api_version, "bleep")
+        return self._create_uri(self.pai_uri, "bleep")
 
     @property
     def health(self):
@@ -45,29 +39,23 @@ class PAIURIs:
 
     @property
     def process_text(self):
-        return self._create_uri(self.pai_uri, self.api_version, "process", "text")
+        return self._create_uri(self.pai_uri, "process", "text")
 
     @property
     def process_files_uri(self):
-        return self._create_uri(
-            self.pai_uri, self.api_version, "process", "files", "uri"
-        )
+        return self._create_uri(self.pai_uri, "process", "files", "uri")
 
     @property
     def reidentify_text(self):
-        return self._create_uri(
-            self.pai_uri, self.api_version, "process", "text", "reidentify"
-        )
+        return self._create_uri(self.pai_uri, "process", "text", "reidentify")
 
     @property
     def process_files_base64(self):
-        return self._create_uri(
-            self.pai_uri, self.api_version, "process", "files", "base64"
-        )
+        return self._create_uri(self.pai_uri, "process", "files", "base64")
 
     @property
     def ner_text(self):
-        return self._create_uri(self.pai_uri, self.api_version, "ner", "text")
+        return self._create_uri(self.pai_uri, "ner", "text")
 
     @property
     def version(self):
