@@ -48,7 +48,7 @@ We use [pytest](https://docs.pytest.org/) to run our tests in the tests folder.
 To run from command line, ensure you have pytest installed, and then run `pytest` from the main project folder.
 
 ```shell
-pip install -U pytest -y
+pip install -r requirements.dev.txt
 pytest
 ```
 
@@ -111,16 +111,16 @@ Once initialized the client can be used to make any request listed in the [Priva
 
 Available requests:
 
-| Client Function          | Endpoint                   |
-| ------------------------ | -------------------------- |
-| `get_version()`          | `/`                        |
-| `ping()`                 | `/healthz`                 |
-| `get_metrics()`          | `/metrics`                 |
-| `get_diagnostics()`      | `/diagnostics`             |
-| `process_text()`         | `/v3/process/text`         |
-| `process_files_uri()`    | `/v3/process/files/uri`    |
-| `process_files_base64()` | `/v3/process/files/base64` |
-| `bleep()`                | `/v3/bleep`                |
+| Client Function          | Endpoint                |
+| ------------------------ | ----------------------- |
+| `get_version()`          | `/`                     |
+| `ping()`                 | `/healthz`              |
+| `get_metrics()`          | `/metrics`              |
+| `get_diagnostics()`      | `/diagnostics`          |
+| `process_text()`         | `/process/text`         |
+| `process_files_uri()`    | `/process/files/uri`    |
+| `process_files_base64()` | `/process/files/base64` |
+| `bleep()`                | `/bleep`                |
 
 Requests can be made using dictionaries:
 
@@ -178,16 +178,19 @@ Additionally there are request objects for each nested dictionary of a request:
 ```python
 from privateai_client import request_objects
 
-sample_text = "This is John Smith's sample process text object request where names won't be removed"
+sample_text = "This is John Smith from Sample Company to show a sample process text object request where organizations won't be removed, but John will be recognized as the same entity"
 
 # sub-dictionary of entity_detection
-sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['NAME', 'NAME_GIVEN', 'NAME_FAMILY'])
+sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=["ORGANIZATION"])
 
 # sub-dictionary of a process text request
 sample_entity_detection = request_objects.entity_detection_obj(entity_types=[sample_entity_type_selector])
 
+# sub-dictionary of a process text request
+sample_processed_text = request_objects.processed_text_obj(type="MARKER", pattern="[UNIQUE_NUMBERED_ENTITY_TYPE]", coreference_resolution="model")
+
 # request object created using the sub-dictionaries
-sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection)
+sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection, processed_text=sample_processed_text)
 response = client.process_text(sample_request)
 print(response.processed_text)
 ```
@@ -195,7 +198,7 @@ print(response.processed_text)
 Output:
 
 ```
-["This is John Smith's sample process text object request where names won't be removed"]
+["This is [NAME_1] from Sample Company to show a sample process text object request where organizations won't be removed, but [NAME_1] will be recognized as the same entity"]
 ```
 
 #### Building Request Objects
@@ -225,7 +228,7 @@ sample_text = "Sample text."
 sample_accuracy = "standard"
 
 # Create the nested request objects
-sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['HIPAA'])
+sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DISABLE", value=['HIPAA_SAFE_HARBOR'])
 sample_entity_detection = request_objects.entity_detection_obj(
     entity_types=[sample_entity_type_selector],
     accuracy=sample_accuracy
@@ -244,7 +247,7 @@ Output:
 {
  'text': ['Sample text.'],
  'link_batch': False,
- 'entity_detection': {'accuracy': 'standard', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA']}], 'filter': [], 'return_entity': True},
+ 'entity_detection': {'accuracy': 'standard', 'entity_types': [{'type': 'DISABLE', 'value': ['HIPAA_SAFE_HARBOR']}], 'filter': [], 'return_entity': True},
  'processed_text': {'type': 'MARKER', 'pattern': '[UNIQUE_NUMBERED_ENTITY_TYPE]'}
 }
 ```
@@ -421,4 +424,4 @@ new_response_obj = client.reidentify_text(new_request_obj)
 print(new_response_obj.body)
 ```
 
-[1]: https://docs.private-ai.com/reference/latest/operation/process_text_v3_process_text_post/
+[1]: https://docs.private-ai.com/reference/latest/operation/process_text_process_text_post/

@@ -19,7 +19,9 @@ def test_file_initializer_fromdict():
 def test_file_invalid_initialize_fromdict():
     error_msg = "File can only accept the values 'data' and 'content_type'"
     with pytest.raises(TypeError) as excinfo:
-        File.fromdict({"data": "test", "content_type": "application/pdf", "garbage": "value"})
+        File.fromdict(
+            {"data": "test", "content_type": "application/pdf", "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -58,7 +60,9 @@ def test_filter_selector_initializer2():
     test_type = "BLOCK"
     test_pattern = "[A-Z]"
     test_entity_type = "CHARACTER"
-    filter_selector = FilterSelector(type=test_type, pattern=test_pattern, entity_type=test_entity_type)
+    filter_selector = FilterSelector(
+        type=test_type, pattern=test_pattern, entity_type=test_entity_type
+    )
     assert filter_selector.type == test_type
     assert filter_selector.pattern == test_pattern
     assert filter_selector.entity_type == "CHARACTER"
@@ -84,8 +88,12 @@ def test_filter_selector_initialize_fromdict():
 
 def test_filter_selector_invalid_initialize_fromdict():
     with pytest.raises(TypeError) as excinfo:
-        FilterSelector.fromdict({"type": "ALLOW", "pattern": "[A-Z]", "fake_key": "fake_value"})
-    assert "FilterSelector can only accept the values 'type' and 'pattern'" in str(excinfo.value)
+        FilterSelector.fromdict(
+            {"type": "ALLOW", "pattern": "[A-Z]", "fake_key": "fake_value"}
+        )
+    assert "FilterSelector can only accept the values 'type' and 'pattern'" in str(
+        excinfo.value
+    )
 
 
 def test_filter_selector_setters():
@@ -108,7 +116,10 @@ def test_filter_selector_type_validator():
     test_pattern = "[A-Z]"
     with pytest.raises(ValueError) as excinfo:
         FilterSelector(type=test_type, pattern=test_pattern)
-    assert " is not valid. FilterSelector.type can only be one of the following: " in str(excinfo.value)
+    assert (
+        " is not valid. FilterSelector.type can only be one of the following: "
+        in str(excinfo.value)
+    )
 
 
 def test_filter_selector_pattern_validator():
@@ -124,7 +135,9 @@ def test_filter_selector_entity_type_validator():
     test_pattern = "[A-Z]"
     test_entity_type = 30
     with pytest.raises(TypeError) as excinfo:
-        FilterSelector(type=test_type, pattern=test_pattern, entity_type=test_entity_type)
+        FilterSelector(
+            type=test_type, pattern=test_pattern, entity_type=test_entity_type
+        )
     assert "FilterSelector.entity_type must be of type string" in str(excinfo.value)
 
 
@@ -168,7 +181,9 @@ def test_entity_initializer_fromdict():
 def test_entity_invalid_initialize_fromdict():
     error_msg = "Entity can only accept the values 'processed_text' and 'text'"
     with pytest.raises(TypeError) as excinfo:
-        Entity.fromdict({"processed_text": "NAME_1", "text": "this is a test", "garbage": "value"})
+        Entity.fromdict(
+            {"processed_text": "NAME_1", "text": "this is a test", "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -212,7 +227,9 @@ def test_entity_type_selector_initialize_fromdict():
 def test_entity_type_selector_invalid_initialize_fromdict():
     error_msg = "EntityTypeSelector can only accept the values 'type' and 'value'"
     with pytest.raises(TypeError) as excinfo:
-        EntityTypeSelector.fromdict({"type": "ENABLE", "value": ["NAME"], "garbage": "value"})
+        EntityTypeSelector.fromdict(
+            {"type": "ENABLE", "value": ["NAME"], "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -238,7 +255,9 @@ def test_entity_type_selector_value_validator():
 
 
 def test_entity_type_selector_to_dict():
-    entity_type_obj = EntityTypeSelector.fromdict({"type": "ENABLE", "value": ["NAME"]}).to_dict()
+    entity_type_obj = EntityTypeSelector.fromdict(
+        {"type": "ENABLE", "value": ["NAME"]}
+    ).to_dict()
     assert entity_type_obj["type"] == "ENABLE"
     assert entity_type_obj["value"] == ["NAME"]
 
@@ -311,7 +330,9 @@ def test_entity_detection_setters():
 
 
 def test_entity_detection_accuracy_validator():
-    error_msg = "junk is not valid. EntityDetection.accuracy can only be one of the following: "
+    error_msg = (
+        "junk is not valid. EntityDetection.accuracy can only be one of the following: "
+    )
     entity_detection_obj = EntityDetection.fromdict(
         {
             "accuracy": "high",
@@ -326,7 +347,9 @@ def test_entity_detection_accuracy_validator():
 
 
 def test_entity_detection_entity_types_validator():
-    error_msg = "EntityDetection.entity_types can only contain EntityTypeSelector objects"
+    error_msg = (
+        "EntityDetection.entity_types can only contain EntityTypeSelector objects"
+    )
     with pytest.raises(ValueError) as excinfo:
         EntityDetection(
             accuracy="high",
@@ -382,20 +405,33 @@ def test_processed_text_default_initializer():
     processed_text = ProcessedText()
     assert processed_text.type == "MARKER"
     assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    assert processed_text.coreference_resolution == "heuristics"
 
 
-def test_processed_text_initializer():
+def test_processed_text_mask_initializer():
     processed_text = ProcessedText(type="MASK", mask_character="*")
     assert processed_text.type == "MASK"
     assert processed_text.mask_character == "*"
 
 
+def test_processed_text_coreference_initializer():
+    processed_text = ProcessedText(type="MARKER", coreference_resolution="model")
+    assert processed_text.type == "MARKER"
+    assert processed_text.coreference_resolution == "model"
+
+
 def test_processed_text_initialize_fromdict():
     processed_text = ProcessedText.fromdict(
-        {"type": "MARKER", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]", "marker_language": "fr"}
+        {
+            "type": "MARKER",
+            "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]",
+            "marker_language": "fr",
+            "coreference_resolution": "combined",
+        }
     )
     assert processed_text.type == "MARKER"
     assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    assert processed_text.coreference_resolution == "combined"
 
 
 def test_processed_text_invalid_initialize_fromdict():
@@ -406,13 +442,14 @@ def test_processed_text_invalid_initialize_fromdict():
                 "type": "MARKER",
                 "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]",
                 "marker_language": "en",
+                "coreference_resolution": "heuristics",
                 "junk": "value",
             }
         )
     assert error_msg in str(excinfo.value)
 
 
-def test_processed_text_setters():
+def test_processed_text_mask_setters():
     processed_text = ProcessedText()
     processed_text.type = "MASK"
     processed_text.pattern = "*ALL_ENTITY_TYPES*"
@@ -422,15 +459,33 @@ def test_processed_text_setters():
     assert processed_text.marker_language == "de"
 
 
+def test_processed_text_coreference_setters():
+    processed_text = ProcessedText()
+    processed_text.type = "MARKER"
+    processed_text.pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    processed_text.marker_language = "fr"
+    processed_text.coreference_resolution = "model"
+    assert processed_text.type == "MARKER"
+    assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
+    assert processed_text.marker_language == "fr"
+    assert processed_text.coreference_resolution == "model"
+
+
 def test_processed_text_type_validator():
-    error_msg = "junk is not valid. ProcessedText.type can only be one of the following: "
+    error_msg = (
+        "junk is not valid. ProcessedText.type can only be one of the following: "
+    )
     with pytest.raises(ValueError) as excinfo:
-        ProcessedText.fromdict({"type": "junk", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+        ProcessedText.fromdict(
+            {"type": "junk", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]"}
+        )
     assert error_msg in str(excinfo.value)
 
 
 def test_processed_text_pattern_validator():
-    error_msg = "junk is not valid. ProcessedText.pattern can only be one of the following: "
+    error_msg = (
+        "junk is not valid. ProcessedText.pattern can only be one of the following: "
+    )
     with pytest.raises(ValueError) as excinfo:
         ProcessedText.fromdict({"type": "MARKER", "pattern": "junk"})
     assert error_msg in str(excinfo.value)
@@ -443,10 +498,25 @@ def test_processed_text_marker_language_validator():
     assert error_msg in str(excinfo.value)
 
 
-def test_processed_text_to_dict():
+def test_processed_text_coreference_validator():
+    error_msg = "junk is not valid. ProcessedText.coreference_resolution can only be one of the following: "
+    with pytest.raises(ValueError) as excinfo:
+        ProcessedText.fromdict({"type": "MARKER", "coreference_resolution": "junk"})
+    assert error_msg in str(excinfo.value)
+
+
+def test_processed_text_mask_to_dict():
     processed_text = ProcessedText(type="MASK", mask_character="*").to_dict()
     assert processed_text["type"] == "MASK"
     assert processed_text["mask_character"] == "*"
+
+
+def test_processed_text_marker_to_dict():
+    processed_text = ProcessedText(
+        type="MARKER", coreference_resolution="combined"
+    ).to_dict()
+    assert processed_text["type"] == "MARKER"
+    assert processed_text["coreference_resolution"] == "combined"
 
 
 # PDF Options Tests
@@ -458,14 +528,18 @@ def test_pdf_options_default_initializer():
 
 
 def test_pdf_options_initializer():
-    pdf_options = PDFOptions(density=300, max_resolution=500, enable_pdf_text_layer=False)
+    pdf_options = PDFOptions(
+        density=300, max_resolution=500, enable_pdf_text_layer=False
+    )
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is False
 
 
 def test_pdf_options_initialize_fromdict():
-    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500, "enable_pdf_text_layer": True})
+    pdf_options = PDFOptions.fromdict(
+        {"density": 300, "max_resolution": 500, "enable_pdf_text_layer": True}
+    )
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is True
@@ -529,7 +603,12 @@ def test_audio_options_default_initializer():
 
 
 def test_audio_options_initializer():
-    audio_options = AudioOptions(bleep_start_padding=200.0, bleep_end_padding=300.0, bleep_gain=-2, bleep_frequency=250)
+    audio_options = AudioOptions(
+        bleep_start_padding=200.0,
+        bleep_end_padding=300.0,
+        bleep_gain=-2,
+        bleep_frequency=250,
+    )
     assert audio_options.bleep_start_padding == 200.0
     assert audio_options.bleep_end_padding == 300.0
     assert audio_options.bleep_gain == -2
@@ -546,7 +625,12 @@ def test_audio_options_initializer_without_bleep_gain_and_bleep_frequency():
 
 def test_audio_options_initialize_fromdict():
     audio_options = AudioOptions.fromdict(
-        {"bleep_start_padding": 0.3, "bleep_end_padding": 0.7, "bleep_gain": -2, "bleep_frequency": 250}
+        {
+            "bleep_start_padding": 0.3,
+            "bleep_end_padding": 0.7,
+            "bleep_gain": -2,
+            "bleep_frequency": 250,
+        }
     )
     assert audio_options.bleep_start_padding == 0.3
     assert audio_options.bleep_end_padding == 0.7
@@ -624,27 +708,25 @@ def test_audio_options_to_dict():
 # Image Options Tests
 def test_image_options_default_initializer():
     image_options = ImageOptions()
-    assert image_options.masking_method == 'blur'
+    assert image_options.masking_method == "blur"
     assert image_options.palette == False
 
 
 def test_image_options_initializer():
-    image_options = ImageOptions(masking_method='blackbox', palette=True)
-    assert image_options.masking_method == 'blackbox'
+    image_options = ImageOptions(masking_method="blackbox", palette=True)
+    assert image_options.masking_method == "blackbox"
     assert image_options.palette == True
 
 
 def test_image_options_initializer_without_palette():
-    image_options = ImageOptions(masking_method='blur')
-    assert image_options.masking_method == 'blur'
+    image_options = ImageOptions(masking_method="blur")
+    assert image_options.masking_method == "blur"
     assert image_options.palette == False
 
 
 def test_image_options_initialize_fromdict():
-    image_options = ImageOptions.fromdict(
-        {"masking_method": 'blur', "palette": True}
-    )
-    assert image_options.masking_method == 'blur'
+    image_options = ImageOptions.fromdict({"masking_method": "blur", "palette": True})
+    assert image_options.masking_method == "blur"
     assert image_options.palette == True
 
 
@@ -653,7 +735,7 @@ def test_image_options_invalid_initialize_fromdict():
     with pytest.raises(TypeError) as excinfo:
         ImageOptions.fromdict(
             {
-                "masking_method": 'blur',
+                "masking_method": "blur",
                 "palette": True,
                 "junk": "value",
             }
@@ -663,15 +745,17 @@ def test_image_options_invalid_initialize_fromdict():
 
 def test_image_options_setters():
     image_options = ImageOptions()
-    image_options.masking_method = 'blur'
+    image_options.masking_method = "blur"
     image_options.palette = True
 
-    assert image_options.masking_method == 'blur'
+    assert image_options.masking_method == "blur"
     assert image_options.palette == True
 
 
 def test_image_options_masking_method_validator():
-    error_msg = "ImageOptions.masking_method must be one of ['blur', 'blackbox'], but got junk"
+    error_msg = (
+        "ImageOptions.masking_method must be one of ['blur', 'blackbox'], but got junk"
+    )
     with pytest.raises(ValueError) as excinfo:
         ImageOptions().masking_method = "junk"
     assert error_msg in str(excinfo.value)
@@ -683,7 +767,7 @@ def test_image_options_palette_validator():
         ImageOptions().palette = "junk"
     assert error_msg in str(excinfo.value)
 
-    
+
 # Timestamp Tests
 def test_timestamp_initializer():
     timestamp = Timestamp(start=2.0, end=3.0)
@@ -764,8 +848,12 @@ def test_process_text_request_initializer():
     assert process_text_request.text == text
     assert process_text_request.link_batch == link_batch
     assert process_text_request.entity_detection.accuracy == entity_detection.accuracy
-    assert process_text_request.entity_detection.entity_types[0].type == entity_type.type
-    assert process_text_request.entity_detection.entity_types[0].value == entity_type.value
+    assert (
+        process_text_request.entity_detection.entity_types[0].type == entity_type.type
+    )
+    assert (
+        process_text_request.entity_detection.entity_types[0].value == entity_type.value
+    )
     assert process_text_request.entity_detection.filter[0].type == filter.type
     assert process_text_request.entity_detection.filter[0].pattern == filter.pattern
     assert process_text_request.processed_text.type == processed_text.type
@@ -787,7 +875,10 @@ def test_process_text_request_initialize_fromdict():
     process_text_request = ProcessTextRequest.fromdict(request_obj)
     assert process_text_request.text == request_obj["text"]
     assert process_text_request.link_batch == request_obj["link_batch"]
-    assert process_text_request.entity_detection.accuracy == request_obj["entity_detection"]["accuracy"]
+    assert (
+        process_text_request.entity_detection.accuracy
+        == request_obj["entity_detection"]["accuracy"]
+    )
     assert (
         process_text_request.entity_detection.entity_types[0].type
         == request_obj["entity_detection"]["entity_types"][0]["type"]
@@ -796,19 +887,26 @@ def test_process_text_request_initialize_fromdict():
         process_text_request.entity_detection.entity_types[0].value
         == request_obj["entity_detection"]["entity_types"][0]["value"]
     )
-    assert process_text_request.entity_detection.filter[0].type == request_obj["entity_detection"]["filter"][0]["type"]
+    assert (
+        process_text_request.entity_detection.filter[0].type
+        == request_obj["entity_detection"]["filter"][0]["type"]
+    )
     assert (
         process_text_request.entity_detection.filter[0].pattern
         == request_obj["entity_detection"]["filter"][0]["pattern"]
     )
-    assert process_text_request.processed_text.type == request_obj["processed_text"]["type"]
-    assert process_text_request.processed_text.pattern == request_obj["processed_text"]["pattern"]
+    assert (
+        process_text_request.processed_text.type
+        == request_obj["processed_text"]["type"]
+    )
+    assert (
+        process_text_request.processed_text.pattern
+        == request_obj["processed_text"]["pattern"]
+    )
 
 
 def test_process_text_request_invalid_initialize_fromdict():
-    error_msg = (
-        "ProcessTextRequest can only accept the values 'text', 'link_batch', 'entity_detection' and 'process_text'"
-    )
+    error_msg = "ProcessTextRequest can only accept the values 'text', 'link_batch', 'entity_detection' and 'process_text'"
     request_obj = {
         "text": ["hey!"],
         "link_batch": False,
@@ -848,11 +946,23 @@ def test_process_text_request_to_dict():
     print(process_text_request)
     assert process_text_request["text"] == text
     assert process_text_request["link_batch"] == link_batch
-    assert process_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
-    assert process_text_request["entity_detection"]["entity_types"][0]["type"] == entity_type.type
-    assert process_text_request["entity_detection"]["entity_types"][0]["value"] == entity_type.value
+    assert (
+        process_text_request["entity_detection"]["accuracy"]
+        == entity_detection.accuracy
+    )
+    assert (
+        process_text_request["entity_detection"]["entity_types"][0]["type"]
+        == entity_type.type
+    )
+    assert (
+        process_text_request["entity_detection"]["entity_types"][0]["value"]
+        == entity_type.value
+    )
     assert process_text_request["entity_detection"]["filter"][0]["type"] == filter.type
-    assert process_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    assert (
+        process_text_request["entity_detection"]["filter"][0]["pattern"]
+        == filter.pattern
+    )
     assert process_text_request["processed_text"]["type"] == processed_text.type
     assert process_text_request["processed_text"]["pattern"] == processed_text.pattern
 
@@ -906,7 +1016,10 @@ def test_ner_text_request_initialize_fromdict():
     ner_text_request = NerTextRequest.fromdict(request_obj)
     assert ner_text_request.text == request_obj["text"]
     assert ner_text_request.link_batch == request_obj["link_batch"]
-    assert ner_text_request.entity_detection.accuracy == request_obj["entity_detection"]["accuracy"]
+    assert (
+        ner_text_request.entity_detection.accuracy
+        == request_obj["entity_detection"]["accuracy"]
+    )
     assert (
         ner_text_request.entity_detection.entity_types[0].type
         == request_obj["entity_detection"]["entity_types"][0]["type"]
@@ -915,7 +1028,10 @@ def test_ner_text_request_initialize_fromdict():
         ner_text_request.entity_detection.entity_types[0].value
         == request_obj["entity_detection"]["entity_types"][0]["value"]
     )
-    assert ner_text_request.entity_detection.filter[0].type == request_obj["entity_detection"]["filter"][0]["type"]
+    assert (
+        ner_text_request.entity_detection.filter[0].type
+        == request_obj["entity_detection"]["filter"][0]["type"]
+    )
     assert (
         ner_text_request.entity_detection.filter[0].pattern
         == request_obj["entity_detection"]["filter"][0]["pattern"]
@@ -923,9 +1039,7 @@ def test_ner_text_request_initialize_fromdict():
 
 
 def test_ner_text_request_invalid_initialize_fromdict():
-    error_msg = (
-        "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
-    )
+    error_msg = "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
     request_obj = {
         "text": ["hey!"],
         "link_batch": False,
@@ -963,10 +1077,18 @@ def test_ner_text_request_to_dict():
     assert ner_text_request["text"] == text
     assert ner_text_request["link_batch"] == link_batch
     assert ner_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
-    assert ner_text_request["entity_detection"]["entity_types"][0]["type"] == entity_type.type
-    assert ner_text_request["entity_detection"]["entity_types"][0]["value"] == entity_type.value
+    assert (
+        ner_text_request["entity_detection"]["entity_types"][0]["type"]
+        == entity_type.type
+    )
+    assert (
+        ner_text_request["entity_detection"]["entity_types"][0]["value"]
+        == entity_type.value
+    )
     assert ner_text_request["entity_detection"]["filter"][0]["type"] == filter.type
-    assert ner_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    assert (
+        ner_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    )
 
 
 # Process File URI Request Tests
@@ -988,7 +1110,12 @@ def test_process_file_uri_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -1013,7 +1140,12 @@ def test_process_file_uri_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
         {
             "uri": "this/location/right/here.png",
@@ -1031,9 +1163,7 @@ def test_process_file_uri_request_initialize_fromdict():
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
-    error_msg = (
-        "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
-    )
+    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
     entity_detection = EntityDetection(
@@ -1043,7 +1173,12 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     with pytest.raises(TypeError) as excinfo:
         ProcessFileUriRequest.fromdict(
             {
@@ -1067,7 +1202,12 @@ def test_process_file_uri_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
@@ -1084,7 +1224,9 @@ def test_process_file_uri_request_to_dict():
 
 # Process File Base64 Request Tests
 def test_process_file_base64_request_default_initializer():
-    process_file_base64_request_obj = ProcessFileBase64Request(file="sfsfxe234jkjsdlkfnDATA!!!!!!")
+    process_file_base64_request_obj = ProcessFileBase64Request(
+        file="sfsfxe234jkjsdlkfnDATA!!!!!!"
+    )
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA!!!!!!"
     assert process_file_base64_request_obj.entity_detection is None
     assert process_file_base64_request_obj.pdf_options is None
@@ -1101,7 +1243,12 @@ def test_process_file_base64_request_initializer():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -1127,7 +1274,12 @@ def test_process_file_base64_request_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
         {
             "file": file.to_dict(),
@@ -1156,7 +1308,12 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     with pytest.raises(TypeError) as excinfo:
         ProcessFileBase64Request.fromdict(
             {
@@ -1180,7 +1337,12 @@ def test_process_file_base64_request_to_dict():
         return_entity=False,
     )
     pdf_options = PDFOptions(density=100)
-    audio_options = AudioOptions(bleep_start_padding=1.0, bleep_end_padding=2.0, bleep_frequency=200, bleep_gain=-2)
+    audio_options = AudioOptions(
+        bleep_start_padding=1.0,
+        bleep_end_padding=2.0,
+        bleep_frequency=200,
+        bleep_gain=-2,
+    )
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
@@ -1207,7 +1369,9 @@ def test_bleep_request_initializer():
 def test_bleep_request_initialize_fromdict():
     file = File(data="test", content_type="image/jpg")
     timestamps = [Timestamp(start=0.0, end=1.0)]
-    bleep_request = BleepRequest.fromdict({"file": file.to_dict(), "timestamps": [row.to_dict() for row in timestamps]})
+    bleep_request = BleepRequest.fromdict(
+        {"file": file.to_dict(), "timestamps": [row.to_dict() for row in timestamps]}
+    )
     assert bleep_request.file.data == "test"
     assert bleep_request.timestamps[0].start == 0
 
@@ -1317,7 +1481,9 @@ def test_synthetic_text():
 
 
 def test_change_type():
-    processed_text = ProcessedText(type="MARKER", pattern="UNIQUE_NUMBERED_ENTITY_TYPE")  # Marker
+    processed_text = ProcessedText(
+        type="MARKER", pattern="UNIQUE_NUMBERED_ENTITY_TYPE"
+    )  # Marker
     processed_text.type = "MASK"
     assert processed_text.type == "MASK"
     assert hasattr(processed_text, "pattern") == False
