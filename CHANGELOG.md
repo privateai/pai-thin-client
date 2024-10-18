@@ -4,8 +4,19 @@
 ### Added
 
 ### Changed
+
+### Fixed
+
+## [4.0.0-alpha]
+
+### Added
+- New option for coreference_resolution in 4.0.0
+
+### Changed
 - Bumped requests from 2.31.0 to 2.32.3
 - Removed reference to the app version from client uris
+- Updated README to include coreference_resolution
+- Changed references of HIPPA to HIPAA_SAFE_HARBOR
 
 ### Fixed
 
