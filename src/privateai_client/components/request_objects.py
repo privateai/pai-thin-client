@@ -984,12 +984,14 @@ class ProcessFileUriRequest(BaseRequestObject):
                     initializer_dict[key] = AudioOptions.fromdict(value)
                 elif key == "image_options":
                     initializer_dict[key] = ImageOptions.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
+                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'image_options', 'ocr_options'"
             )
 
 
@@ -1002,6 +1004,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
         project_id: Optional[str] = None,
+        ocr_options: Optional[OCROptions] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection
@@ -1009,6 +1012,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         self.audio_options = audio_options
         self.image_options = image_options
         self.project_id = project_id
+        self.ocr_options = ocr_options
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -1025,12 +1029,14 @@ class ProcessFileBase64Request(BaseRequestObject):
                     initializer_dict[key] = AudioOptions.fromdict(value)
                 elif key == "image_options":
                     initializer_dict[key] = ImageOptions.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
+                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', 'image_options', 'ocr_options'"
             )
 
 

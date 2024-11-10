@@ -768,6 +768,51 @@ def test_image_options_palette_validator():
     assert error_msg in str(excinfo.value)
 
 
+# OCR Options Tests
+def test_ocr_options_default_initializer():
+    ocr_options = OCROptions()
+    assert ocr_options.ocr_system == "azure_computer_vision"
+
+
+def test_ocr_options_initializer():
+    ocr_options = OCROptions(
+        ocr_system="azure_document_intelligence"
+    )
+    assert ocr_options.ocr_system == "azure_document_intelligence"
+
+
+def test_ocr_options_initialize_fromdict():
+    ocr_options = OCROptions.fromdict(
+        {"ocr_system": "azure_document_intelligence"}
+    )
+    assert ocr_options.ocr_system == "azure_document_intelligence"
+
+
+def test_ocr_options_invalid_initialize_fromdict():
+    error_msg = "OCROptions can only accept 'ocr_system'"
+    with pytest.raises(TypeError) as excinfo:
+        OCROptions.fromdict({"ocr_system": "azure_document_intelligence", "junk": "value"})
+    assert error_msg in str(excinfo.value)
+
+
+def test_ocr_options_setters():
+    ocr_options = OCROptions(ocr_system="hybrid")
+    assert ocr_options.ocr_system == "hybrid"
+
+
+def test_ocr_options_ocr_system_validator():
+    error_msg = "OCROptions.ocr_system must be one of ['azure_computer_vision', 'azure_doc_intelligence', 'hybrid', 'paddleocr'], but got junk"
+    ocr_options = OCROptions()
+    with pytest.raises(ValueError) as excinfo:
+        ocr_options.ocr_system = "junk"
+    assert error_msg in str(excinfo.value)
+
+
+def test_ocr_options_to_dict():
+    ocr_options = OCROptions().to_dict()
+    assert ocr_options["ocr_system"] == "azure_computer_vision"
+
+
 # Timestamp Tests
 def test_timestamp_initializer():
     timestamp = Timestamp(start=2.0, end=3.0)
@@ -1146,12 +1191,14 @@ def test_process_file_uri_request_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    ocr_options = OCROptions(ocr_system="azure_computer_vision")
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
         {
             "uri": "this/location/right/here.png",
             "entity_detection": entity_detection.to_dict(),
             "pdf_options": pdf_options.to_dict(),
             "audio_options": audio_options.to_dict(),
+            "ocr_options": ocr_options.to_dict(),
         }
     )
     assert process_file_uri_obj.uri == "this/location/right/here.png"
@@ -1160,10 +1207,11 @@ def test_process_file_uri_request_initialize_fromdict():
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_uri_obj.audio_options.bleep_frequency == 200
     assert process_file_uri_obj.audio_options.bleep_gain == -2
+    assert process_file_uri_obj.ocr_options.ocr_system == "azure_computer_vision"
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
+    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'ocr_options'"
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
     entity_detection = EntityDetection(
@@ -1179,6 +1227,7 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    ocr_options = OCROptions(ocr_system="azure_computer_vision")
     with pytest.raises(TypeError) as excinfo:
         ProcessFileUriRequest.fromdict(
             {
@@ -1186,6 +1235,7 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
                 "entity_detection": entity_detection.to_dict(),
                 "pdf_options": pdf_options.to_dict(),
                 "audio_options": audio_options.to_dict(),
+                "ocr_options": ocr_options.to_dict(),
                 "junk": "value",
             }
         )
