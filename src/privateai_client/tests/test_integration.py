@@ -265,6 +265,26 @@ def test_process_image_file_base64():
     assert resp.ok
 
 
+def test_process_ocr_image_file_base64():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = "test_image.jpg"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type = "image/jpg"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    image_option_obj = rq.image_options_obj(masking_method="blur", palette=True)
+    ocr_option_obj = rq.ocr_options_obj(ocr_system="azure_doc_intelligence")
+    request_obj = rq.file_base64_obj(file=file_obj, image_options=image_option_obj, ocr_options=ocr_option_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
 def test_bleep():
     client = _get_client()
 

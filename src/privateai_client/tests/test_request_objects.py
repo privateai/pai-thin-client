@@ -776,22 +776,22 @@ def test_ocr_options_default_initializer():
 
 def test_ocr_options_initializer():
     ocr_options = OCROptions(
-        ocr_system="azure_document_intelligence"
+        ocr_system="azure_doc_intelligence"
     )
-    assert ocr_options.ocr_system == "azure_document_intelligence"
+    assert ocr_options.ocr_system == "azure_doc_intelligence"
 
 
 def test_ocr_options_initialize_fromdict():
     ocr_options = OCROptions.fromdict(
-        {"ocr_system": "azure_document_intelligence"}
+        {"ocr_system": "azure_doc_intelligence"}
     )
-    assert ocr_options.ocr_system == "azure_document_intelligence"
+    assert ocr_options.ocr_system == "azure_doc_intelligence"
 
 
 def test_ocr_options_invalid_initialize_fromdict():
     error_msg = "OCROptions can only accept 'ocr_system'"
     with pytest.raises(TypeError) as excinfo:
-        OCROptions.fromdict({"ocr_system": "azure_document_intelligence", "junk": "value"})
+        OCROptions.fromdict({"ocr_system": "azure_doc_intelligence", "junk": "value"})
     assert error_msg in str(excinfo.value)
 
 
@@ -1211,7 +1211,7 @@ def test_process_file_uri_request_initialize_fromdict():
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'ocr_options'"
+    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
     entity_detection = EntityDetection(
@@ -1347,7 +1347,7 @@ def test_process_file_base64_request_initialize_fromdict():
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
+    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
     file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
@@ -1364,6 +1364,7 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    ocr_options = OCROptions(ocr_system="azure_computer_vision")
     with pytest.raises(TypeError) as excinfo:
         ProcessFileBase64Request.fromdict(
             {
@@ -1371,9 +1372,11 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
                 "entity_detection": entity_detection.to_dict(),
                 "pdf_options": pdf_options.to_dict(),
                 "audio_options": audio_options.to_dict(),
+                "ocr_options": ocr_options.to_dict(),
                 "junk": "value",
             }
         )
+        print(str(excinfo.value))
     assert error_msg in str(excinfo.value)
 
 
