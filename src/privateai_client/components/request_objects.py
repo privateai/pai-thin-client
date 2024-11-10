@@ -512,6 +512,41 @@ class PDFOptions(BaseRequestObject):
             )
 
 
+class OCROptions(BaseRequestObject):
+    default_ocr_system = "azure_computer_vision"
+    VALID_OCR_SYSTEM = ["azure_computer_vision", "azure_doc_intelligence", "hybrid", "paddleocr"]
+
+    def __init__(
+        self,
+        ocr_system: str = default_ocr_system,
+    ):
+        self._ocr_system = ocr_system
+
+    @property
+    def ocr_system(self):
+        return self._ocr_system
+
+    @ocr_system.setter
+    def ocr_system(self, var):
+        if self._ocr_system_validator(var):
+            self._ocr_system = var
+
+    def _ocr_system_validator(self, var):
+        if var not in self.VALID_OCR_SYSTEM:
+            raise ValueError(
+                f"OCROptions.ocr_system must be one of {self.VALID_OCR_SYSTEM}, but got {var}"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError(
+                "OCROptions can only accept 'ocr_system'"
+            )
+
 class ProcessedMarkerText(BaseRequestObject):
     attributes = ["_pattern"]
     default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
@@ -926,6 +961,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
         project_id: Optional[str] = None,
+        ocr_options: Optional[OCROptions] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
@@ -933,6 +969,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         self.audio_options = audio_options
         self.image_options = image_options
         self.project_id = project_id
+        self.ocr_options = ocr_options
 
     @classmethod
     def fromdict(cls, values: dict):
