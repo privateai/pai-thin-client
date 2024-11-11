@@ -1376,7 +1376,6 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
                 "junk": "value",
             }
         )
-        print(str(excinfo.value))
     assert error_msg in str(excinfo.value)
 
 
