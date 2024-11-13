@@ -771,7 +771,7 @@ def test_image_options_palette_validator():
 # OCR Options Tests
 def test_ocr_options_default_initializer():
     ocr_options = OCROptions()
-    assert ocr_options.ocr_system == "azure_computer_vision"
+    assert ocr_options.ocr_system == "paddleocr"
 
 
 def test_ocr_options_initializer():
@@ -801,7 +801,7 @@ def test_ocr_options_setters():
 
 
 def test_ocr_options_ocr_system_validator():
-    error_msg = "OCROptions.ocr_system must be one of ['azure_computer_vision', 'azure_doc_intelligence', 'hybrid', 'paddleocr'], but got junk"
+    error_msg = "OCROptions.ocr_system must be one of azure_computer_vision,azure_doc_intelligence,hybrid,paddleocr, but got junk"
     ocr_options = OCROptions()
     with pytest.raises(ValueError) as excinfo:
         ocr_options.ocr_system = "junk"
@@ -810,7 +810,7 @@ def test_ocr_options_ocr_system_validator():
 
 def test_ocr_options_to_dict():
     ocr_options = OCROptions().to_dict()
-    assert ocr_options["ocr_system"] == "azure_computer_vision"
+    assert ocr_options["ocr_system"] == "paddleocr"
 
 
 # Timestamp Tests

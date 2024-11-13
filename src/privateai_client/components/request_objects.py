@@ -513,7 +513,7 @@ class PDFOptions(BaseRequestObject):
 
 
 class OCROptions(BaseRequestObject):
-    default_ocr_system = "azure_computer_vision"
+    default_ocr_system = "paddleocr"
     VALID_OCR_SYSTEM = ["azure_computer_vision", "azure_doc_intelligence", "hybrid", "paddleocr"]
 
     def __init__(
@@ -534,7 +534,7 @@ class OCROptions(BaseRequestObject):
     def _ocr_system_validator(self, var):
         if var not in self.VALID_OCR_SYSTEM:
             raise ValueError(
-                f"OCROptions.ocr_system must be one of {self.VALID_OCR_SYSTEM}, but got {var}"
+                f"OCROptions.ocr_system must be one of {','.join(self.VALID_OCR_SYSTEM)}, but got {var}"
             )
         return True
 
