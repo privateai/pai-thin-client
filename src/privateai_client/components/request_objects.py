@@ -512,6 +512,41 @@ class PDFOptions(BaseRequestObject):
             )
 
 
+class OCROptions(BaseRequestObject):
+    default_ocr_system = "paddleocr"
+    VALID_OCR_SYSTEM = ["azure_computer_vision", "azure_doc_intelligence", "hybrid", "paddleocr"]
+
+    def __init__(
+        self,
+        ocr_system: str = default_ocr_system,
+    ):
+        self._ocr_system = ocr_system
+
+    @property
+    def ocr_system(self):
+        return self._ocr_system
+
+    @ocr_system.setter
+    def ocr_system(self, var):
+        if self._ocr_system_validator(var):
+            self._ocr_system = var
+
+    def _ocr_system_validator(self, var):
+        if var not in self.VALID_OCR_SYSTEM:
+            raise ValueError(
+                f"OCROptions.ocr_system must be one of {','.join(self.VALID_OCR_SYSTEM)}, but got {var}"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError(
+                "OCROptions can only accept 'ocr_system'"
+            )
+
 class ProcessedMarkerText(BaseRequestObject):
     attributes = ["_pattern"]
     default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
@@ -926,6 +961,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
         project_id: Optional[str] = None,
+        ocr_options: Optional[OCROptions] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
@@ -933,6 +969,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         self.audio_options = audio_options
         self.image_options = image_options
         self.project_id = project_id
+        self.ocr_options = ocr_options
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -947,12 +984,14 @@ class ProcessFileUriRequest(BaseRequestObject):
                     initializer_dict[key] = AudioOptions.fromdict(value)
                 elif key == "image_options":
                     initializer_dict[key] = ImageOptions.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
+                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
             )
 
 
@@ -965,6 +1004,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
         project_id: Optional[str] = None,
+        ocr_options: Optional[OCROptions] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection
@@ -972,6 +1012,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         self.audio_options = audio_options
         self.image_options = image_options
         self.project_id = project_id
+        self.ocr_options = ocr_options
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -988,12 +1029,14 @@ class ProcessFileBase64Request(BaseRequestObject):
                     initializer_dict[key] = AudioOptions.fromdict(value)
                 elif key == "image_options":
                     initializer_dict[key] = ImageOptions.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', and 'image_options'"
+                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
             )
 
 
