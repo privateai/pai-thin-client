@@ -1,17 +1,16 @@
 
-## [Unreleased]
+## [4.0.0]
 
 ### Added
-
+- Added ocr options to requests
 ### Changed
 
 ### Fixed
 
-## [4.0.0]
+## [4.0.0a1]
 
 ### Added
 - New option for coreference_resolution in 4.0.0
-- Added ocr options to requests
 
 ### Changed
 - Bumped requests from 2.31.0 to 2.32.3
