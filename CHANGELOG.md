@@ -7,10 +7,11 @@
 
 ### Fixed
 
-## [4.0.0-alpha]
+## [4.0.0]
 
 ### Added
 - New option for coreference_resolution in 4.0.0
+- Added ocr options to requests
 
 ### Changed
 - Bumped requests from 2.31.0 to 2.32.3
