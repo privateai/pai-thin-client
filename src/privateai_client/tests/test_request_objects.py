@@ -1549,7 +1549,7 @@ def test_process_file_base64_request_to_dict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
-    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_type = ObjectEntityTypeSelector(type="DISABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
         object_entity_types=[object_entity_type],
     )
@@ -1562,7 +1562,7 @@ def test_process_file_base64_request_to_dict():
     ).to_dict()
     assert process_file_base64_request_obj["file"] == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj["entity_detection"]["accuracy"] == "standard"
-    assert process_file_base64_request_obj["object_entity_detection"]["object_entity_types"][0]["type"] == "ENABLE"
+    assert process_file_base64_request_obj["object_entity_detection"]["object_entity_types"][0]["type"] == "DISABLE"
     assert process_file_base64_request_obj["pdf_options"]["density"] == 100
     assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.0
     assert process_file_base64_request_obj["audio_options"]["bleep_frequency"] == 200
