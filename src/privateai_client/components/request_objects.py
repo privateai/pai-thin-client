@@ -550,6 +550,7 @@ class OCROptions(BaseRequestObject):
 
 class ObjectEntityTypeSelector(BaseRequestObject):
     valid_types = ["DISABLE", "ENABLE"]
+    valid_values = {"FACE", "LICENSE_PLATE", "LOGO", "SIGNATURE"}
 
     def __init__(self, type: str, value: List[str] = []):
         if self._type_validator(type):
@@ -576,6 +577,10 @@ class ObjectEntityTypeSelector(BaseRequestObject):
     def _value_validator(self, var):
         if type(var) is not list:
             raise TypeError("ObjectEntityTypeSelector.value must be of type list")
+        elif var and not all(value in self.valid_values for value in var):
+            raise ValueError(
+                f"'{var}' is not valid. ObjectEntityTypeSelector.value can only be one of the following: {', '.join(self.valid_values)}"
+            )
         return True
 
     @classmethod
