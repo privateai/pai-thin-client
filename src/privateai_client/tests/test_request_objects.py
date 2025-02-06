@@ -400,6 +400,118 @@ def test_entity_detection_to_dict():
     assert entity_detection_obj["return_entity"] is False
 
 
+# Object Entity Type Selector Tests
+def test_object_entity_type_selector_initializer():
+    test_type = "DISABLE"
+
+    object_entity_type_selector = ObjectEntityTypeSelector(type=test_type)
+    assert object_entity_type_selector.type == test_type
+    assert object_entity_type_selector.value == []
+
+
+def test_object_entity_type_selector_initialize_fromdict():
+    entity_type_obj = ObjectEntityTypeSelector.fromdict({"type": "ENABLE", "value": ["LOGO"]})
+    assert entity_type_obj.type == "ENABLE"
+    assert entity_type_obj.value == ["LOGO"]
+
+
+def test_object_entity_type_selector_invalid_initialize_fromdict():
+    error_msg = "ObjectEntityTypeSelector can only accept the values 'type' and 'value'"
+    with pytest.raises(TypeError) as excinfo:
+        ObjectEntityTypeSelector.fromdict(
+            {"type": "ENABLE", "value": ["LOGO"], "garbage": "value"}
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_object_entity_type_selector_setters():
+    entity_type_obj = ObjectEntityTypeSelector(type="ENABLE", value=["FACE"])
+    entity_type_obj.type = "DISABLE"
+    assert entity_type_obj.type == "DISABLE"
+
+
+def test_object_entity_type_selector_type_validator():
+    error_msg = "'RANDOM' is not valid. ObjectEntityTypeSelector.type can only be one of the following: "
+    entity_type_obj = ObjectEntityTypeSelector(type="ENABLE", value=["FACE"])
+    with pytest.raises(ValueError) as excinfo:
+        entity_type_obj.type = "RANDOM"
+    assert error_msg in str(excinfo.value)
+
+
+def test_object_entity_type_selector_value_validator():
+    error_msg = "ObjectEntityTypeSelector.value must be of type list"
+    with pytest.raises(TypeError) as excinfo:
+        ObjectEntityTypeSelector(type="ENABLE", value={})
+    assert error_msg in str(excinfo.value)
+
+
+def test_object_entity_type_selector_invalid_value_validator():
+    error_msg = "ObjectEntityTypeSelector.value can only be one of the following:"
+    with pytest.raises(ValueError) as excinfo:
+        ObjectEntityTypeSelector(type="ENABLE", value=["RANDOM"])
+    assert error_msg in str(excinfo.value)
+
+
+def test_object_entity_type_selector_to_dict():
+    entity_type_obj = ObjectEntityTypeSelector.fromdict(
+        {"type": "ENABLE", "value": ["SIGNATURE"]}
+    ).to_dict()
+    assert entity_type_obj["type"] == "ENABLE"
+    assert entity_type_obj["value"] == ["SIGNATURE"]
+
+
+# Entity Detection Tests
+def test_object_entity_detection_default_initializer():
+    object_entity_detection = ObjectEntityDetection()
+    assert object_entity_detection.object_entity_types == []
+
+
+def test_object_entity_detection_initializer():
+    object_entity_detection_obj = ObjectEntityDetection(
+        object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")],
+    )
+    assert type(object_entity_detection_obj.object_entity_types[0]) is ObjectEntityTypeSelector
+
+
+def test_object_entity_detection_initialize_fromdict():
+    object_entity_detection = ObjectEntityDetection.fromdict(
+        {
+            "object_entity_types": [ObjectEntityTypeSelector(type="ENABLE").to_dict()],
+        }
+    )
+    assert type(object_entity_detection.object_entity_types[0]) is ObjectEntityTypeSelector
+
+
+def test_object_entity_detection_invalid_initialize_fromdict():
+    error_msg = "ObjectEntityDetection can only accept the value 'object_entity_types'"
+    with pytest.raises(TypeError) as excinfo:
+        ObjectEntityDetection.fromdict(
+            {
+                "object_entity_types": [ObjectEntityTypeSelector(type="ENABLE").to_dict()],
+                "random": "value",
+            }
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_object_entity_detection_object_entity_types_validator():
+    error_msg = (
+        "ObjectEntityDetection.object_entity_types can only contain ObjectEntityTypeSelector objects"
+    )
+    with pytest.raises(ValueError) as excinfo:
+        ObjectEntityDetection(
+            object_entity_types=["junk"],
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_object_entity_detection_to_dict():
+    object_entity_detection_obj = ObjectEntityDetection(
+        object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")],
+    ).to_dict()
+    assert type(object_entity_detection_obj["object_entity_types"][0]) is dict
+
+
 # Processed Text Tests
 def test_processed_text_default_initializer():
     processed_text = ProcessedText()

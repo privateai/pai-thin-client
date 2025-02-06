@@ -964,6 +964,8 @@ class ObjectEntityDetection(BaseRequestObject):
                     initializer_dict[key] = [
                         ObjectEntityTypeSelector.fromdict(row) for row in value
                     ]
+                else:
+                    initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
