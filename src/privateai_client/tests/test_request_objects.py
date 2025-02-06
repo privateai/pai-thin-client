@@ -460,7 +460,7 @@ def test_object_entity_type_selector_to_dict():
     assert entity_type_obj["value"] == ["SIGNATURE"]
 
 
-# Entity Detection Tests
+# Object Entity Detection Tests
 def test_object_entity_detection_default_initializer():
     object_entity_detection = ObjectEntityDetection()
     assert object_entity_detection.object_entity_types == []
@@ -1253,6 +1253,7 @@ def test_process_file_uri_request_default_initializer():
     process_file_uri_obj = ProcessFileUriRequest(uri="this/location/right/here.png")
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection is None
+    assert process_file_uri_obj.object_entity_detection is None
     assert process_file_uri_obj.pdf_options is None
     assert process_file_uri_obj.audio_options is None
 
@@ -1273,14 +1274,20 @@ def test_process_file_uri_request_initializer():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
+        object_entity_detection=object_entity_detection,
         pdf_options=pdf_options,
         audio_options=audio_options,
     )
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
+    assert process_file_uri_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
     assert process_file_uri_obj.pdf_options.density == 100
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_uri_obj.audio_options.bleep_frequency == 200
@@ -1303,11 +1310,16 @@ def test_process_file_uri_request_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     ocr_options = OCROptions(ocr_system="azure_computer_vision")
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
         {
             "uri": "this/location/right/here.png",
             "entity_detection": entity_detection.to_dict(),
+            "object_entity_detection": object_entity_detection.to_dict(),
             "pdf_options": pdf_options.to_dict(),
             "audio_options": audio_options.to_dict(),
             "ocr_options": ocr_options.to_dict(),
@@ -1315,6 +1327,7 @@ def test_process_file_uri_request_initialize_fromdict():
     )
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
+    assert process_file_uri_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
     assert process_file_uri_obj.pdf_options.density == 100
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_uri_obj.audio_options.bleep_frequency == 200
@@ -1323,7 +1336,7 @@ def test_process_file_uri_request_initialize_fromdict():
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
     entity_detection = EntityDetection(
@@ -1339,12 +1352,17 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     ocr_options = OCROptions(ocr_system="azure_computer_vision")
     with pytest.raises(TypeError) as excinfo:
         ProcessFileUriRequest.fromdict(
             {
                 "uri": "this/location/right/here.png",
                 "entity_detection": entity_detection.to_dict(),
+                "object_entity_detection": object_entity_detection.to_dict(),
                 "pdf_options": pdf_options.to_dict(),
                 "audio_options": audio_options.to_dict(),
                 "ocr_options": ocr_options.to_dict(),
@@ -1370,14 +1388,20 @@ def test_process_file_uri_request_to_dict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
         entity_detection=entity_detection,
+        object_entity_detection=object_entity_detection,
         pdf_options=pdf_options,
         audio_options=audio_options,
     ).to_dict()
     assert process_file_uri_obj["uri"] == "this/location/right/here.png"
     assert process_file_uri_obj["entity_detection"]["accuracy"] == "standard"
+    assert process_file_uri_obj["object_entity_detection"]["object_entity_types"][0]["type"] == "ENABLE"
     assert process_file_uri_obj["pdf_options"]["density"] == 100
     assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2.0
     assert process_file_uri_obj["audio_options"]["bleep_frequency"] == 200
@@ -1391,6 +1415,7 @@ def test_process_file_base64_request_default_initializer():
     )
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA!!!!!!"
     assert process_file_base64_request_obj.entity_detection is None
+    assert process_file_base64_request_obj.object_entity_detection is None
     assert process_file_base64_request_obj.pdf_options is None
     assert process_file_base64_request_obj.audio_options is None
 
@@ -1411,14 +1436,20 @@ def test_process_file_base64_request_initializer():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
+        object_entity_detection=object_entity_detection,
         pdf_options=pdf_options,
         audio_options=audio_options,
     )
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
+    assert process_file_base64_request_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
     assert process_file_base64_request_obj.pdf_options.density == 100
     assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_base64_request_obj.audio_options.bleep_frequency == 200
@@ -1442,16 +1473,22 @@ def test_process_file_base64_request_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
         {
             "file": file.to_dict(),
             "entity_detection": entity_detection.to_dict(),
+            "object_entity_detection": object_entity_detection.to_dict(),
             "pdf_options": pdf_options.to_dict(),
             "audio_options": audio_options.to_dict(),
         }
     )
     assert process_file_base64_request_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
+    assert process_file_base64_request_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
     assert process_file_base64_request_obj.pdf_options.density == 100
     assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_base64_request_obj.audio_options.bleep_frequency == 200
@@ -1459,7 +1496,7 @@ def test_process_file_base64_request_initialize_fromdict():
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
     file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
@@ -1476,12 +1513,17 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     ocr_options = OCROptions(ocr_system="azure_computer_vision")
     with pytest.raises(TypeError) as excinfo:
         ProcessFileBase64Request.fromdict(
             {
                 "file": file.to_dict(),
                 "entity_detection": entity_detection.to_dict(),
+                "object_entity_detection": object_entity_detection.to_dict(),
                 "pdf_options": pdf_options.to_dict(),
                 "audio_options": audio_options.to_dict(),
                 "ocr_options": ocr_options.to_dict(),
@@ -1507,14 +1549,20 @@ def test_process_file_base64_request_to_dict():
         bleep_frequency=200,
         bleep_gain=-2,
     )
+    object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
+    object_entity_detection = ObjectEntityDetection(
+        object_entity_types=[object_entity_type],
+    )
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
         entity_detection=entity_detection,
+        object_entity_detection=object_entity_detection,
         pdf_options=pdf_options,
         audio_options=audio_options,
     ).to_dict()
     assert process_file_base64_request_obj["file"] == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj["entity_detection"]["accuracy"] == "standard"
+    assert process_file_base64_request_obj["object_entity_detection"]["object_entity_types"][0]["type"] == "ENABLE"
     assert process_file_base64_request_obj["pdf_options"]["density"] == 100
     assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.0
     assert process_file_base64_request_obj["audio_options"]["bleep_frequency"] == 200
