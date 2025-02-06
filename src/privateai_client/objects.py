@@ -12,6 +12,7 @@ class request_objects:
     entity = req_objects.Entity
     entity_type_selector_obj = req_objects.EntityTypeSelector
     entity_detection_obj = req_objects.EntityDetection
+    object_entity_detection_obj = req_objects.ObjectEntityDetection
     file_obj = req_objects.File
     filter_selector_obj = req_objects.FilterSelector
     pdf_options_obj = req_objects.PDFOptions
