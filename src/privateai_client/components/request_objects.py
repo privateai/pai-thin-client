@@ -547,6 +547,52 @@ class OCROptions(BaseRequestObject):
                 "OCROptions can only accept 'ocr_system'"
             )
 
+
+class ObjectEntityTypeSelector(BaseRequestObject):
+    valid_types = ["DISABLE", "ENABLE"]
+    valid_values = {"FACE", "LICENSE_PLATE", "LOGO", "SIGNATURE"}
+
+    def __init__(self, type: str, value: List[str] = []):
+        if self._type_validator(type):
+            self._type = type
+        if self._value_validator(value):
+            self.value = value
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, var):
+        if self._type_validator(var):
+            self._type = var
+
+    def _type_validator(self, var):
+        if var not in self.valid_types:
+            raise ValueError(
+                f"'{var}' is not valid. ObjectEntityTypeSelector.type can only be one of the following: {', '.join(self.valid_types)}"
+            )
+        return True
+
+    def _value_validator(self, var):
+        if type(var) is not list:
+            raise TypeError("ObjectEntityTypeSelector.value must be of type list")
+        elif var and not all(value in self.valid_values for value in var):
+            raise ValueError(
+                f"'{var}' is not valid. ObjectEntityTypeSelector.value can only be one of the following: {', '.join(self.valid_values)}"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError(
+                "ObjectEntityTypeSelector can only accept the values 'type' and 'value'"
+            )
+
+
 class ProcessedMarkerText(BaseRequestObject):
     attributes = ["_pattern"]
     default_pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
@@ -890,6 +936,43 @@ class EntityDetection(BaseRequestObject):
             )
 
 
+class ObjectEntityDetection(BaseRequestObject):
+    def __init__(
+        self,
+        object_entity_types: List[ObjectEntityTypeSelector] = [],
+    ):
+        if self._object_entity_types_validator(object_entity_types):
+            self.object_entity_types = object_entity_types
+
+    def _object_entity_types_validator(self, var):
+        if type(var) is not list:
+            raise TypeError(
+                f"{var} is not valid. ObjectEntityDetection.object_entity_types can only be a list"
+            )
+        elif var and not all(isinstance(row, ObjectEntityTypeSelector) for row in var):
+            raise ValueError(
+                "ObjectEntityDetection.object_entity_types can only contain ObjectEntityTypeSelector objects"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "object_entity_types":
+                    initializer_dict[key] = [
+                        ObjectEntityTypeSelector.fromdict(row) for row in value
+                    ]
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "ObjectEntityDetection can only accept the value 'object_entity_types'"
+            )
+
+
 class ProcessTextRequest(BaseRequestObject):
     def __init__(
         self,
@@ -957,6 +1040,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         self,
         uri: str,
         entity_detection: Optional[EntityDetection] = None,
+        object_entity_detection: Optional[ObjectEntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
@@ -965,6 +1049,7 @@ class ProcessFileUriRequest(BaseRequestObject):
     ):
         self.uri = uri
         self.entity_detection = entity_detection
+        self.object_entity_detection = object_entity_detection
         self.pdf_options = pdf_options
         self.audio_options = audio_options
         self.image_options = image_options
@@ -978,6 +1063,8 @@ class ProcessFileUriRequest(BaseRequestObject):
             for key, value in values.items():
                 if key == "entity_detection":
                     initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "object_entity_detection":
+                    initializer_dict[key] = ObjectEntityDetection.fromdict(value)
                 elif key == "pdf_options":
                     initializer_dict[key] = PDFOptions.fromdict(value)
                 elif key == "audio_options":
@@ -991,7 +1078,7 @@ class ProcessFileUriRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
             )
 
 
@@ -1000,6 +1087,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         self,
         file: File,
         entity_detection: Optional[EntityDetection] = None,
+        object_entity_detection: Optional[ObjectEntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
@@ -1008,6 +1096,7 @@ class ProcessFileBase64Request(BaseRequestObject):
     ):
         self.file = file
         self.entity_detection = entity_detection
+        self.object_entity_detection = object_entity_detection
         self.pdf_options = pdf_options
         self.audio_options = audio_options
         self.image_options = image_options
@@ -1023,6 +1112,8 @@ class ProcessFileBase64Request(BaseRequestObject):
                     initializer_dict[key] = File.fromdict(value)
                 elif key == "entity_detection":
                     initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "object_entity_detection":
+                    initializer_dict[key] = ObjectEntityDetection.fromdict(value)
                 elif key == "pdf_options":
                     initializer_dict[key] = PDFOptions.fromdict(value)
                 elif key == "audio_options":
@@ -1036,7 +1127,7 @@ class ProcessFileBase64Request(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
             )
 
 

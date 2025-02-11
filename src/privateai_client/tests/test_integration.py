@@ -284,6 +284,61 @@ def test_process_ocr_image_file_base64():
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
+def test_object_entity_detection_default():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = "test_image.jpg"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type = "image/jpg"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    request_obj = rq.file_base64_obj(file=file_obj, object_entity_detection = rq.object_entity_detection_obj())
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_object_entity_detection_with_enable_entity_types():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = "test_image.jpg"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type = "image/jpg"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    selector = rq.object_entity_type_selector_obj(type="ENABLE", value=["LOGO"])
+    request_obj = rq.file_base64_obj(file=file_obj, object_entity_detection = rq.object_entity_detection_obj(object_entity_types=[selector]))
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_object_entity_detection_with_disable_entity_types():
+    client = _get_client()
+
+    test_dir = "/".join(__file__.split("/")[:-1])
+    file_name = "test_image.jpg"
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    file_type = "image/jpg"
+
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read())
+        file_data = file_data.decode("ascii")
+
+    file_obj = rq.file_obj(data=file_data, content_type=file_type)
+    selector = rq.object_entity_type_selector_obj(type="DISABLE", value=["SIGNATURE"])
+    request_obj = rq.file_base64_obj(file=file_obj, object_entity_detection = rq.object_entity_detection_obj(object_entity_types=[selector]))
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
 
 def test_bleep():
     client = _get_client()
