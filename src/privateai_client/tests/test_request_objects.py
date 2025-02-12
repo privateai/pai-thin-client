@@ -527,9 +527,11 @@ def test_processed_text_mask_initializer():
 
 
 def test_processed_text_coreference_initializer():
-    processed_text = ProcessedText(type="MARKER", coreference_resolution="model")
+    processed_text = ProcessedText(
+        type="MARKER", coreference_resolution="model_prediction"
+    )
     assert processed_text.type == "MARKER"
-    assert processed_text.coreference_resolution == "model"
+    assert processed_text.coreference_resolution == "model_prediction"
 
 
 def test_processed_text_initialize_fromdict():
@@ -576,11 +578,11 @@ def test_processed_text_coreference_setters():
     processed_text.type = "MARKER"
     processed_text.pattern = "[UNIQUE_NUMBERED_ENTITY_TYPE]"
     processed_text.marker_language = "fr"
-    processed_text.coreference_resolution = "model"
+    processed_text.coreference_resolution = "model_prediction"
     assert processed_text.type == "MARKER"
     assert processed_text.pattern == "[UNIQUE_NUMBERED_ENTITY_TYPE]"
     assert processed_text.marker_language == "fr"
-    assert processed_text.coreference_resolution == "model"
+    assert processed_text.coreference_resolution == "model_prediction"
 
 
 def test_processed_text_type_validator():
@@ -887,16 +889,12 @@ def test_ocr_options_default_initializer():
 
 
 def test_ocr_options_initializer():
-    ocr_options = OCROptions(
-        ocr_system="azure_doc_intelligence"
-    )
+    ocr_options = OCROptions(ocr_system="azure_doc_intelligence")
     assert ocr_options.ocr_system == "azure_doc_intelligence"
 
 
 def test_ocr_options_initialize_fromdict():
-    ocr_options = OCROptions.fromdict(
-        {"ocr_system": "azure_doc_intelligence"}
-    )
+    ocr_options = OCROptions.fromdict({"ocr_system": "azure_doc_intelligence"})
     assert ocr_options.ocr_system == "azure_doc_intelligence"
 
 

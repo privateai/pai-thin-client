@@ -187,7 +187,7 @@ sample_entity_type_selector = request_objects.entity_type_selector_obj(type="DIS
 sample_entity_detection = request_objects.entity_detection_obj(entity_types=[sample_entity_type_selector])
 
 # sub-dictionary of a process text request
-sample_processed_text = request_objects.processed_text_obj(type="MARKER", pattern="[UNIQUE_NUMBERED_ENTITY_TYPE]", coreference_resolution="model")
+sample_processed_text = request_objects.processed_text_obj(type="MARKER", pattern="[UNIQUE_NUMBERED_ENTITY_TYPE]", coreference_resolution="model_prediction")
 
 # request object created using the sub-dictionaries
 sample_request = request_objects.process_text_obj(text=[sample_text], entity_detection=sample_entity_detection, processed_text=sample_processed_text)

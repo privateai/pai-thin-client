@@ -514,7 +514,12 @@ class PDFOptions(BaseRequestObject):
 
 class OCROptions(BaseRequestObject):
     default_ocr_system = "paddleocr"
-    VALID_OCR_SYSTEM = ["azure_computer_vision", "azure_doc_intelligence", "hybrid", "paddleocr"]
+    VALID_OCR_SYSTEM = [
+        "azure_computer_vision",
+        "azure_doc_intelligence",
+        "hybrid",
+        "paddleocr",
+    ]
 
     def __init__(
         self,
@@ -543,9 +548,8 @@ class OCROptions(BaseRequestObject):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError(
-                "OCROptions can only accept 'ocr_system'"
-            )
+            raise TypeError("OCROptions can only accept 'ocr_system'")
+
 
 
 class ObjectEntityTypeSelector(BaseRequestObject):
@@ -605,7 +609,7 @@ class ProcessedMarkerText(BaseRequestObject):
     default_marker_language = "en"
     valid_marker_languages = ["auto", "en", "fr", "de", "ja", "ko", "nl", "ru", "uk"]
     default_coreference_resolution = "heuristics"
-    valid_coreference_resolutions = ["heuristics", "model", "combined"]
+    valid_coreference_resolutions = ["heuristics", "model_prediction", "combined"]
 
     def __init__(
         self,

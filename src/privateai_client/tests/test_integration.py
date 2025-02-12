@@ -37,6 +37,45 @@ def test_entity_detection_default():
     assert resp.ok
 
 
+def test_entity_detection_coref_model_prediction():
+    client = _get_client()
+    req = rq.process_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        processed_text=rq.processed_text_obj(
+            type="MARKER", coreference_resolution="model_prediction"
+        ),
+    )
+    resp = client.process_text(req)
+    assert resp.ok
+
+
+def test_entity_detection_coref_heuristic():
+    client = _get_client()
+    req = rq.process_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        processed_text=rq.processed_text_obj(
+            type="MARKER", coreference_resolution="heuristics"
+        ),
+    )
+    resp = client.process_text(req)
+    assert resp.ok
+
+
+def test_entity_detection_coref_combined():
+    client = _get_client()
+    req = rq.process_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        processed_text=rq.processed_text_obj(
+            type="MARKER", coreference_resolution="combined"
+        ),
+    )
+    resp = client.process_text(req)
+    assert resp.ok
+
+
 def test_entity_detection_with_enable_entity_types():
     client = _get_client()
     selector = rq.entity_type_selector_obj(type="ENABLE", value=["HIPAA_SAFE_HARBOR"])
@@ -280,7 +319,9 @@ def test_process_ocr_image_file_base64():
     file_obj = rq.file_obj(data=file_data, content_type=file_type)
     image_option_obj = rq.image_options_obj(masking_method="blur", palette=True)
     ocr_option_obj = rq.ocr_options_obj(ocr_system="azure_doc_intelligence")
-    request_obj = rq.file_base64_obj(file=file_obj, image_options=image_option_obj, ocr_options=ocr_option_obj)
+    request_obj = rq.file_base64_obj(
+        file=file_obj, image_options=image_option_obj, ocr_options=ocr_option_obj
+    )
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
