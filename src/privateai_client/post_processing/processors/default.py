@@ -17,8 +17,3 @@ class MarkerEntityProcessor:
         key = entity["best_label"]
         self.counts[key] += 1
         return f"{key}_{self.counts[key]}"
-
-
-class DoNothingEntityProcessor:
-    def __call__(self, entity: dict) -> str:
-        return entity["text"]

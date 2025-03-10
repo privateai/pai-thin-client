@@ -15,3 +15,5 @@ repos:
     hooks:
       - id: isort
         name: Sort imports (isort)
+        args: ["--profile", "black"]
+
