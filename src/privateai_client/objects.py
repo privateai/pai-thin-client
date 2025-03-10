@@ -7,6 +7,7 @@ class request_objects:
     file_base64_obj = req_objects.ProcessFileBase64Request
     process_text_obj = req_objects.ProcessTextRequest
     ner_text_obj = req_objects.NerTextRequest
+    analyze_text_obj = req_objects.AnalyzeTextRequest
     audio_options_obj = req_objects.AudioOptions
     image_options_obj = req_objects.ImageOptions
     entity = req_objects.Entity

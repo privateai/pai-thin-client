@@ -158,7 +158,7 @@ class NerTextResponse(BaseResponse):
     @property
     def entities_present(self):
         return self.get_attribute_entries("entities_present")
-    
+
     @property
     def characters_processed(self):
         return self.get_attribute_entries("characters_processed")
@@ -166,6 +166,15 @@ class NerTextResponse(BaseResponse):
     @property
     def languages_detected(self):
         return self.get_attribute_entries("languages_detected")
+
+
+class AnalyzeTextResponse(NerTextResponse):
+    def __init__(self, response_object: Response = None):
+        super(AnalyzeTextResponse, self).__init__(response_object)
+
+    @property
+    def analysis_result(self):
+        return self.get_attribute_entries("analysis_result")
 
 
 class TextResponse(DemiTextResponse):
