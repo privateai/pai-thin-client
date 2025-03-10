@@ -1059,7 +1059,7 @@ class AnalyzeTextRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "AnalyzeTextRequest can only accept the values 'text', 'link_batch', 'entity_detection' and 'locale'"
+                "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch' and 'entity_detection'"
             )
 
 

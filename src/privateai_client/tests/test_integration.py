@@ -325,6 +325,7 @@ def test_process_ocr_image_file_base64():
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
+
 def test_object_entity_detection_default():
     client = _get_client()
 
@@ -338,7 +339,9 @@ def test_object_entity_detection_default():
         file_data = file_data.decode("ascii")
 
     file_obj = rq.file_obj(data=file_data, content_type=file_type)
-    request_obj = rq.file_base64_obj(file=file_obj, object_entity_detection = rq.object_entity_detection_obj())
+    request_obj = rq.file_base64_obj(
+        file=file_obj, object_entity_detection=rq.object_entity_detection_obj()
+    )
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
@@ -357,7 +360,12 @@ def test_object_entity_detection_with_enable_entity_types():
 
     file_obj = rq.file_obj(data=file_data, content_type=file_type)
     selector = rq.object_entity_type_selector_obj(type="ENABLE", value=["LOGO"])
-    request_obj = rq.file_base64_obj(file=file_obj, object_entity_detection = rq.object_entity_detection_obj(object_entity_types=[selector]))
+    request_obj = rq.file_base64_obj(
+        file=file_obj,
+        object_entity_detection=rq.object_entity_detection_obj(
+            object_entity_types=[selector]
+        ),
+    )
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
@@ -376,7 +384,12 @@ def test_object_entity_detection_with_disable_entity_types():
 
     file_obj = rq.file_obj(data=file_data, content_type=file_type)
     selector = rq.object_entity_type_selector_obj(type="DISABLE", value=["SIGNATURE"])
-    request_obj = rq.file_base64_obj(file=file_obj, object_entity_detection = rq.object_entity_detection_obj(object_entity_types=[selector]))
+    request_obj = rq.file_base64_obj(
+        file=file_obj,
+        object_entity_detection=rq.object_entity_detection_obj(
+            object_entity_types=[selector]
+        ),
+    )
     resp = client.process_files_base64(request_object=request_obj)
     assert resp.ok
 
@@ -484,4 +497,100 @@ def test_ner_full_entity_detection():
         ),
     )
     resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_analyze_text_only():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_entity_detection_default():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"], locale="en", entity_detection=rq.entity_detection_obj()
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_entity_detection_with_enable_entity_types():
+    client = _get_client()
+    selector = rq.entity_type_selector_obj(type="ENABLE", value=["HIPAA_SAFE_HARBOR"])
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+        entity_detection=rq.entity_detection_obj(entity_types=[selector]),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_entity_detection_with_disable_entity_types():
+    client = _get_client()
+    selector = rq.entity_type_selector_obj(type="DISABLE", value=["HIPAA_SAFE_HARBOR"])
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+        entity_detection=rq.entity_detection_obj(entity_types=[selector]),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_entity_detection_with_allow_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW", pattern="[A-Za-z0-9]*")
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+        entity_detection=rq.entity_detection_obj(filter=[filter]),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_entity_detection_with_block_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(
+        type="BLOCK", pattern="[A-Za-z0-9]*", entity_type="ANY_TEXT"
+    )
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+        entity_detection=rq.entity_detection_obj(filter=[filter]),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_entity_detection_with_allow_text_filter():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW_TEXT", pattern="[A-Za-z0-9]*")
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+        entity_detection=rq.entity_detection_obj(filter=[filter]),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_full_entity_detection():
+    client = _get_client()
+    filter = rq.filter_selector_obj(type="ALLOW", pattern="[A-Za-z0-9]*")
+    selector = rq.entity_type_selector_obj(type="ENABLE", value=["HIPAA_SAFE_HARBOR"])
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        locale="en",
+        entity_detection=rq.entity_detection_obj(
+            filter=[filter], entity_types=[selector]
+        ),
+    )
+    resp = client.analyze_text(req)
     assert resp.ok
