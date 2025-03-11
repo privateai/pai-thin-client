@@ -26,9 +26,15 @@ class FuzzyMatchEntityProcessor:
     def __call__(self, entity: dict) -> str:
         if self.ignore_casing:
             lower_text = entity["text"].lower()
-            min_dist = min(damerau_levenshtein_distance(lower_text, word.lower()) for word in self.known_words_list)
+            min_dist = min(
+                damerau_levenshtein_distance(lower_text, word.lower())
+                for word in self.known_words_list
+            )
         else:
-            min_dist = min(damerau_levenshtein_distance(entity["text"], word) for word in self.known_words_list)
+            min_dist = min(
+                damerau_levenshtein_distance(entity["text"], word)
+                for word in self.known_words_list
+            )
         should_allow = self.strategy == "ALLOW"
         is_similar = min_dist <= self.threshold
 
@@ -43,15 +49,26 @@ class FuzzyMatchEntityProcessor:
 
     def _validate_attributes(self):
         if self.strategy not in ["BLOCK", "ALLOW"]:
-            raise ValueError(f"Invalid value for strategy. Accepted values: 'BLOCK' and 'ALLOW'")
+            raise ValueError(
+                f"Invalid value for strategy. Accepted values: 'BLOCK' and 'ALLOW'"
+            )
         if self.process_type not in ["MARKER", "MASK"]:
-            raise ValueError(f"Invalid value for process_type. Accepted values: 'MARKER' and 'MASK'")
+            raise ValueError(
+                f"Invalid value for process_type. Accepted values: 'MARKER' and 'MASK'"
+            )
         if not (
-            isinstance(self.known_words_list, list) or isinstance(self.known_words_list, tuple),
+            isinstance(self.known_words_list, list)
+            or isinstance(self.known_words_list, tuple),
             isinstance(self.known_words_list, set),
         ):
-            raise ValueError(f"Invalid value for known_words_list. Accepted are list, tuple or set of strings.")
+            raise ValueError(
+                f"Invalid value for known_words_list. Accepted are list, tuple or set of strings."
+            )
         if not isinstance(self.masking_character, str):
-            raise ValueError(f"Invalid value for masking_character. Accepted value is a valid string")
+            raise ValueError(
+                f"Invalid value for masking_character. Accepted value is a valid string"
+            )
         if not isinstance(self.ignore_casing, bool):
-            raise ValueError(f"Invalid value for ignore_casing. Accepted values: True and False")
+            raise ValueError(
+                f"Invalid value for ignore_casing. Accepted values: True and False"
+            )

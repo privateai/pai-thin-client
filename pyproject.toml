@@ -29,4 +29,4 @@ dependencies = ["requests~=2.32.3"]
 path = "src/privateai_client/__about__.py"
 
 [tool.black]
-line-length = 150
+line-length = 88

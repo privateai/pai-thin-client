@@ -31,6 +31,8 @@ def deidentify_text(
             length_diff = len(entity["text"]) - len(initial_entity_length)
             offset += length_diff
 
-            modified_text = modified_text[:start_idx] + entity["text"] + modified_text[end_idx:]
+            modified_text = (
+                modified_text[:start_idx] + entity["text"] + modified_text[end_idx:]
+            )
         modified_texts.append(modified_text)
     return modified_texts

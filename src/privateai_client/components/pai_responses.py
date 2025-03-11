@@ -9,7 +9,9 @@ class BaseResponse:
         # Should be json or text
         self._json_response = json_response
         if not self.response.ok:
-            message = f"The request returned with a {self.response.status_code} {self.reason}"
+            message = (
+                f"The request returned with a {self.response.status_code} {self.reason}"
+            )
             if self.response.status_code == 400:
                 message += f" -- {self.body}"
             raise HTTPError(message)
@@ -121,14 +123,23 @@ class DemiTextResponse(BaseResponse):
         if type(self.body) == dict:
             best_labels = [entity["best_label"] for entity in self.entities]
         else:
-            best_labels = [attr["best_label"] for entity in self.entities for attr in entity]
+            best_labels = [
+                attr["best_label"] for entity in self.entities for attr in entity
+            ]
         return best_labels
 
     def get_reidentify_entities(self):
         if type(self.body) == dict:
-            entities = [Entity(entity["processed_text"], entity["text"]) for entity in self.entities]
+            entities = [
+                Entity(entity["processed_text"], entity["text"])
+                for entity in self.entities
+            ]
         else:
-            entities = [Entity(attr["processed_text"], attr["text"]) for entity in self.entities for attr in entity]
+            entities = [
+                Entity(attr["processed_text"], attr["text"])
+                for entity in self.entities
+                for attr in entity
+            ]
         return entities
 
     def get_reidentify_request(self):

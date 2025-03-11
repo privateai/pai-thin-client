@@ -19,7 +19,9 @@ def test_file_initializer_fromdict():
 def test_file_invalid_initialize_fromdict():
     error_msg = "File can only accept the values 'data' and 'content_type'"
     with pytest.raises(TypeError) as excinfo:
-        File.fromdict({"data": "test", "content_type": "application/pdf", "garbage": "value"})
+        File.fromdict(
+            {"data": "test", "content_type": "application/pdf", "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -58,7 +60,9 @@ def test_filter_selector_initializer2():
     test_type = "BLOCK"
     test_pattern = "[A-Z]"
     test_entity_type = "CHARACTER"
-    filter_selector = FilterSelector(type=test_type, pattern=test_pattern, entity_type=test_entity_type)
+    filter_selector = FilterSelector(
+        type=test_type, pattern=test_pattern, entity_type=test_entity_type
+    )
     assert filter_selector.type == test_type
     assert filter_selector.pattern == test_pattern
     assert filter_selector.entity_type == "CHARACTER"
@@ -84,8 +88,12 @@ def test_filter_selector_initialize_fromdict():
 
 def test_filter_selector_invalid_initialize_fromdict():
     with pytest.raises(TypeError) as excinfo:
-        FilterSelector.fromdict({"type": "ALLOW", "pattern": "[A-Z]", "fake_key": "fake_value"})
-    assert "FilterSelector can only accept the values 'type' and 'pattern'" in str(excinfo.value)
+        FilterSelector.fromdict(
+            {"type": "ALLOW", "pattern": "[A-Z]", "fake_key": "fake_value"}
+        )
+    assert "FilterSelector can only accept the values 'type' and 'pattern'" in str(
+        excinfo.value
+    )
 
 
 def test_filter_selector_setters():
@@ -108,7 +116,10 @@ def test_filter_selector_type_validator():
     test_pattern = "[A-Z]"
     with pytest.raises(ValueError) as excinfo:
         FilterSelector(type=test_type, pattern=test_pattern)
-    assert " is not valid. FilterSelector.type can only be one of the following: " in str(excinfo.value)
+    assert (
+        " is not valid. FilterSelector.type can only be one of the following: "
+        in str(excinfo.value)
+    )
 
 
 def test_filter_selector_pattern_validator():
@@ -124,7 +135,9 @@ def test_filter_selector_entity_type_validator():
     test_pattern = "[A-Z]"
     test_entity_type = 30
     with pytest.raises(TypeError) as excinfo:
-        FilterSelector(type=test_type, pattern=test_pattern, entity_type=test_entity_type)
+        FilterSelector(
+            type=test_type, pattern=test_pattern, entity_type=test_entity_type
+        )
     assert "FilterSelector.entity_type must be of type string" in str(excinfo.value)
 
 
@@ -168,7 +181,9 @@ def test_entity_initializer_fromdict():
 def test_entity_invalid_initialize_fromdict():
     error_msg = "Entity can only accept the values 'processed_text' and 'text'"
     with pytest.raises(TypeError) as excinfo:
-        Entity.fromdict({"processed_text": "NAME_1", "text": "this is a test", "garbage": "value"})
+        Entity.fromdict(
+            {"processed_text": "NAME_1", "text": "this is a test", "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -212,7 +227,9 @@ def test_entity_type_selector_initialize_fromdict():
 def test_entity_type_selector_invalid_initialize_fromdict():
     error_msg = "EntityTypeSelector can only accept the values 'type' and 'value'"
     with pytest.raises(TypeError) as excinfo:
-        EntityTypeSelector.fromdict({"type": "ENABLE", "value": ["NAME"], "garbage": "value"})
+        EntityTypeSelector.fromdict(
+            {"type": "ENABLE", "value": ["NAME"], "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -238,7 +255,9 @@ def test_entity_type_selector_value_validator():
 
 
 def test_entity_type_selector_to_dict():
-    entity_type_obj = EntityTypeSelector.fromdict({"type": "ENABLE", "value": ["NAME"]}).to_dict()
+    entity_type_obj = EntityTypeSelector.fromdict(
+        {"type": "ENABLE", "value": ["NAME"]}
+    ).to_dict()
     assert entity_type_obj["type"] == "ENABLE"
     assert entity_type_obj["value"] == ["NAME"]
 
@@ -311,7 +330,9 @@ def test_entity_detection_setters():
 
 
 def test_entity_detection_accuracy_validator():
-    error_msg = "junk is not valid. EntityDetection.accuracy can only be one of the following: "
+    error_msg = (
+        "junk is not valid. EntityDetection.accuracy can only be one of the following: "
+    )
     entity_detection_obj = EntityDetection.fromdict(
         {
             "accuracy": "high",
@@ -326,7 +347,9 @@ def test_entity_detection_accuracy_validator():
 
 
 def test_entity_detection_entity_types_validator():
-    error_msg = "EntityDetection.entity_types can only contain EntityTypeSelector objects"
+    error_msg = (
+        "EntityDetection.entity_types can only contain EntityTypeSelector objects"
+    )
     with pytest.raises(ValueError) as excinfo:
         EntityDetection(
             accuracy="high",
@@ -387,7 +410,9 @@ def test_object_entity_type_selector_initializer():
 
 
 def test_object_entity_type_selector_initialize_fromdict():
-    entity_type_obj = ObjectEntityTypeSelector.fromdict({"type": "ENABLE", "value": ["LOGO"]})
+    entity_type_obj = ObjectEntityTypeSelector.fromdict(
+        {"type": "ENABLE", "value": ["LOGO"]}
+    )
     assert entity_type_obj.type == "ENABLE"
     assert entity_type_obj.value == ["LOGO"]
 
@@ -395,7 +420,9 @@ def test_object_entity_type_selector_initialize_fromdict():
 def test_object_entity_type_selector_invalid_initialize_fromdict():
     error_msg = "ObjectEntityTypeSelector can only accept the values 'type' and 'value'"
     with pytest.raises(TypeError) as excinfo:
-        ObjectEntityTypeSelector.fromdict({"type": "ENABLE", "value": ["LOGO"], "garbage": "value"})
+        ObjectEntityTypeSelector.fromdict(
+            {"type": "ENABLE", "value": ["LOGO"], "garbage": "value"}
+        )
     assert error_msg in str(excinfo.value)
 
 
@@ -428,7 +455,9 @@ def test_object_entity_type_selector_invalid_value_validator():
 
 
 def test_object_entity_type_selector_to_dict():
-    entity_type_obj = ObjectEntityTypeSelector.fromdict({"type": "ENABLE", "value": ["SIGNATURE"]}).to_dict()
+    entity_type_obj = ObjectEntityTypeSelector.fromdict(
+        {"type": "ENABLE", "value": ["SIGNATURE"]}
+    ).to_dict()
     assert entity_type_obj["type"] == "ENABLE"
     assert entity_type_obj["value"] == ["SIGNATURE"]
 
@@ -443,7 +472,10 @@ def test_object_entity_detection_initializer():
     object_entity_detection_obj = ObjectEntityDetection(
         object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")],
     )
-    assert type(object_entity_detection_obj.object_entity_types[0]) is ObjectEntityTypeSelector
+    assert (
+        type(object_entity_detection_obj.object_entity_types[0])
+        is ObjectEntityTypeSelector
+    )
 
 
 def test_object_entity_detection_initialize_fromdict():
@@ -452,7 +484,9 @@ def test_object_entity_detection_initialize_fromdict():
             "object_entity_types": [ObjectEntityTypeSelector(type="ENABLE").to_dict()],
         }
     )
-    assert type(object_entity_detection.object_entity_types[0]) is ObjectEntityTypeSelector
+    assert (
+        type(object_entity_detection.object_entity_types[0]) is ObjectEntityTypeSelector
+    )
 
 
 def test_object_entity_detection_invalid_initialize_fromdict():
@@ -460,7 +494,9 @@ def test_object_entity_detection_invalid_initialize_fromdict():
     with pytest.raises(TypeError) as excinfo:
         ObjectEntityDetection.fromdict(
             {
-                "object_entity_types": [ObjectEntityTypeSelector(type="ENABLE").to_dict()],
+                "object_entity_types": [
+                    ObjectEntityTypeSelector(type="ENABLE").to_dict()
+                ],
                 "random": "value",
             }
         )
@@ -498,7 +534,9 @@ def test_processed_text_mask_initializer():
 
 
 def test_processed_text_coreference_initializer():
-    processed_text = ProcessedText(type="MARKER", coreference_resolution="model_prediction")
+    processed_text = ProcessedText(
+        type="MARKER", coreference_resolution="model_prediction"
+    )
     assert processed_text.type == "MARKER"
     assert processed_text.coreference_resolution == "model_prediction"
 
@@ -555,14 +593,20 @@ def test_processed_text_coreference_setters():
 
 
 def test_processed_text_type_validator():
-    error_msg = "junk is not valid. ProcessedText.type can only be one of the following: "
+    error_msg = (
+        "junk is not valid. ProcessedText.type can only be one of the following: "
+    )
     with pytest.raises(ValueError) as excinfo:
-        ProcessedText.fromdict({"type": "junk", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]"})
+        ProcessedText.fromdict(
+            {"type": "junk", "pattern": "[UNIQUE_NUMBERED_ENTITY_TYPE]"}
+        )
     assert error_msg in str(excinfo.value)
 
 
 def test_processed_text_pattern_validator():
-    error_msg = "junk is not valid. ProcessedText.pattern can only be one of the following: "
+    error_msg = (
+        "junk is not valid. ProcessedText.pattern can only be one of the following: "
+    )
     with pytest.raises(ValueError) as excinfo:
         ProcessedText.fromdict({"type": "MARKER", "pattern": "junk"})
     assert error_msg in str(excinfo.value)
@@ -589,7 +633,9 @@ def test_processed_text_mask_to_dict():
 
 
 def test_processed_text_marker_to_dict():
-    processed_text = ProcessedText(type="MARKER", coreference_resolution="combined").to_dict()
+    processed_text = ProcessedText(
+        type="MARKER", coreference_resolution="combined"
+    ).to_dict()
     assert processed_text["type"] == "MARKER"
     assert processed_text["coreference_resolution"] == "combined"
 
@@ -603,14 +649,18 @@ def test_pdf_options_default_initializer():
 
 
 def test_pdf_options_initializer():
-    pdf_options = PDFOptions(density=300, max_resolution=500, enable_pdf_text_layer=False)
+    pdf_options = PDFOptions(
+        density=300, max_resolution=500, enable_pdf_text_layer=False
+    )
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is False
 
 
 def test_pdf_options_initialize_fromdict():
-    pdf_options = PDFOptions.fromdict({"density": 300, "max_resolution": 500, "enable_pdf_text_layer": True})
+    pdf_options = PDFOptions.fromdict(
+        {"density": 300, "max_resolution": 500, "enable_pdf_text_layer": True}
+    )
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is True
@@ -824,7 +874,9 @@ def test_image_options_setters():
 
 
 def test_image_options_masking_method_validator():
-    error_msg = "ImageOptions.masking_method must be one of ['blur', 'blackbox'], but got junk"
+    error_msg = (
+        "ImageOptions.masking_method must be one of ['blur', 'blackbox'], but got junk"
+    )
     with pytest.raises(ValueError) as excinfo:
         ImageOptions().masking_method = "junk"
     assert error_msg in str(excinfo.value)
@@ -958,8 +1010,12 @@ def test_process_text_request_initializer():
     assert process_text_request.text == text
     assert process_text_request.link_batch == link_batch
     assert process_text_request.entity_detection.accuracy == entity_detection.accuracy
-    assert process_text_request.entity_detection.entity_types[0].type == entity_type.type
-    assert process_text_request.entity_detection.entity_types[0].value == entity_type.value
+    assert (
+        process_text_request.entity_detection.entity_types[0].type == entity_type.type
+    )
+    assert (
+        process_text_request.entity_detection.entity_types[0].value == entity_type.value
+    )
     assert process_text_request.entity_detection.filter[0].type == filter.type
     assert process_text_request.entity_detection.filter[0].pattern == filter.pattern
     assert process_text_request.processed_text.type == processed_text.type
@@ -981,13 +1037,34 @@ def test_process_text_request_initialize_fromdict():
     process_text_request = ProcessTextRequest.fromdict(request_obj)
     assert process_text_request.text == request_obj["text"]
     assert process_text_request.link_batch == request_obj["link_batch"]
-    assert process_text_request.entity_detection.accuracy == request_obj["entity_detection"]["accuracy"]
-    assert process_text_request.entity_detection.entity_types[0].type == request_obj["entity_detection"]["entity_types"][0]["type"]
-    assert process_text_request.entity_detection.entity_types[0].value == request_obj["entity_detection"]["entity_types"][0]["value"]
-    assert process_text_request.entity_detection.filter[0].type == request_obj["entity_detection"]["filter"][0]["type"]
-    assert process_text_request.entity_detection.filter[0].pattern == request_obj["entity_detection"]["filter"][0]["pattern"]
-    assert process_text_request.processed_text.type == request_obj["processed_text"]["type"]
-    assert process_text_request.processed_text.pattern == request_obj["processed_text"]["pattern"]
+    assert (
+        process_text_request.entity_detection.accuracy
+        == request_obj["entity_detection"]["accuracy"]
+    )
+    assert (
+        process_text_request.entity_detection.entity_types[0].type
+        == request_obj["entity_detection"]["entity_types"][0]["type"]
+    )
+    assert (
+        process_text_request.entity_detection.entity_types[0].value
+        == request_obj["entity_detection"]["entity_types"][0]["value"]
+    )
+    assert (
+        process_text_request.entity_detection.filter[0].type
+        == request_obj["entity_detection"]["filter"][0]["type"]
+    )
+    assert (
+        process_text_request.entity_detection.filter[0].pattern
+        == request_obj["entity_detection"]["filter"][0]["pattern"]
+    )
+    assert (
+        process_text_request.processed_text.type
+        == request_obj["processed_text"]["type"]
+    )
+    assert (
+        process_text_request.processed_text.pattern
+        == request_obj["processed_text"]["pattern"]
+    )
 
 
 def test_process_text_request_invalid_initialize_fromdict():
@@ -1031,11 +1108,23 @@ def test_process_text_request_to_dict():
     print(process_text_request)
     assert process_text_request["text"] == text
     assert process_text_request["link_batch"] == link_batch
-    assert process_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
-    assert process_text_request["entity_detection"]["entity_types"][0]["type"] == entity_type.type
-    assert process_text_request["entity_detection"]["entity_types"][0]["value"] == entity_type.value
+    assert (
+        process_text_request["entity_detection"]["accuracy"]
+        == entity_detection.accuracy
+    )
+    assert (
+        process_text_request["entity_detection"]["entity_types"][0]["type"]
+        == entity_type.type
+    )
+    assert (
+        process_text_request["entity_detection"]["entity_types"][0]["value"]
+        == entity_type.value
+    )
     assert process_text_request["entity_detection"]["filter"][0]["type"] == filter.type
-    assert process_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    assert (
+        process_text_request["entity_detection"]["filter"][0]["pattern"]
+        == filter.pattern
+    )
     assert process_text_request["processed_text"]["type"] == processed_text.type
     assert process_text_request["processed_text"]["pattern"] == processed_text.pattern
 
@@ -1089,11 +1178,26 @@ def test_ner_text_request_initialize_fromdict():
     ner_text_request = NerTextRequest.fromdict(request_obj)
     assert ner_text_request.text == request_obj["text"]
     assert ner_text_request.link_batch == request_obj["link_batch"]
-    assert ner_text_request.entity_detection.accuracy == request_obj["entity_detection"]["accuracy"]
-    assert ner_text_request.entity_detection.entity_types[0].type == request_obj["entity_detection"]["entity_types"][0]["type"]
-    assert ner_text_request.entity_detection.entity_types[0].value == request_obj["entity_detection"]["entity_types"][0]["value"]
-    assert ner_text_request.entity_detection.filter[0].type == request_obj["entity_detection"]["filter"][0]["type"]
-    assert ner_text_request.entity_detection.filter[0].pattern == request_obj["entity_detection"]["filter"][0]["pattern"]
+    assert (
+        ner_text_request.entity_detection.accuracy
+        == request_obj["entity_detection"]["accuracy"]
+    )
+    assert (
+        ner_text_request.entity_detection.entity_types[0].type
+        == request_obj["entity_detection"]["entity_types"][0]["type"]
+    )
+    assert (
+        ner_text_request.entity_detection.entity_types[0].value
+        == request_obj["entity_detection"]["entity_types"][0]["value"]
+    )
+    assert (
+        ner_text_request.entity_detection.filter[0].type
+        == request_obj["entity_detection"]["filter"][0]["type"]
+    )
+    assert (
+        ner_text_request.entity_detection.filter[0].pattern
+        == request_obj["entity_detection"]["filter"][0]["pattern"]
+    )
 
 
 def test_ner_text_request_invalid_initialize_fromdict():
@@ -1135,10 +1239,18 @@ def test_ner_text_request_to_dict():
     assert ner_text_request["text"] == text
     assert ner_text_request["link_batch"] == link_batch
     assert ner_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
-    assert ner_text_request["entity_detection"]["entity_types"][0]["type"] == entity_type.type
-    assert ner_text_request["entity_detection"]["entity_types"][0]["value"] == entity_type.value
+    assert (
+        ner_text_request["entity_detection"]["entity_types"][0]["type"]
+        == entity_type.type
+    )
+    assert (
+        ner_text_request["entity_detection"]["entity_types"][0]["value"]
+        == entity_type.value
+    )
     assert ner_text_request["entity_detection"]["filter"][0]["type"] == filter.type
-    assert ner_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    assert (
+        ner_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    )
 
 
 # Analyze Text Request Tests
@@ -1174,8 +1286,12 @@ def test_analyze_text_request_initializer():
     assert analyze_text_request.locale == locale
     assert analyze_text_request.link_batch == link_batch
     assert analyze_text_request.entity_detection.accuracy == entity_detection.accuracy
-    assert analyze_text_request.entity_detection.entity_types[0].type == entity_type.type
-    assert analyze_text_request.entity_detection.entity_types[0].value == entity_type.value
+    assert (
+        analyze_text_request.entity_detection.entity_types[0].type == entity_type.type
+    )
+    assert (
+        analyze_text_request.entity_detection.entity_types[0].value == entity_type.value
+    )
     assert analyze_text_request.entity_detection.filter[0].type == filter.type
     assert analyze_text_request.entity_detection.filter[0].pattern == filter.pattern
 
@@ -1196,11 +1312,26 @@ def test_analyze_text_request_initialize_fromdict():
     assert analyze_text_request.text == request_obj["text"]
     assert analyze_text_request.locale == request_obj["locale"]
     assert analyze_text_request.link_batch == request_obj["link_batch"]
-    assert analyze_text_request.entity_detection.accuracy == request_obj["entity_detection"]["accuracy"]
-    assert analyze_text_request.entity_detection.entity_types[0].type == request_obj["entity_detection"]["entity_types"][0]["type"]
-    assert analyze_text_request.entity_detection.entity_types[0].value == request_obj["entity_detection"]["entity_types"][0]["value"]
-    assert analyze_text_request.entity_detection.filter[0].type == request_obj["entity_detection"]["filter"][0]["type"]
-    assert analyze_text_request.entity_detection.filter[0].pattern == request_obj["entity_detection"]["filter"][0]["pattern"]
+    assert (
+        analyze_text_request.entity_detection.accuracy
+        == request_obj["entity_detection"]["accuracy"]
+    )
+    assert (
+        analyze_text_request.entity_detection.entity_types[0].type
+        == request_obj["entity_detection"]["entity_types"][0]["type"]
+    )
+    assert (
+        analyze_text_request.entity_detection.entity_types[0].value
+        == request_obj["entity_detection"]["entity_types"][0]["value"]
+    )
+    assert (
+        analyze_text_request.entity_detection.filter[0].type
+        == request_obj["entity_detection"]["filter"][0]["type"]
+    )
+    assert (
+        analyze_text_request.entity_detection.filter[0].pattern
+        == request_obj["entity_detection"]["filter"][0]["pattern"]
+    )
 
 
 def test_analyze_text_request_invalid_initialize_fromdict():
@@ -1244,11 +1375,23 @@ def test_analyze_text_request_to_dict():
     assert analyze_text_request["text"] == text
     assert analyze_text_request["locale"] == locale
     assert analyze_text_request["link_batch"] == link_batch
-    assert analyze_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
-    assert analyze_text_request["entity_detection"]["entity_types"][0]["type"] == entity_type.type
-    assert analyze_text_request["entity_detection"]["entity_types"][0]["value"] == entity_type.value
+    assert (
+        analyze_text_request["entity_detection"]["accuracy"]
+        == entity_detection.accuracy
+    )
+    assert (
+        analyze_text_request["entity_detection"]["entity_types"][0]["type"]
+        == entity_type.type
+    )
+    assert (
+        analyze_text_request["entity_detection"]["entity_types"][0]["value"]
+        == entity_type.value
+    )
     assert analyze_text_request["entity_detection"]["filter"][0]["type"] == filter.type
-    assert analyze_text_request["entity_detection"]["filter"][0]["pattern"] == filter.pattern
+    assert (
+        analyze_text_request["entity_detection"]["filter"][0]["pattern"]
+        == filter.pattern
+    )
 
 
 # Process File URI Request Tests
@@ -1290,7 +1433,10 @@ def test_process_file_uri_request_initializer():
     )
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
-    assert process_file_uri_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
+    assert (
+        process_file_uri_obj.object_entity_detection.object_entity_types[0].type
+        == "ENABLE"
+    )
     assert process_file_uri_obj.pdf_options.density == 100
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_uri_obj.audio_options.bleep_frequency == 200
@@ -1330,7 +1476,10 @@ def test_process_file_uri_request_initialize_fromdict():
     )
     assert process_file_uri_obj.uri == "this/location/right/here.png"
     assert process_file_uri_obj.entity_detection.accuracy == "standard"
-    assert process_file_uri_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
+    assert (
+        process_file_uri_obj.object_entity_detection.object_entity_types[0].type
+        == "ENABLE"
+    )
     assert process_file_uri_obj.pdf_options.density == 100
     assert process_file_uri_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_uri_obj.audio_options.bleep_frequency == 200
@@ -1404,7 +1553,12 @@ def test_process_file_uri_request_to_dict():
     ).to_dict()
     assert process_file_uri_obj["uri"] == "this/location/right/here.png"
     assert process_file_uri_obj["entity_detection"]["accuracy"] == "standard"
-    assert process_file_uri_obj["object_entity_detection"]["object_entity_types"][0]["type"] == "ENABLE"
+    assert (
+        process_file_uri_obj["object_entity_detection"]["object_entity_types"][0][
+            "type"
+        ]
+        == "ENABLE"
+    )
     assert process_file_uri_obj["pdf_options"]["density"] == 100
     assert process_file_uri_obj["audio_options"]["bleep_end_padding"] == 2.0
     assert process_file_uri_obj["audio_options"]["bleep_frequency"] == 200
@@ -1413,7 +1567,9 @@ def test_process_file_uri_request_to_dict():
 
 # Process File Base64 Request Tests
 def test_process_file_base64_request_default_initializer():
-    process_file_base64_request_obj = ProcessFileBase64Request(file="sfsfxe234jkjsdlkfnDATA!!!!!!")
+    process_file_base64_request_obj = ProcessFileBase64Request(
+        file="sfsfxe234jkjsdlkfnDATA!!!!!!"
+    )
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA!!!!!!"
     assert process_file_base64_request_obj.entity_detection is None
     assert process_file_base64_request_obj.object_entity_detection is None
@@ -1450,7 +1606,12 @@ def test_process_file_base64_request_initializer():
     )
     assert process_file_base64_request_obj.file == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
-    assert process_file_base64_request_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
+    assert (
+        process_file_base64_request_obj.object_entity_detection.object_entity_types[
+            0
+        ].type
+        == "ENABLE"
+    )
     assert process_file_base64_request_obj.pdf_options.density == 100
     assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_base64_request_obj.audio_options.bleep_frequency == 200
@@ -1489,7 +1650,12 @@ def test_process_file_base64_request_initialize_fromdict():
     )
     assert process_file_base64_request_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj.entity_detection.accuracy == "standard"
-    assert process_file_base64_request_obj.object_entity_detection.object_entity_types[0].type == "ENABLE"
+    assert (
+        process_file_base64_request_obj.object_entity_detection.object_entity_types[
+            0
+        ].type
+        == "ENABLE"
+    )
     assert process_file_base64_request_obj.pdf_options.density == 100
     assert process_file_base64_request_obj.audio_options.bleep_end_padding == 2.0
     assert process_file_base64_request_obj.audio_options.bleep_frequency == 200
@@ -1563,7 +1729,12 @@ def test_process_file_base64_request_to_dict():
     ).to_dict()
     assert process_file_base64_request_obj["file"] == "sfsfxe234jkjsdlkfnDATA"
     assert process_file_base64_request_obj["entity_detection"]["accuracy"] == "standard"
-    assert process_file_base64_request_obj["object_entity_detection"]["object_entity_types"][0]["type"] == "DISABLE"
+    assert (
+        process_file_base64_request_obj["object_entity_detection"][
+            "object_entity_types"
+        ][0]["type"]
+        == "DISABLE"
+    )
     assert process_file_base64_request_obj["pdf_options"]["density"] == 100
     assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.0
     assert process_file_base64_request_obj["audio_options"]["bleep_frequency"] == 200
@@ -1582,7 +1753,9 @@ def test_bleep_request_initializer():
 def test_bleep_request_initialize_fromdict():
     file = File(data="test", content_type="image/jpg")
     timestamps = [Timestamp(start=0.0, end=1.0)]
-    bleep_request = BleepRequest.fromdict({"file": file.to_dict(), "timestamps": [row.to_dict() for row in timestamps]})
+    bleep_request = BleepRequest.fromdict(
+        {"file": file.to_dict(), "timestamps": [row.to_dict() for row in timestamps]}
+    )
     assert bleep_request.file.data == "test"
     assert bleep_request.timestamps[0].start == 0
 
@@ -1692,7 +1865,9 @@ def test_synthetic_text():
 
 
 def test_change_type():
-    processed_text = ProcessedText(type="MARKER", pattern="UNIQUE_NUMBERED_ENTITY_TYPE")  # Marker
+    processed_text = ProcessedText(
+        type="MARKER", pattern="UNIQUE_NUMBERED_ENTITY_TYPE"
+    )  # Marker
     processed_text.type = "MASK"
     assert processed_text.type == "MASK"
     assert hasattr(processed_text, "pattern") == False
