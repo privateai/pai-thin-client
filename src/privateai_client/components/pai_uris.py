@@ -9,14 +9,12 @@ class PAIURIs:
             self.valid_schemes = ["http", "https"]
             scheme = scheme.split("://")[0]
             if scheme not in self.valid_schemes:
-                raise ValueError(
-                    f"Scheme must be one of the following: {', '.join(self.valid_schemes)}"
-                )
+                raise ValueError(f"Scheme must be one of the following: {', '.join(self.valid_schemes)}")
             port = f":{port}" if port else ""
             self._pai_uri = f"{scheme}://{host}{port}"
         else:
             raise ValueError(
-                "PAIClient needs either a url, or a scheme and host to initialize. You can find more information on which url to use here: https://docs.private-ai.com/thin-client/"
+                "PAIClient needs either a url, or a scheme and host to initialize. You can find more information on which url to use here: https://docs.private-ai.com/thin-client/",
             )
 
     @property
