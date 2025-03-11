@@ -14,7 +14,7 @@ class PAIURIs:
             self._pai_uri = f"{scheme}://{host}{port}"
         else:
             raise ValueError(
-                "PAIClient needs either a url, or a scheme and host to initialize. You can find more information on which url to use here: https://docs.private-ai.com/thin-client/",
+                "PAIClient needs either a url, or a scheme and host to initialize. You can find more information on which url to use here: https://docs.private-ai.com/thin-client/"
             )
 
     @property
