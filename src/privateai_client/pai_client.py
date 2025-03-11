@@ -213,12 +213,11 @@ class PAIClient:
             response = AnalyzeTextResponse(
                 self.post.analyze_text(request_object.to_dict())
             )
-            request_object = request_object.to_dict()
         elif type(request_object) is dict:
             self.check_version_compatibility()
             response = AnalyzeTextResponse(self.post.analyze_text(request_object))
         else:
             raise ValueError(
-                "request_object can only be a dictionary or a AnalyzeTextRequest object"
+                "request_object can only be a dictionary or an AnalyzeTextRequest object"
             )
         return response
