@@ -181,3 +181,99 @@ def test_fuzzy_match_entity_processor(
     )
     entity = {"text": entity_text, "best_label": "NAME_GIVEN"}
     assert processor(entity) == processed_text
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "known_words_list",
+        "threshold",
+        "strategy",
+        "process_type",
+        "masking_character",
+        "ignore_casing",
+        "error",
+    ],
+    argvalues=[
+        (
+            {"NAME": ["JOHN"]},
+            2,
+            "BLOCK",
+            "MASK",
+            "#",
+            True,
+            "Invalid value for known_words_list. Accepted are list, tuple or set of strings.",
+        ),
+        (
+            ["John", 25],
+            2,
+            "BLOCK",
+            "MASK",
+            "#",
+            True,
+            "Invalid value for known_words_list. Accepted are list, tuple or set of strings.",
+        ),
+        (
+            ["John", "Peter"],
+            "two",
+            "BLOCK",
+            "MASK",
+            "#",
+            True,
+            "Invalid value for threshold. Accepted value is a valid integer.",
+        ),
+        (
+            ["John", "Peter"],
+            2,
+            "ENABLE",
+            "MASK",
+            "#",
+            True,
+            "Invalid value for strategy. Accepted values: 'BLOCK' and 'ALLOW'",
+        ),
+        (
+            ["John", "Peter"],
+            2,
+            "ALLOW",
+            "HIDE",
+            "#",
+            True,
+            "Invalid value for process_type. Accepted values: 'MARKER' and 'MASK'",
+        ),
+        (
+            ["John", "Peter"],
+            2,
+            "BLOCK",
+            "MARKER",
+            [],
+            True,
+            "Invalid value for masking_character. Accepted value is a valid string",
+        ),
+        (
+            ["JOSH", "Peter"],
+            2,
+            "BLOCK",
+            "MARKER",
+            "#",
+            "ignore",
+            "Invalid value for ignore_casing. Accepted values: True and False",
+        ),
+    ],
+)
+def test_fuzzy_match_processor_invalid_attrs(
+    known_words_list,
+    threshold,
+    strategy,
+    process_type,
+    masking_character,
+    ignore_casing,
+    error,
+):
+    with pytest.raises(ValueError, match=error):
+        FuzzyMatchEntityProcessor(
+            known_words_list=known_words_list,
+            threshold=threshold,
+            strategy=strategy,
+            process_type=process_type,
+            masking_character=masking_character,
+            ignore_casing=ignore_casing,
+        )

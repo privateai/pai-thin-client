@@ -56,10 +56,12 @@ class FuzzyMatchEntityProcessor:
             raise ValueError(
                 f"Invalid value for process_type. Accepted values: 'MARKER' and 'MASK'"
             )
-        if not (
-            isinstance(self.known_words_list, list)
-            or isinstance(self.known_words_list, tuple),
-            isinstance(self.known_words_list, set),
+        if not isinstance(self.threshold, int):
+            raise ValueError(
+                f"Invalid value for threshold. Accepted value is a valid integer."
+            )
+        if not isinstance(self.known_words_list, (list, tuple, set)) or not all(
+            isinstance(word, str) for word in self.known_words_list
         ):
             raise ValueError(
                 f"Invalid value for known_words_list. Accepted are list, tuple or set of strings."
