@@ -64,7 +64,7 @@ def test_deidentify_text_with_default_entities():
         entity_processors={},
         default_processor=MarkerEntityProcessor(),
     )
-    assert text_out == ["My name is NAME_GIVEN_1."]
+    assert text_out == ["My name is [NAME_GIVEN_1]."]
 
 
 def test_deidentify_text_with_fuzzy_matching():
@@ -137,7 +137,7 @@ def test_marker_processor():
     }
     processor = MarkerEntityProcessor()
     markers = [processor(e) for e in [entity_1, entity_2, entity_3]]
-    assert markers == ["NAME_GIVEN_1", "LOCATION_COUNTRY_1", "NAME_GIVEN_2"]
+    assert markers == ["[NAME_GIVEN_1]", "[LOCATION_COUNTRY_1]", "[NAME_GIVEN_2]"]
 
 
 # Fuzzy match processor
@@ -157,7 +157,7 @@ def test_marker_processor():
         ("Ian", ["John", "Peter"], 2, "BLOCK", "MASK", "#", True, "Ian"),
         ("Josh", ["John", "Peter"], 2, "ALLOW", "MASK", "#", True, "Josh"),
         ("Ian", ["John", "Peter"], 2, "ALLOW", "MASK", "#", True, "###"),
-        ("Josh", ["John", "Peter"], 2, "BLOCK", "MARKER", "#", True, "NAME_GIVEN_1"),
+        ("Josh", ["John", "Peter"], 2, "BLOCK", "MARKER", "#", True, "[NAME_GIVEN_1]"),
         ("Josh", ["JOSH", "Peter"], 2, "BLOCK", "MARKER", "#", False, "Josh"),
     ],
 )

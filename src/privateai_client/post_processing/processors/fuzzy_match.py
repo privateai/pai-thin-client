@@ -45,7 +45,7 @@ class FuzzyMatchEntityProcessor:
                 return self.masking_character * len(entity["text"])
             key = entity["best_label"]
             self.counts[key] += 1
-            return f"{key}_{self.counts[key]}"
+            return f"[{key}_{self.counts[key]}]"
 
     def _validate_attributes(self):
         if self.strategy not in ["BLOCK", "ALLOW"]:
