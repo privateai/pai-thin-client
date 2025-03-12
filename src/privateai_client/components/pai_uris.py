@@ -9,7 +9,9 @@ class PAIURIs:
             self.valid_schemes = ["http", "https"]
             scheme = scheme.split("://")[0]
             if scheme not in self.valid_schemes:
-                raise ValueError(f"Scheme must be one of the following: {', '.join(self.valid_schemes)}")
+                raise ValueError(
+                    f"Scheme must be one of the following: {', '.join(self.valid_schemes)}"
+                )
             port = f":{port}" if port else ""
             self._pai_uri = f"{scheme}://{host}{port}"
         else:
@@ -56,6 +58,10 @@ class PAIURIs:
     @property
     def ner_text(self):
         return self._create_uri(self.pai_uri, "ner", "text")
+
+    @property
+    def analyze_text(self):
+        return self._create_uri(self.pai_uri, "analyze", "text")
 
     @property
     def version(self):

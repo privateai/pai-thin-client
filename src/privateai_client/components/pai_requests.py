@@ -78,6 +78,9 @@ class PAIPostRequests(PAIRequests):
         )
 
     def ner_text(self, request_object):
+        return self.make_request(self.request_type, self.uris.ner_text, request_object)
+
+    def analyze_text(self, request_object):
         return self.make_request(
-            self.request_type, self.uris.ner_text, request_object
+            self.request_type, self.uris.analyze_text, request_object
         )

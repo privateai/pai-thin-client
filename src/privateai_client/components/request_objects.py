@@ -521,10 +521,7 @@ class OCROptions(BaseRequestObject):
         "paddleocr",
     ]
 
-    def __init__(
-        self,
-        ocr_system: str = default_ocr_system,
-    ):
+    def __init__(self, ocr_system: str = default_ocr_system):
         self._ocr_system = ocr_system
 
     @property
@@ -549,7 +546,6 @@ class OCROptions(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError("OCROptions can only accept 'ocr_system'")
-
 
 
 class ObjectEntityTypeSelector(BaseRequestObject):
@@ -941,10 +937,7 @@ class EntityDetection(BaseRequestObject):
 
 
 class ObjectEntityDetection(BaseRequestObject):
-    def __init__(
-        self,
-        object_entity_types: List[ObjectEntityTypeSelector] = [],
-    ):
+    def __init__(self, object_entity_types: List[ObjectEntityTypeSelector] = []):
         if self._object_entity_types_validator(object_entity_types):
             self.object_entity_types = object_entity_types
 
@@ -1036,6 +1029,37 @@ class NerTextRequest(BaseRequestObject):
         except TypeError:
             raise TypeError(
                 "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
+            )
+
+
+class AnalyzeTextRequest(BaseRequestObject):
+    def __init__(
+        self,
+        text: List[str],
+        locale: str,
+        link_batch: Optional[bool] = None,
+        entity_detection: Optional[EntityDetection] = None,
+        project_id: Optional[str] = None,
+    ):
+        self.text = text
+        self.locale = locale
+        self.link_batch = link_batch
+        self.entity_detection = entity_detection
+        self.project_id = project_id
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entity_detection":
+                    initializer_dict[key] = EntityDetection.fromdict(value)
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch' and 'entity_detection'"
             )
 
 

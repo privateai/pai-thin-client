@@ -424,4 +424,51 @@ new_response_obj = client.reidentify_text(new_request_obj)
 print(new_response_obj.body)
 ```
 
+Blocking Misspelled Sensitive Words
+
+```python
+"""This example demonstrates using fuzzy matching as a post-processing step to block potentially misspelled sensitive words.
+In this case, we allow OCCUPATION to remain unredacted, except for identifiable roles like CEO. Even though the user mistakenly typed COE, the entity is still redacted.
+"""
+
+from privateai_client import PAIClient, request_objects
+from privateai_client.post_processing import (
+    FuzzyMatchEntityProcessor,
+    MarkerEntityProcessor,
+    deidentify_text,
+)
+client = PAIClient(url="http://localhost:8080")
+
+
+default_marker_processor = MarkerEntityProcessor()
+
+fuzzy_processor = FuzzyMatchEntityProcessor(
+    known_words_list=["CFO", "CTO", "CEO"],
+    threshold=2,
+    strategy="BLOCK",
+    process_type="MARKER",
+    ignore_casing=True,
+)
+
+text_in = ["John is our COE. This is Peter, he is a Software Engineer."]
+request_object = request_objects.analyze_text_obj(
+    text=text_in,
+    locale="en",
+)
+analyze_text_rsp = client.analyze_text(request_object)
+
+text_out = deidentify_text(
+    text=text_in,
+    response=analyze_text_rsp,
+    entity_processors={"OCCUPATION": fuzzy_processor},
+    default_processor=default_marker_processor,
+)
+print(text_out)
+```
+
+Output:
+```
+['[NAME_GIVEN_1] is our [OCCUPATION_1]. This is [NAME_GIVEN_2], he is a Software Engineer.']
+```
+
 [1]: https://docs.private-ai.com/reference/latest/operation/process_text_process_text_post/

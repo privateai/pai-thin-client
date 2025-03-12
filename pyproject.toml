@@ -27,3 +27,6 @@ dependencies = ["requests~=2.32.3"]
 
 [tool.hatch.version]
 path = "src/privateai_client/__about__.py"
+
+[tool.black]
+line-length = 88
