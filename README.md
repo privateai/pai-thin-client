@@ -468,7 +468,7 @@ print(text_out)
 
 Output:
 ```
-['NAME_GIVEN_1 is our OCCUPATION_1. This is NAME_GIVEN_2, he is a Software Engineer.']
+['[NAME_GIVEN_1] is our [OCCUPATION_1]. This is [NAME_GIVEN_2], he is a Software Engineer.']
 ```
 
 [1]: https://docs.private-ai.com/reference/latest/operation/process_text_process_text_post/
