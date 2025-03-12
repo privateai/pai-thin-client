@@ -13,7 +13,7 @@ from ..post_processing import (
 
 
 # Deidentify text
-def test_deidentify_text__no_entities():
+def test_deidentify_text_no_entities():
     response = requests.Response()
     response.status_code = 200
     response._content = json.dumps(
@@ -27,7 +27,7 @@ def test_deidentify_text__no_entities():
     ).encode("utf-8")
 
     text_out = deidentify_text(
-        input_texts=["My name is."],
+        text=["My name is."],
         response=AnalyzeTextResponse(response),
         entity_processors={},
         default_processor=MarkerEntityProcessor(),
@@ -35,7 +35,7 @@ def test_deidentify_text__no_entities():
     assert text_out == ["My name is."]
 
 
-def test_deidentify_text__with_default_entities():
+def test_deidentify_text_with_default_entities():
     response = requests.Response()
     response.status_code = 200
     response._content = json.dumps(
@@ -59,7 +59,7 @@ def test_deidentify_text__with_default_entities():
     ).encode("utf-8")
 
     text_out = deidentify_text(
-        input_texts=["My name is John."],
+        text=["My name is John."],
         response=AnalyzeTextResponse(response),
         entity_processors={},
         default_processor=MarkerEntityProcessor(),
@@ -67,7 +67,7 @@ def test_deidentify_text__with_default_entities():
     assert text_out == ["My name is NAME_GIVEN_1."]
 
 
-def test_deidentify_text__with_fuzzy_matching():
+def test_deidentify_text_with_fuzzy_matching():
     response = requests.Response()
     response.status_code = 200
     response._content = json.dumps(
@@ -91,7 +91,7 @@ def test_deidentify_text__with_fuzzy_matching():
     ).encode("utf-8")
 
     text_out = deidentify_text(
-        input_texts=["My name is John."],
+        text=["My name is John."],
         response=AnalyzeTextResponse(response),
         entity_processors={
             "NAME_GIVEN": FuzzyMatchEntityProcessor(
@@ -219,7 +219,16 @@ def test_fuzzy_match_entity_processor(
             "MASK",
             "#",
             True,
-            "Invalid value for threshold. Accepted value is a valid integer.",
+            "Invalid value for threshold. Accepted value is a positive integer.",
+        ),
+        (
+            ["John", "Peter"],
+            0,
+            "BLOCK",
+            "MASK",
+            "#",
+            True,
+            "Invalid value for threshold. Accepted value is a positive integer.",
         ),
         (
             ["John", "Peter"],

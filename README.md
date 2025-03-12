@@ -428,7 +428,7 @@ Blocking Misspelled Sensitive Words
 
 ```python
 """This example demonstrates using fuzzy matching as a post-processing step to block potentially misspelled sensitive words.
-In this case, we allow OCCUPATION to remain unredacted, except for identifiable roles like CEO. Even though the user mistakenly typed COE, it is still redacted.
+In this case, we allow OCCUPATION to remain unredacted, except for identifiable roles like CEO. Even though the user mistakenly typed COE, the entity is still redacted.
 """
 
 from privateai_client import PAIClient, request_objects
@@ -458,7 +458,7 @@ request_object = request_objects.analyze_text_obj(
 analyze_text_rsp = client.analyze_text(request_object)
 
 text_out = deidentify_text(
-    input_texts=text_in,
+    text=text_in,
     response=analyze_text_rsp,
     entity_processors={"OCCUPATION": fuzzy_processor},
     default_processor=default_marker_processor,

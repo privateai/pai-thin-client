@@ -6,7 +6,7 @@ EntityProcessor = Callable[[dict], str]
 
 
 def deidentify_text(
-    input_texts: list[str],
+    text: list[str],
     response: AnalyzeTextResponse,
     entity_processors: dict[str, EntityProcessor],
     default_processor: EntityProcessor,
@@ -15,7 +15,7 @@ def deidentify_text(
     Deidentifies analyzed text by processing entities with multiple processors, adjusting text dynamically.
 
     Args:
-        input_texts: The original list of texts used as input in the `PAIClient.analyze_text()` call.
+        text: The original list of text messages used as input in the `PAIClient.analyze_text()` call.
         response: The response object returned by `PAIClient.analyze_text()`, containing detected entities.
         entity_processors: A dictionary mapping entity types to processing functions in the format
             `{ENTITY_TYPE: entity_processor_fn}`, where `entity_processor_fn` takes an entity dictionary
@@ -24,26 +24,27 @@ def deidentify_text(
 
 
     Returns:
-        A list of de-identified texts, with the same length and order as `input_texts`.
+        A list of de-identified text messages, with the same length and order as the `text` argument.
 
     """
     modified_texts = []
-    for text, entities in zip(input_texts, response.entities):
+    for t, entities in zip(text, response.entities):
         offset = 0
-        modified_text = text
+        modified_text = t
         for entity in sorted(entities, key=lambda e: e["location"]["stt_idx"]):
             start_idx = entity["location"]["stt_idx"] + offset
             end_idx = entity["location"]["end_idx"] + offset
 
-            initial_entity_length = entity["text"]
-
             processor = entity_processors.get(entity["best_label"], default_processor)
-            entity["text"] = processor(entity)
-            length_diff = len(entity["text"]) - len(initial_entity_length)
+            modified_entity_text = processor(entity)
+
+            length_diff = len(modified_entity_text) - len(entity["text"])
             offset += length_diff
 
             modified_text = (
-                modified_text[:start_idx] + entity["text"] + modified_text[end_idx:]
+                modified_text[:start_idx]
+                + modified_entity_text
+                + modified_text[end_idx:]
             )
         modified_texts.append(modified_text)
     return modified_texts

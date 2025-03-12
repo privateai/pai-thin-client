@@ -1,1 +1,2 @@
 requests~=2.32.3
+pyxDamerauLevenshtein~=1.8.0
