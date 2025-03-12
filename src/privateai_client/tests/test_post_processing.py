@@ -191,7 +191,7 @@ def test_fuzzy_match_entity_processor(
         "process_type",
         "masking_character",
         "ignore_casing",
-        "error",
+        "error_str",
     ],
     argvalues=[
         (
@@ -266,9 +266,9 @@ def test_fuzzy_match_processor_invalid_attrs(
     process_type,
     masking_character,
     ignore_casing,
-    error,
+    error_str,
 ):
-    with pytest.raises(ValueError, match=error):
+    with pytest.raises(ValueError, match=error_str):
         FuzzyMatchEntityProcessor(
             known_words_list=known_words_list,
             threshold=threshold,
