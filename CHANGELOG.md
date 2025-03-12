@@ -1,5 +1,8 @@
 ## [Unreleased]
 ### Added
+- Support for `analyze/text` route
+- Post-processing for `analyze/text` responses
+- `FuzzyMatchEntityProcessor`: A fuzzy matching processor to "BLOCK" or "ALLOW" entities based on a list of known words.
 
 ### Changed
 
