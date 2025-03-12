@@ -445,7 +445,7 @@ fuzzy_processor = FuzzyMatchEntityProcessor(
     ignore_casing=True,
 )
 
-text_in = ["John is our CEO. This is Peter, he is a Software Engineer."]
+text_in = ["John is our COE. This is Peter, he is a Software Engineer."]
 request_object = request_objects.analyze_text_obj(
     text=text_in,
     locale="en",
