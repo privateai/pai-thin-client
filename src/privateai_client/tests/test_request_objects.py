@@ -1105,7 +1105,6 @@ def test_process_text_request_to_dict():
         entity_detection=entity_detection,
         processed_text=processed_text,
     ).to_dict()
-    print(process_text_request)
     assert process_text_request["text"] == text
     assert process_text_request["link_batch"] == link_batch
     assert (
@@ -1235,7 +1234,6 @@ def test_ner_text_request_to_dict():
         link_batch=link_batch,
         entity_detection=entity_detection,
     ).to_dict()
-    print(ner_text_request)
     assert ner_text_request["text"] == text
     assert ner_text_request["link_batch"] == link_batch
     assert ner_text_request["entity_detection"]["accuracy"] == entity_detection.accuracy
@@ -1260,6 +1258,7 @@ def test_analyze_text_request_default_initializer():
     assert analyze_text_request.locale == "en-US"
     assert analyze_text_request.link_batch is None
     assert analyze_text_request.entity_detection is None
+    assert analyze_text_request.relation_detection is None
 
 
 def test_analyze_text_request_initializer():
@@ -1274,12 +1273,16 @@ def test_analyze_text_request_initializer():
         filter=[filter],
         return_entity=False,
     )
+    relation_detection = RelationDetection(
+        coreference_resolution="model_prediction",
+    )
 
     analyze_text_request = AnalyzeTextRequest(
         text=text,
         locale=locale,
         link_batch=link_batch,
         entity_detection=entity_detection,
+        relation_detection=relation_detection,
     )
 
     assert analyze_text_request.text == text
@@ -1294,6 +1297,10 @@ def test_analyze_text_request_initializer():
     )
     assert analyze_text_request.entity_detection.filter[0].type == filter.type
     assert analyze_text_request.entity_detection.filter[0].pattern == filter.pattern
+    assert (
+        analyze_text_request.relation_detection.coreference_resolution
+        == relation_detection.coreference_resolution
+    )
 
 
 def test_analyze_text_request_initialize_fromdict():
@@ -1307,6 +1314,7 @@ def test_analyze_text_request_initialize_fromdict():
             "filter": [{"type": "BLOCK", "pattern": "Roger", "entity_type": "TEST"}],
             "return_entity": False,
         },
+        "relation_detection": {"coreference_resolution": "combined"},
     }
     analyze_text_request = AnalyzeTextRequest.fromdict(request_obj)
     assert analyze_text_request.text == request_obj["text"]
@@ -1332,10 +1340,14 @@ def test_analyze_text_request_initialize_fromdict():
         analyze_text_request.entity_detection.filter[0].pattern
         == request_obj["entity_detection"]["filter"][0]["pattern"]
     )
+    assert (
+        analyze_text_request.relation_detection.coreference_resolution
+        == request_obj["relation_detection"]["coreference_resolution"]
+    )
 
 
 def test_analyze_text_request_invalid_initialize_fromdict():
-    error_msg = "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch' and 'entity_detection'"
+    error_msg = "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch', 'entity_detection' and 'relation_detection'"
     request_obj = {
         "text": ["hey!"],
         "link_batch": False,
@@ -1345,6 +1357,7 @@ def test_analyze_text_request_invalid_initialize_fromdict():
             "filter": [{"type": "BLOCK", "pattern": "Roger"}],
             "return_entity": False,
         },
+        "relation_detection": {"coreference_resolution": "model_prediction"},
         "junk": "value",
     }
     with pytest.raises(TypeError) as excinfo:
@@ -1364,14 +1377,15 @@ def test_analyze_text_request_to_dict():
         filter=[filter],
         return_entity=False,
     )
+    relation_detection = RelationDetection(coreference_resolution="heuristics")
 
     analyze_text_request = AnalyzeTextRequest(
         text=text,
         locale=locale,
         link_batch=link_batch,
         entity_detection=entity_detection,
+        relation_detection=relation_detection,
     ).to_dict()
-    print(analyze_text_request)
     assert analyze_text_request["text"] == text
     assert analyze_text_request["locale"] == locale
     assert analyze_text_request["link_batch"] == link_batch
@@ -1391,6 +1405,10 @@ def test_analyze_text_request_to_dict():
     assert (
         analyze_text_request["entity_detection"]["filter"][0]["pattern"]
         == filter.pattern
+    )
+    assert (
+        analyze_text_request["relation_detection"]["coreference_resolution"]
+        == "heuristics"
     )
 
 

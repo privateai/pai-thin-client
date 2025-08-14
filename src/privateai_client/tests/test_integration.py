@@ -594,3 +594,40 @@ def test_analyze_full_entity_detection():
     )
     resp = client.analyze_text(req)
     assert resp.ok
+
+
+def test_analyze_coref_model_prediction():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        relation_detection=rq.relation_detection_obj(
+            coreference_resolution="model_prediction"
+        ),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_coref_heuristic():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        relation_detection=rq.relation_detection_obj(
+            coreference_resolution="heuristics"
+        ),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_coref_combined():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        relation_detection=rq.relation_detection_obj(coreference_resolution="combined"),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
