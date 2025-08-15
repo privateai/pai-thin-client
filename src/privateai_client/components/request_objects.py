@@ -971,20 +971,30 @@ class ObjectEntityDetection(BaseRequestObject):
 
 
 class RelationDetection(BaseRequestObject):
-    default_coreference_resolution = "heuristics"
+    default_coreference_resolution = None
     valid_coreference_resolutions = ["heuristics", "model_prediction", "combined"]
 
-    def __init__(self, coreference_resolution: str):
-        self._coreference_resolution = coreference_resolution
+    def __init__(
+        self, coreference_resolution: Optional[str] = default_coreference_resolution
+    ):
+        if self._coreference_resolution_validator:
+            self._coreference_resolution = coreference_resolution
 
     @property
     def coreference_resolution(self):
         return self._coreference_resolution
 
+    @coreference_resolution.setter
+    def coreference_resolution(self, var):
+        if self._coreference_resolution_validator(var):
+            self._coreference_resolution = var
+
     def _coreference_resolution_validator(self, var):
+        if var is None:
+            return True
         if var not in self.valid_coreference_resolutions:
             raise ValueError(
-                f"{var} is not valid. RelationDetection.coreference_resolution can only be one of the following: {', '.join(self.valid_coreference_resolutions)}"
+                f"{var} is not valid. RelationDetection.coreference_resolution can only be one of the following: {', '.join(self.valid_coreference_resolutions)} or None"
             )
         return True
 

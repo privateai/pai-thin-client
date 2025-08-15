@@ -470,7 +470,7 @@ def test_object_entity_detection_default_initializer():
 
 def test_object_entity_detection_initializer():
     object_entity_detection_obj = ObjectEntityDetection(
-        object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")],
+        object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")]
     )
     assert (
         type(object_entity_detection_obj.object_entity_types[0])
@@ -480,9 +480,7 @@ def test_object_entity_detection_initializer():
 
 def test_object_entity_detection_initialize_fromdict():
     object_entity_detection = ObjectEntityDetection.fromdict(
-        {
-            "object_entity_types": [ObjectEntityTypeSelector(type="ENABLE").to_dict()],
-        }
+        {"object_entity_types": [ObjectEntityTypeSelector(type="ENABLE").to_dict()]}
     )
     assert (
         type(object_entity_detection.object_entity_types[0]) is ObjectEntityTypeSelector
@@ -506,15 +504,13 @@ def test_object_entity_detection_invalid_initialize_fromdict():
 def test_object_entity_detection_object_entity_types_validator():
     error_msg = "ObjectEntityDetection.object_entity_types can only contain ObjectEntityTypeSelector objects"
     with pytest.raises(ValueError) as excinfo:
-        ObjectEntityDetection(
-            object_entity_types=["junk"],
-        )
+        ObjectEntityDetection(object_entity_types=["junk"])
     assert error_msg in str(excinfo.value)
 
 
 def test_object_entity_detection_to_dict():
     object_entity_detection_obj = ObjectEntityDetection(
-        object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")],
+        object_entity_types=[ObjectEntityTypeSelector(type="ENABLE")]
     ).to_dict()
     assert type(object_entity_detection_obj["object_entity_types"][0]) is dict
 
@@ -855,11 +851,7 @@ def test_image_options_invalid_initialize_fromdict():
     error_msg = "ImageOptions can only accept the values 'masking_method' and 'palette'"
     with pytest.raises(TypeError) as excinfo:
         ImageOptions.fromdict(
-            {
-                "masking_method": "blur",
-                "palette": True,
-                "junk": "value",
-            }
+            {"masking_method": "blur", "palette": True, "junk": "value"}
         )
     assert error_msg in str(excinfo.value)
 
@@ -976,6 +968,54 @@ def test_timestamp_to_dict():
     timestamp = Timestamp(start=2.0, end=3.0).to_dict()
     assert timestamp["start"] == 2.0
     assert timestamp["end"] == 3.0
+
+
+# Relation Detection Tests
+def test_relation_detection_default_initializer():
+    relation_detection = RelationDetection()
+    assert relation_detection.coreference_resolution is None
+
+
+def test_relation_detection_initializer():
+    relation_detection = RelationDetection(coreference_resolution="model_prediction")
+    assert relation_detection.coreference_resolution == "model_prediction"
+
+
+def test_relation_detection_initialize_fromdict():
+    relation_detection = RelationDetection.fromdict(
+        {"coreference_resolution": "combined"}
+    )
+    assert relation_detection.coreference_resolution == "combined"
+
+
+def test_relation_detection_invalid_initialize_fromdict():
+    error_msg = "RelationDetection can only accept the value 'coreference_resolution'"
+    with pytest.raises(TypeError) as excinfo:
+        RelationDetection.fromdict(
+            {"coreference_resolution": "combined", "junk": "value"}
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_relation_detection_setters():
+    relation_detection = RelationDetection()
+    relation_detection.coreference_resolution = "combined"
+    assert relation_detection.coreference_resolution == "combined"
+
+
+def test_relation_detection_coreference_resolution_validator():
+    error_msg = "junk is not valid. RelationDetection.coreference_resolution can only be one of the following: heuristics, model_prediction, combined or None"
+    relation_detection = RelationDetection()
+    with pytest.raises(ValueError) as excinfo:
+        relation_detection.coreference_resolution = "junk"
+    assert error_msg in str(excinfo.value)
+
+
+def test_relation_detection_to_dict():
+    relation_detection = RelationDetection(
+        coreference_resolution="model_prediction"
+    ).to_dict()
+    assert relation_detection["coreference_resolution"] == "model_prediction"
 
 
 # Process Text Request Tests
@@ -1149,9 +1189,7 @@ def test_ner_text_request_initializer():
     )
 
     ner_text_request = NerTextRequest(
-        text=text,
-        link_batch=link_batch,
-        entity_detection=entity_detection,
+        text=text, link_batch=link_batch, entity_detection=entity_detection
     )
 
     assert ner_text_request.text == text
@@ -1230,9 +1268,7 @@ def test_ner_text_request_to_dict():
     )
 
     ner_text_request = NerTextRequest(
-        text=text,
-        link_batch=link_batch,
-        entity_detection=entity_detection,
+        text=text, link_batch=link_batch, entity_detection=entity_detection
     ).to_dict()
     assert ner_text_request["text"] == text
     assert ner_text_request["link_batch"] == link_batch
@@ -1273,9 +1309,7 @@ def test_analyze_text_request_initializer():
         filter=[filter],
         return_entity=False,
     )
-    relation_detection = RelationDetection(
-        coreference_resolution="model_prediction",
-    )
+    relation_detection = RelationDetection(coreference_resolution="model_prediction")
 
     analyze_text_request = AnalyzeTextRequest(
         text=text,
@@ -1440,7 +1474,7 @@ def test_process_file_uri_request_initializer():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
@@ -1479,7 +1513,7 @@ def test_process_file_uri_request_initialize_fromdict():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     ocr_options = OCROptions(ocr_system="azure_computer_vision")
     process_file_uri_obj = ProcessFileUriRequest.fromdict(
@@ -1524,7 +1558,7 @@ def test_process_file_uri_request_invalid_initialize_fromdict():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     ocr_options = OCROptions(ocr_system="azure_computer_vision")
     with pytest.raises(TypeError) as excinfo:
@@ -1560,7 +1594,7 @@ def test_process_file_uri_request_to_dict():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     process_file_uri_obj = ProcessFileUriRequest(
         uri="this/location/right/here.png",
@@ -1613,7 +1647,7 @@ def test_process_file_base64_request_initializer():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
@@ -1655,7 +1689,7 @@ def test_process_file_base64_request_initialize_fromdict():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
         {
@@ -1700,7 +1734,7 @@ def test_process_file_base64_request_invalid_initialize_fromdict():
     )
     object_entity_type = ObjectEntityTypeSelector(type="ENABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     ocr_options = OCROptions(ocr_system="azure_computer_vision")
     with pytest.raises(TypeError) as excinfo:
@@ -1736,7 +1770,7 @@ def test_process_file_base64_request_to_dict():
     )
     object_entity_type = ObjectEntityTypeSelector(type="DISABLE", value=["LOGO"])
     object_entity_detection = ObjectEntityDetection(
-        object_entity_types=[object_entity_type],
+        object_entity_types=[object_entity_type]
     )
     process_file_base64_request_obj = ProcessFileBase64Request(
         file="sfsfxe234jkjsdlkfnDATA",
@@ -1922,10 +1956,7 @@ def test_synthetic_invalid_accuracy_initialize():
 
 def test_synthetic_invalid_accuracy():
     error_msg = "Synthetic Entity Accuracy can only accept values"
-    processed_text = ProcessedText(
-        type="SYNTHETIC",
-        preserve_relationships=True,
-    )
+    processed_text = ProcessedText(type="SYNTHETIC", preserve_relationships=True)
     with pytest.raises(ValueError) as excinfo:
         processed_text.synthetic_entity_accuracy = "invalid"
     assert error_msg in str(excinfo.value)
