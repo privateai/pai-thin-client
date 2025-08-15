@@ -970,6 +970,47 @@ class ObjectEntityDetection(BaseRequestObject):
             )
 
 
+class RelationDetection(BaseRequestObject):
+    default_coreference_resolution = None
+    valid_coreference_resolutions = ["heuristics", "model_prediction", "combined"]
+
+    def __init__(
+        self, coreference_resolution: Optional[str] = default_coreference_resolution
+    ):
+        if self._coreference_resolution_validator:
+            self._coreference_resolution = coreference_resolution
+
+    @property
+    def coreference_resolution(self):
+        return self._coreference_resolution
+
+    @coreference_resolution.setter
+    def coreference_resolution(self, var):
+        if self._coreference_resolution_validator(var):
+            self._coreference_resolution = var
+
+    def _coreference_resolution_validator(self, var):
+        if var is None:
+            return True
+        if var not in self.valid_coreference_resolutions:
+            raise ValueError(
+                f"{var} is not valid. RelationDetection.coreference_resolution can only be one of the following: {', '.join(self.valid_coreference_resolutions)} or None"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "RelationDetection can only accept the value 'coreference_resolution'"
+            )
+
+
 class ProcessTextRequest(BaseRequestObject):
     def __init__(
         self,
@@ -1036,16 +1077,18 @@ class AnalyzeTextRequest(BaseRequestObject):
     def __init__(
         self,
         text: List[str],
-        locale: str,
+        locale: Optional[str] = None,
         link_batch: Optional[bool] = None,
         entity_detection: Optional[EntityDetection] = None,
         project_id: Optional[str] = None,
+        relation_detection: Optional[RelationDetection] = None,
     ):
         self.text = text
         self.locale = locale
         self.link_batch = link_batch
         self.entity_detection = entity_detection
         self.project_id = project_id
+        self.relation_detection = relation_detection
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -1054,12 +1097,15 @@ class AnalyzeTextRequest(BaseRequestObject):
             for key, value in values.items():
                 if key == "entity_detection":
                     initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "relation_detection":
+                    initializer_dict[key] = RelationDetection.fromdict(value)
                 else:
                     initializer_dict[key] = value
+
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch' and 'entity_detection'"
+                "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch', 'entity_detection' and 'relation_detection'"
             )
 
 

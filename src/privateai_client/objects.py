@@ -22,3 +22,4 @@ class request_objects:
     processed_text_obj = req_objects.ProcessedText
     reidentify_text_obj = req_objects.ReidentifyTextRequest
     timestamp_obj = req_objects.Timestamp
+    relation_detection_obj = req_objects.RelationDetection
