@@ -6,6 +6,15 @@
 ### Fixed
 
 
+## [4.1.0.1]
+### Added
+
+### Changed
+
+### Fixed
+- Added pyxDamerauLevenshtein dependency to pyproject.toml
+
+
 ## [4.1.0]
 ### Added
 - Support for `analyze/text` route
