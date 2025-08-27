@@ -1,10 +1,22 @@
 ## [Unreleased]
 ### Added
-- Support for `analyze/text` route
-- Post-processing for `analyze/text` responses
-- `FuzzyMatchEntityProcessor`: A fuzzy matching processor to "BLOCK" or "ALLOW" entities based on a list of known words.
 
 ### Changed
+
+### Fixed
+
+
+## [4.1.0]
+### Added
+- Support for `analyze/text` route
+- Post-processing for `analyze/text` responses
+- `FuzzyMatchEntityProcessor`: A fuzzy matching processor to "BLOCK" or "ALLOW" entities based on a list of known words
+- Support for Object Entity Detection config in request objects
+- Added support for relation_detection in the analyze/text route, so coref can be enabled
+- Updated locale field to be optional
+
+### Changed
+- Updated the valid_coreference_resolutions list to accept "model_prediction", instead of "model", as expected by the process/text endpoint
 
 ### Fixed
 
