@@ -631,3 +631,29 @@ def test_analyze_coref_combined():
     )
     resp = client.analyze_text(req)
     assert resp.ok
+
+
+def test_analyze_enable_relation_extraction_true():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        relation_detection=rq.relation_detection_obj(
+            coreference_resolution="combined", enable_relation_extraction=True
+        ),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok
+
+
+def test_analyze_enable_relation_extraction_false():
+    client = _get_client()
+    req = rq.analyze_text_obj(
+        text=["Hey there!"],
+        entity_detection=rq.entity_detection_obj(),
+        relation_detection=rq.relation_detection_obj(
+            coreference_resolution="combined", enable_relation_extraction=False
+        ),
+    )
+    resp = client.analyze_text(req)
+    assert resp.ok

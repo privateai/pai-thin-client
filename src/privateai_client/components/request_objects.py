@@ -975,10 +975,14 @@ class RelationDetection(BaseRequestObject):
     valid_coreference_resolutions = ["heuristics", "model_prediction", "combined"]
 
     def __init__(
-        self, coreference_resolution: Optional[str] = default_coreference_resolution
+        self,
+        coreference_resolution: Optional[str] = default_coreference_resolution,
+        enable_relation_extraction: Optional[bool] = False,
     ):
-        if self._coreference_resolution_validator:
+        if self._coreference_resolution_validator(coreference_resolution):
             self._coreference_resolution = coreference_resolution
+        if self._enable_relation_extraction_validator(enable_relation_extraction):
+            self._enable_relation_extraction = enable_relation_extraction
 
     @property
     def coreference_resolution(self):
@@ -998,6 +1002,26 @@ class RelationDetection(BaseRequestObject):
             )
         return True
 
+    @property
+    def enable_relation_extraction(self):
+        return self._enable_relation_extraction
+
+    @enable_relation_extraction.setter
+    def enable_relation_extraction(self, var):
+        if self._enable_relation_extraction_validator(var):
+            self._enable_relation_extraction = var
+
+    def _enable_relation_extraction_validator(self, var):
+        if type(var) is not bool:
+            raise ValueError(
+                f"{var} is not valid. RelationDetection.enable_relation_extraction must be of type bool"
+            )
+        if var is True and self.coreference_resolution is None:
+            raise ValueError(
+                "Coreference resolution must be enabled before setting enable_relation_extraction to true"
+            )
+        return True
+
     @classmethod
     def fromdict(cls, values: dict):
         try:
@@ -1007,7 +1031,7 @@ class RelationDetection(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "RelationDetection can only accept the value 'coreference_resolution'"
+                "RelationDetection can only accept the values 'coreference_resolution' and 'enable_relation_extraction'"
             )
 
 

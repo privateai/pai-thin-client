@@ -974,11 +974,15 @@ def test_timestamp_to_dict():
 def test_relation_detection_default_initializer():
     relation_detection = RelationDetection()
     assert relation_detection.coreference_resolution is None
+    assert relation_detection.enable_relation_extraction is False
 
 
 def test_relation_detection_initializer():
-    relation_detection = RelationDetection(coreference_resolution="model_prediction")
+    relation_detection = RelationDetection(
+        coreference_resolution="model_prediction", enable_relation_extraction=True
+    )
     assert relation_detection.coreference_resolution == "model_prediction"
+    assert relation_detection.enable_relation_extraction is True
 
 
 def test_relation_detection_initialize_fromdict():
@@ -986,13 +990,18 @@ def test_relation_detection_initialize_fromdict():
         {"coreference_resolution": "combined"}
     )
     assert relation_detection.coreference_resolution == "combined"
+    assert relation_detection.enable_relation_extraction is False
 
 
 def test_relation_detection_invalid_initialize_fromdict():
-    error_msg = "RelationDetection can only accept the value 'coreference_resolution'"
+    error_msg = "RelationDetection can only accept the values 'coreference_resolution' and 'enable_relation_extraction'"
     with pytest.raises(TypeError) as excinfo:
         RelationDetection.fromdict(
-            {"coreference_resolution": "combined", "junk": "value"}
+            {
+                "coreference_resolution": "combined",
+                "enable_relation_extraction": True,
+                "junk": "value",
+            }
         )
     assert error_msg in str(excinfo.value)
 
@@ -1000,7 +1009,9 @@ def test_relation_detection_invalid_initialize_fromdict():
 def test_relation_detection_setters():
     relation_detection = RelationDetection()
     relation_detection.coreference_resolution = "combined"
+    relation_detection.enable_relation_extraction = True
     assert relation_detection.coreference_resolution == "combined"
+    assert relation_detection.enable_relation_extraction is True
 
 
 def test_relation_detection_coreference_resolution_validator():
@@ -1011,11 +1022,28 @@ def test_relation_detection_coreference_resolution_validator():
     assert error_msg in str(excinfo.value)
 
 
+def test_relation_detection_enable_relation_extraction_validator():
+    error_msg = "junk is not valid. RelationDetection.enable_relation_extraction must be of type bool"
+    relation_detection = RelationDetection()
+    with pytest.raises(ValueError) as excinfo:
+        relation_detection.enable_relation_extraction = "junk"
+    assert error_msg in str(excinfo.value)
+
+
+def test_relation_detection_enable_relation_extraction_validator_when_coref_disabled():
+    error_msg = "Coreference resolution must be enabled before setting enable_relation_extraction to true"
+    relation_detection = RelationDetection()
+    with pytest.raises(ValueError) as excinfo:
+        relation_detection.enable_relation_extraction = True
+    assert error_msg in str(excinfo.value)
+
+
 def test_relation_detection_to_dict():
     relation_detection = RelationDetection(
-        coreference_resolution="model_prediction"
+        coreference_resolution="model_prediction", enable_relation_extraction=False
     ).to_dict()
     assert relation_detection["coreference_resolution"] == "model_prediction"
+    assert relation_detection["enable_relation_extraction"] is False
 
 
 # Process Text Request Tests
@@ -1309,7 +1337,9 @@ def test_analyze_text_request_initializer():
         filter=[filter],
         return_entity=False,
     )
-    relation_detection = RelationDetection(coreference_resolution="model_prediction")
+    relation_detection = RelationDetection(
+        coreference_resolution="model_prediction", enable_relation_extraction=True
+    )
 
     analyze_text_request = AnalyzeTextRequest(
         text=text,
@@ -1335,6 +1365,7 @@ def test_analyze_text_request_initializer():
         analyze_text_request.relation_detection.coreference_resolution
         == relation_detection.coreference_resolution
     )
+    assert analyze_text_request.relation_detection.enable_relation_extraction is True
 
 
 def test_analyze_text_request_initialize_fromdict():
@@ -1348,7 +1379,10 @@ def test_analyze_text_request_initialize_fromdict():
             "filter": [{"type": "BLOCK", "pattern": "Roger", "entity_type": "TEST"}],
             "return_entity": False,
         },
-        "relation_detection": {"coreference_resolution": "combined"},
+        "relation_detection": {
+            "coreference_resolution": "combined",
+            "enable_relation_extraction": True,
+        },
     }
     analyze_text_request = AnalyzeTextRequest.fromdict(request_obj)
     assert analyze_text_request.text == request_obj["text"]
@@ -1377,6 +1411,10 @@ def test_analyze_text_request_initialize_fromdict():
     assert (
         analyze_text_request.relation_detection.coreference_resolution
         == request_obj["relation_detection"]["coreference_resolution"]
+    )
+    assert (
+        analyze_text_request.relation_detection.enable_relation_extraction
+        == request_obj["relation_detection"]["enable_relation_extraction"]
     )
 
 
@@ -1443,6 +1481,10 @@ def test_analyze_text_request_to_dict():
     assert (
         analyze_text_request["relation_detection"]["coreference_resolution"]
         == "heuristics"
+    )
+    assert (
+        analyze_text_request["relation_detection"]["enable_relation_extraction"]
+        is False
     )
 
 
