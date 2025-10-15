@@ -6,6 +6,15 @@
 ### Fixed
 
 
+## [4.2.0]
+### Added
+- added enable_relation_extraction, within the relation_detection object
+
+### Changed
+
+### Fixed
+
+
 ## [4.1.0.1]
 ### Added
 
