@@ -1952,7 +1952,6 @@ def test_synthetic_text():
     processed_text = ProcessedText(
         type="SYNTHETIC",
         synthetic_entity_accuracy="standard",
-        preserve_relationships=True,
     )
     assert processed_text.type == "SYNTHETIC"
     assert hasattr(processed_text, "pattern") == False
@@ -1991,14 +1990,13 @@ def test_synthetic_invalid_accuracy_initialize():
         processed_text = ProcessedText(
             type="SYNTHETIC",
             synthetic_entity_accuracy="invalid",
-            preserve_relationships=True,
         )
     assert error_msg in str(excinfo.value)
 
 
 def test_synthetic_invalid_accuracy():
     error_msg = "Synthetic Entity Accuracy can only accept values"
-    processed_text = ProcessedText(type="SYNTHETIC", preserve_relationships=True)
+    processed_text = ProcessedText(type="SYNTHETIC")
     with pytest.raises(ValueError) as excinfo:
         processed_text.synthetic_entity_accuracy = "invalid"
     assert error_msg in str(excinfo.value)
