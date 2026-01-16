@@ -704,21 +704,18 @@ class ProcessedMaskText(BaseRequestObject):
 
 
 class ProcessedSyntheticText(BaseRequestObject):
-    attributes = ["_synthetic_entity_accuracy", "_preserve_relationships"]
+    attributes = ["_synthetic_entity_accuracy"]
     valid_synthetic_accuracy_values = ["standard", "standard_multilingual"]
 
     def __init__(
         self,
         synthetic_entity_accuracy: str = "standard",
-        preserve_relationships: bool = True,
     ):
         for attribute in ProcessedMarkerText.attributes + ProcessedMaskText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "SYNTHETIC"
         if self._synthetic_entity_accuracy_validator(synthetic_entity_accuracy):
             self._synthetic_entity_accuracy = synthetic_entity_accuracy
-        self._preserve_relationships = preserve_relationships
-        self._preserve_relationships = True
 
     @property
     def synthetic_entity_accuracy(self):
@@ -728,14 +725,6 @@ class ProcessedSyntheticText(BaseRequestObject):
     def synthetic_entity_accuracy(self, var):
         if self._synthetic_entity_accuracy_validator(var):
             self._synthetic_entity_accuracy = var
-
-    @property
-    def preserve_relationships(self):
-        return self._preserve_relationships
-
-    @preserve_relationships.setter
-    def preserve_relationships(self, var):
-        self._preserve_relationships = var
 
     def _synthetic_entity_accuracy_validator(self, var):
         if var not in self.valid_synthetic_accuracy_values:

@@ -6,6 +6,14 @@
 ### Fixed
 
 
+## [4.2.1]
+### Added
+
+### Changed
+
+### Fixed
+- Removed `reserve_relationships` from synthetic objects.
+
 ## [4.2.0]
 ### Added
 - added enable_relation_extraction, within the relation_detection object
