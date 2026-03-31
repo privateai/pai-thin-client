@@ -1040,7 +1040,16 @@ class SyntheticReplacements(BaseRequestObject):
         if self._accuracy_validator(accuracy):
             self._accuracy = accuracy
         if self._entity_types_validator(entity_types):
-            self.entity_types = entity_types
+            self._entity_types = entity_types
+
+    @property
+    def entity_types(self):
+        return self._entity_types
+
+    @entity_types.setter
+    def entity_types(self, var):
+        if self._entity_types_validator(var):
+            self._entity_types = var
 
     @property
     def accuracy(self):

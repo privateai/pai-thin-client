@@ -8,6 +8,7 @@ from ..post_processing import (
     FuzzyMatchEntityProcessor,
     MarkerEntityProcessor,
     MaskEntityProcessor,
+    SyntheticReplacementProcessor,
     deidentify_text,
 )
 
@@ -286,3 +287,69 @@ def test_fuzzy_match_processor_invalid_attrs(
             masking_character=masking_character,
             ignore_casing=ignore_casing,
         )
+
+
+# Synthetic replacement processor
+def test_synthetic_replacement_processor():
+    entity = {
+        "text": "John",
+        "best_label": "NAME_GIVEN",
+        "synthetic_text": "Michael",
+    }
+    processor = SyntheticReplacementProcessor()
+    assert processor(entity) == "Michael"
+
+
+def test_synthetic_replacement_processor_missing_synthetic_text():
+    entity = {
+        "text": "John",
+        "best_label": "NAME_GIVEN",
+    }
+    processor = SyntheticReplacementProcessor()
+    with pytest.raises(ValueError, match="does not have a `synthetic_text` field"):
+        processor(entity)
+
+
+def test_deidentify_text_with_synthetic_replacements():
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(
+        [
+            {
+                "entities": [
+                    {
+                        "text": "John",
+                        "location": {"stt_idx": 11, "end_idx": 15},
+                        "best_label": "NAME_GIVEN",
+                        "labels": {
+                            "NAME_GIVEN": 0.9202193021774292,
+                            "NAME": 0.9011530876159668,
+                        },
+                        "coreference_id": "0a82c40c-77cc-42a1-8c3b-5006ddcdc668",
+                        "synthetic_text": "Ezekiel",
+                    },
+                    {
+                        "text": "France",
+                        "location": {"stt_idx": 27, "end_idx": 33},
+                        "best_label": "LOCATION_COUNTRY",
+                        "labels": {
+                            "LOCATION_COUNTRY": 0.9462521076202393,
+                            "LOCATION": 0.9141559600830078,
+                        },
+                        "coreference_id": "90f6c359-fdbf-4214-a40d-7952a95b7dd5",
+                    },
+                ],
+                "entities_present": True,
+                "characters_processed": 34,
+                "languages_detected": {"en": 0.9607678651809692},
+            }
+        ]
+    ).encode("utf-8")
+
+    text_out = deidentify_text(
+        text=["My name is John. I live in France."],
+        response=AnalyzeTextResponse(response),
+        entity_processors={"NAME_GIVEN": SyntheticReplacementProcessor()},
+        default_processor=MaskEntityProcessor(),
+    )
+    assert text_out == ["My name is Ezekiel. I live in ######."]
