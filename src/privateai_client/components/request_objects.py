@@ -705,7 +705,11 @@ class ProcessedMaskText(BaseRequestObject):
 
 class ProcessedSyntheticText(BaseRequestObject):
     attributes = ["_synthetic_entity_accuracy"]
-    valid_synthetic_accuracy_values = ["standard", "standard_multilingual"]
+    valid_synthetic_accuracy_values = [
+        "standard",
+        "standard_multilingual",
+        "standard_automatic",
+    ]
 
     def __init__(
         self,
@@ -1024,6 +1028,65 @@ class RelationDetection(BaseRequestObject):
             )
 
 
+class SyntheticReplacements(BaseRequestObject):
+    default_accuracy = "standard"
+    valid_accuracies = ["standard", "standard_multilingual", "standard_automatic"]
+
+    def __init__(
+        self,
+        accuracy: str = default_accuracy,
+        entity_types: List[EntityTypeSelector] = [],
+    ):
+        if self._accuracy_validator(accuracy):
+            self._accuracy = accuracy
+        if self._entity_types_validator(entity_types):
+            self.entity_types = entity_types
+
+    @property
+    def accuracy(self):
+        return self._accuracy
+
+    @accuracy.setter
+    def accuracy(self, var):
+        if self._accuracy_validator(var):
+            self._accuracy = var
+
+    def _accuracy_validator(self, var):
+        if var not in self.valid_accuracies:
+            raise ValueError(
+                f"{var} is not valid. SyntheticReplacements.accuracy can only accept values: {', '.join(self.valid_accuracies)}"
+            )
+        return True
+
+    def _entity_types_validator(self, var):
+        if type(var) is not list:
+            raise TypeError(
+                f"{var} is not valid. SyntheticReplacements.entity_types can only be a list"
+            )
+        elif var and not all(isinstance(row, EntityTypeSelector) for row in var):
+            raise ValueError(
+                "SyntheticReplacements.entity_types can only contain EntityTypeSelector objects"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entity_types":
+                    initializer_dict[key] = [
+                        EntityTypeSelector.fromdict(row) for row in value
+                    ]
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "SyntheticReplacements can only accept the values 'accuracy' and 'entity_types'"
+            )
+
+
 class ProcessTextRequest(BaseRequestObject):
     def __init__(
         self,
@@ -1095,6 +1158,7 @@ class AnalyzeTextRequest(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         project_id: Optional[str] = None,
         relation_detection: Optional[RelationDetection] = None,
+        synthetic_replacements: Optional[SyntheticReplacements] = None,
     ):
         self.text = text
         self.locale = locale
@@ -1102,6 +1166,7 @@ class AnalyzeTextRequest(BaseRequestObject):
         self.entity_detection = entity_detection
         self.project_id = project_id
         self.relation_detection = relation_detection
+        self.synthetic_replacements = synthetic_replacements
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -1112,13 +1177,15 @@ class AnalyzeTextRequest(BaseRequestObject):
                     initializer_dict[key] = EntityDetection.fromdict(value)
                 elif key == "relation_detection":
                     initializer_dict[key] = RelationDetection.fromdict(value)
+                elif key == "synthetic_replacements":
+                    initializer_dict[key] = SyntheticReplacements.fromdict(value)
                 else:
                     initializer_dict[key] = value
 
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch', 'entity_detection' and 'relation_detection'"
+                "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch', 'entity_detection', 'relation_detection' and 'synthetic_replacements'"
             )
 
 

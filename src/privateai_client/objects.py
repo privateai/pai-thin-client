@@ -23,3 +23,4 @@ class request_objects:
     reidentify_text_obj = req_objects.ReidentifyTextRequest
     timestamp_obj = req_objects.Timestamp
     relation_detection_obj = req_objects.RelationDetection
+    synthetic_replacements_obj = req_objects.SyntheticReplacements
