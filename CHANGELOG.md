@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Added
-
+- Support for synthetic replacements in analyze/text route
+- `SyntheticReplacementProcessor`: A predefined processor used to replace entities with synthetic text
 ### Changed
 
 ### Fixed
