@@ -1,4 +1,5 @@
 import inspect
+from enum import Enum
 from typing import List, Optional, Union
 
 
@@ -703,17 +704,18 @@ class ProcessedMaskText(BaseRequestObject):
         return True
 
 
+class SyntheticAccuracy(Enum):
+    STANDARD = "standard"
+    STANDARD_MULTILINGUAL = "standard_multilingual"
+    STANDARD_AUTOMATIC = "standard_automatic"
+
+
 class ProcessedSyntheticText(BaseRequestObject):
     attributes = ["_synthetic_entity_accuracy"]
-    valid_synthetic_accuracy_values = [
-        "standard",
-        "standard_multilingual",
-        "standard_automatic",
-    ]
 
     def __init__(
         self,
-        synthetic_entity_accuracy: str = "standard",
+        synthetic_entity_accuracy: str = SyntheticAccuracy.STANDARD_AUTOMATIC.value,
     ):
         for attribute in ProcessedMarkerText.attributes + ProcessedMaskText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
@@ -731,9 +733,10 @@ class ProcessedSyntheticText(BaseRequestObject):
             self._synthetic_entity_accuracy = var
 
     def _synthetic_entity_accuracy_validator(self, var):
-        if var not in self.valid_synthetic_accuracy_values:
+        valid_values = [e.value for e in SyntheticAccuracy]
+        if var not in valid_values:
             raise ValueError(
-                f"{var} is not valid. Synthetic Entity Accuracy can only accept values {', '.join(self.valid_synthetic_accuracy_values)}"
+                f"{var} is not valid. Synthetic Entity Accuracy can only accept values {', '.join(valid_values)}"
             )
 
 
@@ -1029,12 +1032,9 @@ class RelationDetection(BaseRequestObject):
 
 
 class SyntheticReplacements(BaseRequestObject):
-    default_accuracy = "standard"
-    valid_accuracies = ["standard", "standard_multilingual", "standard_automatic"]
-
     def __init__(
         self,
-        accuracy: str = default_accuracy,
+        accuracy: str = SyntheticAccuracy.STANDARD_AUTOMATIC.value,
         entity_types: List[EntityTypeSelector] = [],
     ):
         if self._accuracy_validator(accuracy):
@@ -1061,9 +1061,10 @@ class SyntheticReplacements(BaseRequestObject):
             self._accuracy = var
 
     def _accuracy_validator(self, var):
-        if var not in self.valid_accuracies:
+        valid_values = [e.value for e in SyntheticAccuracy]
+        if var not in valid_values:
             raise ValueError(
-                f"{var} is not valid. SyntheticReplacements.accuracy can only accept values: {', '.join(self.valid_accuracies)}"
+                f"{var} is not valid. SyntheticReplacements.accuracy can only accept values: {', '.join(valid_values)}"
             )
         return True
 
