@@ -1323,6 +1323,7 @@ def test_analyze_text_request_default_initializer():
     assert analyze_text_request.link_batch is None
     assert analyze_text_request.entity_detection is None
     assert analyze_text_request.relation_detection is None
+    assert analyze_text_request.synthetic_replacements is None
 
 
 def test_analyze_text_request_initializer():
@@ -1340,6 +1341,9 @@ def test_analyze_text_request_initializer():
     relation_detection = RelationDetection(
         coreference_resolution="model_prediction", enable_relation_extraction=True
     )
+    synthetic_replacements = SyntheticReplacements(
+        accuracy="standard", entity_types=[entity_type]
+    )
 
     analyze_text_request = AnalyzeTextRequest(
         text=text,
@@ -1347,6 +1351,7 @@ def test_analyze_text_request_initializer():
         link_batch=link_batch,
         entity_detection=entity_detection,
         relation_detection=relation_detection,
+        synthetic_replacements=synthetic_replacements,
     )
 
     assert analyze_text_request.text == text
@@ -1366,6 +1371,18 @@ def test_analyze_text_request_initializer():
         == relation_detection.coreference_resolution
     )
     assert analyze_text_request.relation_detection.enable_relation_extraction is True
+    assert (
+        analyze_text_request.synthetic_replacements.accuracy
+        == synthetic_replacements.accuracy
+    )
+    assert (
+        analyze_text_request.synthetic_replacements.entity_types[0].type
+        == entity_type.type
+    )
+    assert (
+        analyze_text_request.synthetic_replacements.entity_types[0].value
+        == entity_type.value
+    )
 
 
 def test_analyze_text_request_initialize_fromdict():
@@ -1382,6 +1399,10 @@ def test_analyze_text_request_initialize_fromdict():
         "relation_detection": {
             "coreference_resolution": "combined",
             "enable_relation_extraction": True,
+        },
+        "synthetic_replacements": {
+            "accuracy": "standard",
+            "entity_types": [{"type": "DISABLE", "value": ["LOCATION"]}],
         },
     }
     analyze_text_request = AnalyzeTextRequest.fromdict(request_obj)
@@ -1416,10 +1437,22 @@ def test_analyze_text_request_initialize_fromdict():
         analyze_text_request.relation_detection.enable_relation_extraction
         == request_obj["relation_detection"]["enable_relation_extraction"]
     )
+    assert (
+        analyze_text_request.synthetic_replacements.accuracy
+        == request_obj["synthetic_replacements"]["accuracy"]
+    )
+    assert (
+        analyze_text_request.synthetic_replacements.entity_types[0].type
+        == request_obj["synthetic_replacements"]["entity_types"][0]["type"]
+    )
+    assert (
+        analyze_text_request.synthetic_replacements.entity_types[0].value
+        == request_obj["synthetic_replacements"]["entity_types"][0]["value"]
+    )
 
 
 def test_analyze_text_request_invalid_initialize_fromdict():
-    error_msg = "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch', 'entity_detection' and 'relation_detection'"
+    error_msg = "AnalyzeTextRequest can only accept the values 'text', 'locale', 'link_batch', 'entity_detection', 'relation_detection' and 'synthetic_replacements'"
     request_obj = {
         "text": ["hey!"],
         "link_batch": False,
@@ -1450,6 +1483,9 @@ def test_analyze_text_request_to_dict():
         return_entity=False,
     )
     relation_detection = RelationDetection(coreference_resolution="heuristics")
+    synthetic_replacements = SyntheticReplacements(
+        accuracy="standard", entity_types=[entity_type]
+    )
 
     analyze_text_request = AnalyzeTextRequest(
         text=text,
@@ -1457,7 +1493,9 @@ def test_analyze_text_request_to_dict():
         link_batch=link_batch,
         entity_detection=entity_detection,
         relation_detection=relation_detection,
+        synthetic_replacements=synthetic_replacements,
     ).to_dict()
+
     assert analyze_text_request["text"] == text
     assert analyze_text_request["locale"] == locale
     assert analyze_text_request["link_batch"] == link_batch
@@ -1485,6 +1523,18 @@ def test_analyze_text_request_to_dict():
     assert (
         analyze_text_request["relation_detection"]["enable_relation_extraction"]
         is False
+    )
+    assert (
+        analyze_text_request["synthetic_replacements"]["accuracy"]
+        == synthetic_replacements.accuracy
+    )
+    assert (
+        analyze_text_request["synthetic_replacements"]["entity_types"][0]["type"]
+        == entity_type.type
+    )
+    assert (
+        analyze_text_request["synthetic_replacements"]["entity_types"][0]["value"]
+        == entity_type.value
     )
 
 
