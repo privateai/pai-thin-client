@@ -5,6 +5,7 @@ import requests
 
 from ..components.pai_responses import AnalyzeTextResponse
 from ..post_processing import (
+    AgeEntityBucketProcessor,
     FuzzyMatchEntityProcessor,
     MarkerEntityProcessor,
     MaskEntityProcessor,
@@ -353,3 +354,114 @@ def test_deidentify_text_with_synthetic_replacements():
         default_processor=MaskEntityProcessor(),
     )
     assert text_out == ["My name is Ezekiel. I live in ######."]
+
+
+# Age Bucketing
+@pytest.mark.parametrize(
+    argnames=["entity", "bucket_size", "processed_text"],
+    argvalues=[
+        (
+            {
+                "text": "32",
+                "best_label": "AGE",
+                "location": {"stt_idx": 2, "end_idx": 4},
+                "labels": {"AGE": 0.9599081873893738},
+                "analysis_result": {
+                    "formatted": 32,
+                    "subtypes": [],
+                    "validation_assertions": [],
+                },
+            },
+            5,
+            "[30-34]",
+        ),
+        (
+            {
+                "text": "32",
+                "best_label": "AGE",
+                "location": {"stt_idx": 2, "end_idx": 4},
+                "labels": {"AGE": 0.9599081873893738},
+                "analysis_result": {
+                    "formatted": 32,
+                    "subtypes": [],
+                    "validation_assertions": [],
+                },
+            },
+            2,
+            "[32-33]",
+        ),
+        (
+            {
+                "text": "32",
+                "best_label": "AGE",
+                "location": {"stt_idx": 2, "end_idx": 4},
+                "labels": {"AGE": 0.9599081873893738},
+                "analysis_result": {
+                    "formatted": 32,
+                    "subtypes": [],
+                    "validation_assertions": [],
+                },
+            },
+            3,
+            "[30-32]",
+        ),
+        (
+            {
+                "text": "32",
+                "best_label": "AGE",
+                "location": {"stt_idx": 2, "end_idx": 4},
+                "labels": {"AGE": 0.9599081873893738},
+            },
+            3,
+            "[%-%]",
+        ),
+    ],
+)
+def test_age_bucket_processor(entity, bucket_size, processed_text):
+    processor = AgeEntityBucketProcessor(bin_size=bucket_size)
+    assert processor(entity) == processed_text
+
+
+# Date Shifting
+def test_date_shifting_processor():
+    pass
+
+
+def test_date_shifting_processor_wrong_arg():
+    pass
+
+
+# Date Bucketing
+def test_date_bucketing_processor():
+    pass
+
+
+def test_date_bucketing_processor_wrong_arg():
+    pass
+
+
+# Selective Date Component Redaction
+def test_date_component_processor():
+    pass
+
+
+[
+    {
+        "entities": [
+            {
+                "text": "32",
+                "best_label": "AGE",
+                "location": {"stt_idx": 2, "end_idx": 4},
+                "labels": {"AGE": 0.9599081873893738},
+                "analysis_result": {
+                    "formatted": 32,
+                    "subtypes": [],
+                    "validation_assertions": [],
+                },
+            }
+        ],
+        "entities_present": true,
+        "characters_processed": 30,
+        "languages_detected": {"en": 0.9850051403045654},
+    }
+]

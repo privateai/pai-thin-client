@@ -46,7 +46,7 @@ class AgeEntityBucketProcessor:
                     default_processor=MarkerEntityProcessor()
                 )
             >>> anon_text_blocks
-                ["A [30-35]-year old wants to travel."]
+                ["A [30-34]-year old wants to travel."]
         """
         formatted_age = entity["analysis_result"].get("formatted")
         if not formatted_age:
@@ -54,4 +54,4 @@ class AgeEntityBucketProcessor:
 
         start_age = (formatted_age // self.bin_size) * self.bin_size
         end_age = start_age + self.bin_size
-        return f"[{start_age}-{end_age}]"
+        return f"[{start_age}-{end_age-1}]"
