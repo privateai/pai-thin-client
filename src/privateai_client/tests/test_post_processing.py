@@ -2,10 +2,12 @@ import json
 
 import pytest
 import requests
+from dateutil.relativedelta import relativedelta
 
 from ..components.pai_responses import AnalyzeTextResponse
 from ..post_processing import (
     AgeEntityBucketProcessor,
+    DateShiftProcessor,
     FuzzyMatchEntityProcessor,
     MarkerEntityProcessor,
     MaskEntityProcessor,
@@ -423,12 +425,79 @@ def test_age_bucket_processor(entity, bucket_size, processed_text):
 
 
 # Date Shifting
-def test_date_shifting_processor():
-    pass
+@pytest.mark.parametrize(
+    argnames=["entity", "date_offset", "operator", "processed_text"],
+    argvalues=[
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            relativedelta(days=1),
+            "add",
+            "[1990-01-02]",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            relativedelta(days=1),
+            "subtract",
+            "[1989-12-31]",
+        ),
+    ],
+)
+def test_date_shifting_processor(entity, date_offset, operator, processed_text):
+    processor = DateShiftProcessor(date_offset, operator)
+    assert processor(entity) == processed_text
 
 
 def test_date_shifting_processor_wrong_arg():
-    pass
+    entity = {
+        "text": "1990-01-01",
+        "location": {"stt_idx": 9, "end_idx": 19},
+        "best_label": "DOB",
+        "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+        "analysis_result": {
+            "formatted": "1990-01-01T00:00:00",
+            "subtypes": [
+                {"formatted": "1", "label": "DAY"},
+                {"formatted": "1", "label": "MONTH"},
+                {"formatted": "1990", "label": "YEAR"},
+            ],
+            "validation_assertions": [],
+        },
+    }
+    offset = relativedelta(months=3)
+    # checking error handling
+    error_msg = (
+        "The operation 'minus' does not exist. Unable to initialize DateShiftProcessor."
+    )
+    with pytest.raises(ValueError, match=error_msg):
+        DateShiftProcessor(offset, "minus")
 
 
 # Date Bucketing
@@ -449,19 +518,23 @@ def test_date_component_processor():
     {
         "entities": [
             {
-                "text": "32",
-                "best_label": "AGE",
-                "location": {"stt_idx": 2, "end_idx": 4},
-                "labels": {"AGE": 0.9599081873893738},
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
                 "analysis_result": {
-                    "formatted": 32,
-                    "subtypes": [],
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
                     "validation_assertions": [],
                 },
             }
         ],
         "entities_present": true,
-        "characters_processed": 30,
-        "languages_detected": {"en": 0.9850051403045654},
+        "characters_processed": 20,
+        "languages_detected": {"en": 0.7509669661521912},
     }
 ]
