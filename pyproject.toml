@@ -19,6 +19,7 @@ classifiers = [
 ]
 dependencies = [
   "requests~=2.32.3",
+  "python-dateutil~=2.9.0",
   "pyxDamerauLevenshtein~=1.8.0"
 ]
 
