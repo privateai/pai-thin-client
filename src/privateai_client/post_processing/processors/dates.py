@@ -67,7 +67,7 @@ class DateShiftProcessor:
                     default_processor=MarkerEntityProcessor()
                 )
             >>> anon_text_blocks
-                ["today is 1990-04-01."]
+                ["today is [1990-04-01]."]
         """
         # iso-8601 format: date as year-month-day
         iso_date_str = entity["analysis_result"].get("formatted")
@@ -78,7 +78,7 @@ class DateShiftProcessor:
             new_date = date_obj + self._offset
         else:
             new_date = date_obj - self._offset
-        return f"{new_date.strftime(self._date_format)}"
+        return f"[{new_date.strftime(self._date_format)}]"
 
 
 class DateBucketProcessor:
@@ -139,7 +139,7 @@ class DateBucketProcessor:
                     default_processor=MarkerEntityProcessor()
                 )
             >>> anon_text_blocks
-                ["today is between 1990-01-01 and 1990-12-31."]
+                ["today is [1990-01-01 and 1990-12-31]."]
         """
         # iso-8601 format: date as year-month-day
         iso_date_str = entity["analysis_result"].get("formatted")
@@ -195,6 +195,33 @@ class DateComponentProcessor:
             entity: an individual entity returned by the DEID container.
 
         Examples:
+            >>> text = ["today is 1990-01-01."]
+            >>> request = {
+                "text": text,
+                "entity_detection": {
+                    "accuracy": "high",
+                    "entity_types": [
+                        {
+                        "type": "ENABLE",
+                        "value": ["DATE", "DATE_OF_DEATH", "DOB"]
+                        }
+                        ],
+                    },
+                }
+            >>> text_request = AnalyzeTextRequest.from_dict(request)
+            >>> # run analyze text
+            >>> resp = client.analyze_text(text_request)
+            >>> # run post-processing tasks
+            >>> to_redact = ["DAY"]
+            >>> entity_processors = {"DATE": DateComponentProcessor(redact_components=to_redact)}
+            >>> anon_text_blocks = deidentify_text(
+                    text,
+                    resp,
+                    entity_processors=entity_processors,
+                    default_processor=MarkerEntityProcessor()
+                )
+            >>> anon_text_blocks
+                ["today is 1990-01-##."]
         """
         offset = entity["location"]["stt_idx"]
         text = entity["text"]
