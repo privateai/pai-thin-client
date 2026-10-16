@@ -8,6 +8,7 @@ from ..components.pai_responses import AnalyzeTextResponse
 from ..post_processing import (
     AgeEntityBucketProcessor,
     DateBucketProcessor,
+    DateComponentProcessor,
     DateShiftProcessor,
     FuzzyMatchEntityProcessor,
     MarkerEntityProcessor,
@@ -577,7 +578,220 @@ def test_date_bucketing_processor_wrong_arg():
 
 
 # Selective Date Component Redaction
-def test_date_component_processor():
+@pytest.mark.parametrize(
+    argnames=["entity", "redact_date_comps", "processed_text"],
+    argvalues=[
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["DAY"],
+            "1990-01-01",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {
+                            "formatted": "1",
+                            "label": "DAY",
+                            "location": {"stt_idx": 17, "end_idx": 19},
+                        },
+                        {
+                            "formatted": "1",
+                            "label": "MONTH",
+                            "location": {"stt_idx": 14, "end_idx": 16},
+                        },
+                        {
+                            "formatted": "1990",
+                            "label": "YEAR",
+                            "location": {"stt_idx": 9, "end_idx": 13},
+                        },
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["DAY"],
+            "1990-01-##",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {
+                            "formatted": "1",
+                            "label": "DAY",
+                            "location": {"stt_idx": 17, "end_idx": 19},
+                        },
+                        {
+                            "formatted": "1",
+                            "label": "MONTH",
+                            "location": {"stt_idx": 14, "end_idx": 16},
+                        },
+                        {
+                            "formatted": "1990",
+                            "label": "YEAR",
+                            "location": {"stt_idx": 9, "end_idx": 13},
+                        },
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["MONTH"],
+            "1990-##-01",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {
+                            "formatted": "1",
+                            "label": "DAY",
+                            "location": {"stt_idx": 17, "end_idx": 19},
+                        },
+                        {
+                            "formatted": "1",
+                            "label": "MONTH",
+                            "location": {"stt_idx": 14, "end_idx": 16},
+                        },
+                        {
+                            "formatted": "1990",
+                            "label": "YEAR",
+                            "location": {"stt_idx": 9, "end_idx": 13},
+                        },
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["YEAR"],
+            "####-01-01",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {
+                            "formatted": "1",
+                            "label": "DAY",
+                            "location": {"stt_idx": 17, "end_idx": 19},
+                        },
+                        {
+                            "formatted": "1",
+                            "label": "MONTH",
+                            "location": {"stt_idx": 14, "end_idx": 16},
+                        },
+                        {
+                            "formatted": "1990",
+                            "label": "YEAR",
+                            "location": {"stt_idx": 9, "end_idx": 13},
+                        },
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["DAY", "MONTH"],
+            "1990-##-##",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {
+                            "formatted": "1",
+                            "label": "DAY",
+                            "location": {"stt_idx": 17, "end_idx": 19},
+                        },
+                        {
+                            "formatted": "1",
+                            "label": "MONTH",
+                            "location": {"stt_idx": 14, "end_idx": 16},
+                        },
+                        {
+                            "formatted": "1990",
+                            "label": "YEAR",
+                            "location": {"stt_idx": 9, "end_idx": 13},
+                        },
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["DAY", "YEAR"],
+            "####-01-##",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {
+                            "formatted": "1",
+                            "label": "DAY",
+                            "location": {"stt_idx": 17, "end_idx": 19},
+                        },
+                        {
+                            "formatted": "1",
+                            "label": "MONTH",
+                            "location": {"stt_idx": 14, "end_idx": 16},
+                        },
+                        {
+                            "formatted": "1990",
+                            "label": "YEAR",
+                            "location": {"stt_idx": 9, "end_idx": 13},
+                        },
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            ["DAY", "MONTH", "YEAR"],
+            "####-##-##",
+        ),
+    ],
+)
+def test_date_component_processor(entity, redact_date_comps, text_processed):
+    processor = DateComponentProcessor(redact_date_comps)
+    assert processor(entity) == text_processed
+
     pass
 
 
