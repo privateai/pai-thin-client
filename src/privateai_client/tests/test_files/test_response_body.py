@@ -5,9 +5,31 @@ age_repsonse_1 = [
                 "text": "32",
                 "location": {"stt_idx": 2, "end_idx": 4},
                 "best_label": "AGE",
-                "" "labels": {"AGE": 0.9599081873893738},
+                "labels": {"AGE": 0.9599081873893738},
                 "analysis_result": {
                     "formatted": 32,
+                    "subtypes": [],
+                    "validation_assertions": [],
+                },
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 30,
+        "languages_detected": {"en": 0.9850051403045654},
+    }
+]
+
+
+age_repsonse_2 = [
+    {
+        "entities": [
+            {
+                "text": "32",
+                "location": {"stt_idx": 2, "end_idx": 4},
+                "best_label": "AGE",
+                "labels": {"AGE": 0.9599081873893738},
+                "analysis_result": {
+                    "formatted": None,
                     "subtypes": [],
                     "validation_assertions": [],
                 },
