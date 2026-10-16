@@ -4,8 +4,6 @@ import pytest
 import requests
 from dateutil.relativedelta import relativedelta
 
-from src.privateai_client.tests.test_files import test_response_body
-
 from ..components.pai_responses import AnalyzeTextResponse
 from ..post_processing import (
     AgeEntityBucketProcessor,
@@ -18,6 +16,7 @@ from ..post_processing import (
     SyntheticReplacementProcessor,
     deidentify_text,
 )
+from ..tests.test_files import test_response_body
 
 
 # Deidentify text
@@ -367,57 +366,22 @@ def test_deidentify_text_with_synthetic_replacements():
     argnames=["entity", "bucket_size", "processed_text"],
     argvalues=[
         (
-            {
-                "text": "32",
-                "best_label": "AGE",
-                "location": {"stt_idx": 2, "end_idx": 4},
-                "labels": {"AGE": 0.9599081873893738},
-                "analysis_result": {
-                    "formatted": 32,
-                    "subtypes": [],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.age_repsonse_1[0]["entities"][0],
             5,
             "[30-34]",
         ),
         (
-            {
-                "text": "32",
-                "best_label": "AGE",
-                "location": {"stt_idx": 2, "end_idx": 4},
-                "labels": {"AGE": 0.9599081873893738},
-                "analysis_result": {
-                    "formatted": 32,
-                    "subtypes": [],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.age_repsonse_1[0]["entities"][0],
             2,
             "[32-33]",
         ),
         (
-            {
-                "text": "32",
-                "best_label": "AGE",
-                "location": {"stt_idx": 2, "end_idx": 4},
-                "labels": {"AGE": 0.9599081873893738},
-                "analysis_result": {
-                    "formatted": 32,
-                    "subtypes": [],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.age_repsonse_1[0]["entities"][0],
             3,
             "[30-32]",
         ),
         (
-            {
-                "text": "32",
-                "best_label": "AGE",
-                "location": {"stt_idx": 2, "end_idx": 4},
-                "labels": {"AGE": 0.9599081873893738},
-            },
+            test_response_body.age_repsonse_1[0]["entities"][0],
             3,
             "[%-%]",
         ),
@@ -433,41 +397,13 @@ def test_age_bucket_processor(entity, bucket_size, processed_text):
     argnames=["entity", "date_offset", "operator", "processed_text"],
     argvalues=[
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {"formatted": "1", "label": "DAY"},
-                        {"formatted": "1", "label": "MONTH"},
-                        {"formatted": "1990", "label": "YEAR"},
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_1[0]["entities"][0],
             relativedelta(days=1),
             "add",
             "[1990-01-02]",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {"formatted": "1", "label": "DAY"},
-                        {"formatted": "1", "label": "MONTH"},
-                        {"formatted": "1990", "label": "YEAR"},
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_1[0]["entities"][0],
             relativedelta(days=1),
             "subtract",
             "[1989-12-31]",
@@ -480,21 +416,6 @@ def test_date_shifting_processor(entity, date_offset, operator, processed_text):
 
 
 def test_date_shifting_processor_wrong_arg():
-    entity = {
-        "text": "1990-01-01",
-        "location": {"stt_idx": 9, "end_idx": 19},
-        "best_label": "DOB",
-        "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-        "analysis_result": {
-            "formatted": "1990-01-01T00:00:00",
-            "subtypes": [
-                {"formatted": "1", "label": "DAY"},
-                {"formatted": "1", "label": "MONTH"},
-                {"formatted": "1990", "label": "YEAR"},
-            ],
-            "validation_assertions": [],
-        },
-    }
     offset = relativedelta(months=3)
     # checking error handling
     error_msg = (
@@ -509,59 +430,17 @@ def test_date_shifting_processor_wrong_arg():
     argnames=["entity", "date_bin", "processed_text"],
     argvalues=[
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {"formatted": "1", "label": "DAY"},
-                        {"formatted": "1", "label": "MONTH"},
-                        {"formatted": "1990", "label": "YEAR"},
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_1[0]["entities"][0],
             "decade",
             "[1990-01-01 and 1999-12-31]",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {"formatted": "1", "label": "DAY"},
-                        {"formatted": "1", "label": "MONTH"},
-                        {"formatted": "1990", "label": "YEAR"},
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_1[0]["entities"][0],
             "year",
             "[1990-01-01 and 1990-12-31]",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {"formatted": "1", "label": "DAY"},
-                        {"formatted": "1", "label": "MONTH"},
-                        {"formatted": "1990", "label": "YEAR"},
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_1[0]["entities"][0],
             "month",
             "[1990-01-01 and 1990-01-31]",
         ),
@@ -584,207 +463,37 @@ def test_date_bucketing_processor_wrong_arg():
     argnames=["entity", "redact_date_comps", "processed_text"],
     argvalues=[
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {"formatted": "1", "label": "DAY"},
-                        {"formatted": "1", "label": "MONTH"},
-                        {"formatted": "1990", "label": "YEAR"},
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_1[0]["entities"][0],
             ["DAY"],
             "1990-01-01",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {
-                            "formatted": "1",
-                            "label": "DAY",
-                            "location": {"stt_idx": 17, "end_idx": 19},
-                        },
-                        {
-                            "formatted": "1",
-                            "label": "MONTH",
-                            "location": {"stt_idx": 14, "end_idx": 16},
-                        },
-                        {
-                            "formatted": "1990",
-                            "label": "YEAR",
-                            "location": {"stt_idx": 9, "end_idx": 13},
-                        },
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_2[0]["entities"][0],
             ["DAY"],
             "1990-01-##",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {
-                            "formatted": "1",
-                            "label": "DAY",
-                            "location": {"stt_idx": 17, "end_idx": 19},
-                        },
-                        {
-                            "formatted": "1",
-                            "label": "MONTH",
-                            "location": {"stt_idx": 14, "end_idx": 16},
-                        },
-                        {
-                            "formatted": "1990",
-                            "label": "YEAR",
-                            "location": {"stt_idx": 9, "end_idx": 13},
-                        },
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_2[0]["entities"][0],
             ["MONTH"],
             "1990-##-01",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {
-                            "formatted": "1",
-                            "label": "DAY",
-                            "location": {"stt_idx": 17, "end_idx": 19},
-                        },
-                        {
-                            "formatted": "1",
-                            "label": "MONTH",
-                            "location": {"stt_idx": 14, "end_idx": 16},
-                        },
-                        {
-                            "formatted": "1990",
-                            "label": "YEAR",
-                            "location": {"stt_idx": 9, "end_idx": 13},
-                        },
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_2[0]["entities"][0],
             ["YEAR"],
             "####-01-01",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {
-                            "formatted": "1",
-                            "label": "DAY",
-                            "location": {"stt_idx": 17, "end_idx": 19},
-                        },
-                        {
-                            "formatted": "1",
-                            "label": "MONTH",
-                            "location": {"stt_idx": 14, "end_idx": 16},
-                        },
-                        {
-                            "formatted": "1990",
-                            "label": "YEAR",
-                            "location": {"stt_idx": 9, "end_idx": 13},
-                        },
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_2[0]["entities"][0],
             ["DAY", "MONTH"],
             "1990-##-##",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {
-                            "formatted": "1",
-                            "label": "DAY",
-                            "location": {"stt_idx": 17, "end_idx": 19},
-                        },
-                        {
-                            "formatted": "1",
-                            "label": "MONTH",
-                            "location": {"stt_idx": 14, "end_idx": 16},
-                        },
-                        {
-                            "formatted": "1990",
-                            "label": "YEAR",
-                            "location": {"stt_idx": 9, "end_idx": 13},
-                        },
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_2[0]["entities"][0],
             ["DAY", "YEAR"],
             "####-01-##",
         ),
         (
-            {
-                "text": "1990-01-01",
-                "location": {"stt_idx": 9, "end_idx": 19},
-                "best_label": "DOB",
-                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
-                "analysis_result": {
-                    "formatted": "1990-01-01T00:00:00",
-                    "subtypes": [
-                        {
-                            "formatted": "1",
-                            "label": "DAY",
-                            "location": {"stt_idx": 17, "end_idx": 19},
-                        },
-                        {
-                            "formatted": "1",
-                            "label": "MONTH",
-                            "location": {"stt_idx": 14, "end_idx": 16},
-                        },
-                        {
-                            "formatted": "1990",
-                            "label": "YEAR",
-                            "location": {"stt_idx": 9, "end_idx": 13},
-                        },
-                    ],
-                    "validation_assertions": [],
-                },
-            },
+            test_response_body.date_response_2[0]["entities"][0],
             ["DAY", "MONTH", "YEAR"],
             "####-##-##",
         ),
