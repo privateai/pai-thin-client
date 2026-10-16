@@ -49,3 +49,10 @@ def deidentify_text(
             )
         modified_texts.append(modified_text)
     return modified_texts
+
+
+def reidentify_process_text():
+    """
+    Rehydrate text that has PII removed.
+    """
+    pass
