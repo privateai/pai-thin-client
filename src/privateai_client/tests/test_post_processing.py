@@ -392,6 +392,20 @@ def test_age_bucket_processor(entity, bucket_size, processed_text):
     assert processor(entity) == processed_text
 
 
+def test_deidentify_text_with_age_bucketing():
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(test_response_body.age_repsonse_1).encode("utf-8")
+
+    text_out = deidentify_text(
+        text=["A 32-year old wants to travel."],
+        response=AnalyzeTextResponse(response),
+        entity_processors={"AGE": AgeEntityBucketProcessor(bin_size=5)},
+        default_processor=MaskEntityProcessor(),
+    )
+    assert text_out == ["A [30-34]-year old wants to travel."]
+
+
 # Date Shifting
 @pytest.mark.parametrize(
     argnames=["entity", "date_offset", "operator", "processed_text"],
@@ -425,6 +439,22 @@ def test_date_shifting_processor_wrong_arg():
         DateShiftProcessor(offset, "minus")
 
 
+def test_deidentify_text_with_date_shifting():
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(test_response_body.date_response_1).encode("utf-8")
+
+    text_out = deidentify_text(
+        text=["today is 1990-01-01."],
+        response=AnalyzeTextResponse(response),
+        entity_processors={
+            "DATE": DateShiftProcessor(date_offset=relativedelta(months=3))
+        },
+        default_processor=MaskEntityProcessor(),
+    )
+    assert text_out == ["today is [1990-04-01]."]
+
+
 # Date Bucketing
 @pytest.mark.parametrize(
     argnames=["entity", "date_bin", "processed_text"],
@@ -456,6 +486,20 @@ def test_date_bucketing_processor_wrong_arg():
     error_msg = "date_bin value: 'millennia' is not a valid value. Unable to initialize DateBucketProcessor."
     with pytest.raises(ValueError, match=error_msg):
         DateBucketProcessor("millennia")
+
+
+def test_deidentify_text_with_date_bucketing():
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(test_response_body.date_response_1).encode("utf-8")
+
+    text_out = deidentify_text(
+        text=["today is 1990-01-01."],
+        response=AnalyzeTextResponse(response),
+        entity_processors={"DATE": DateBucketProcessor(date_bin="year")},
+        default_processor=MaskEntityProcessor(),
+    )
+    assert text_out == ["today is [1990-01-01 and 1990-12-31]."]
 
 
 # Selective Date Component Redaction
@@ -502,3 +546,17 @@ def test_date_bucketing_processor_wrong_arg():
 def test_date_component_processor(entity, redact_date_comps, text_processed):
     processor = DateComponentProcessor(redact_date_comps)
     assert processor(entity) == text_processed
+
+
+def test_deidentify_text_with_date_comp_redaction():
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(test_response_body.date_response_1).encode("utf-8")
+
+    text_out = deidentify_text(
+        text=["today is 1990-01-01."],
+        response=AnalyzeTextResponse(response),
+        entity_processors={"DATE": DateComponentProcessor(redact_components=["DAY"])},
+        default_processor=MaskEntityProcessor(),
+    )
+    assert text_out == ["today is 1990-01-##."]
