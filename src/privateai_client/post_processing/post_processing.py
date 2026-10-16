@@ -1,6 +1,11 @@
 from typing import Callable
 
-from privateai_client.components import AnalyzeTextResponse, TextResponse
+from privateai_client.components import (
+    AnalyzeTextResponse,
+    FilesBase64Response,
+    FilesUriResponse,
+    TextResponse,
+)
 
 EntityProcessor = Callable[[dict], str]
 
@@ -51,8 +56,30 @@ def deidentify_text(
     return modified_texts
 
 
-def reidentify_process_text():
+def reidentify_process_text(
+    response: TextResponse | FilesBase64Response | FilesUriResponse,
+):
     """
     Rehydrate text that has PII removed.
+
+    Args:
+        response: The response object returned by `PAIClient.process_text()`, `PAIClient.process_files_base64()`,
+            and `PAIClient.process_files_uri()`containing detected entities.
     """
-    pass
+    returned_text_msgs = []
+    # handle linked batches
+    for text, entities in zip(response.processed_text, response.entities):
+        rehydrated_text = text
+        for entity in sorted(
+            entities, key=lambda e: e["location"]["stt_idx"], reverse=True
+        ):
+            start_idx = entity["location"]["stt_idx_processed"]
+            end_idx = entity["location"]["end_idx_processed"]
+            orig_text = entity["text"]
+
+            # put the text back together
+            rehydrated_text = (
+                rehydrated_text[:start_idx] + orig_text + rehydrated_text[end_idx:]
+            )
+        returned_text_msgs.append(rehydrated_text)
+    return returned_text_msgs

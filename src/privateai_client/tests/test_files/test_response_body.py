@@ -104,3 +104,16 @@ date_response_2 = [
         "languages_detected": {"en": 0.7509669661521912},
     }
 ]
+
+
+processed_text_response = [
+    {
+        "entities": [
+            {"processed_text": "", "text": "", "best_label": "", "labels": []}
+        ],
+        "entities_present": True,
+        "characters_processed": 0,
+        "lanuages_detected": {},
+        "processed_text": "",
+    }
+]
