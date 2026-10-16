@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from ..components.pai_responses import AnalyzeTextResponse
 from ..post_processing import (
     AgeEntityBucketProcessor,
+    DateBucketProcessor,
     DateShiftProcessor,
     FuzzyMatchEntityProcessor,
     MarkerEntityProcessor,
@@ -501,12 +502,78 @@ def test_date_shifting_processor_wrong_arg():
 
 
 # Date Bucketing
-def test_date_bucketing_processor():
-    pass
+@pytest.mark.parametrize(
+    argnames=["entity", "date_bin", "processed_text"],
+    argvalues=[
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            "decade",
+            "[1990-01-01 and 1999-12-31]",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            "year",
+            "[1990-01-01 and 1990-12-31]",
+        ),
+        (
+            {
+                "text": "1990-01-01",
+                "location": {"stt_idx": 9, "end_idx": 19},
+                "best_label": "DOB",
+                "labels": {"DOB": 0.8460723161697388, "DATE": 0.07507945299148559},
+                "analysis_result": {
+                    "formatted": "1990-01-01T00:00:00",
+                    "subtypes": [
+                        {"formatted": "1", "label": "DAY"},
+                        {"formatted": "1", "label": "MONTH"},
+                        {"formatted": "1990", "label": "YEAR"},
+                    ],
+                    "validation_assertions": [],
+                },
+            },
+            "month",
+            "[1990-01-01 and 1990-01-31]",
+        ),
+    ],
+)
+def test_date_bucketing_processor(entity, date_bin, text_processed):
+    processor = DateBucketProcessor(date_bin)
+    assert processor(entity) == text_processed
 
 
 def test_date_bucketing_processor_wrong_arg():
-    pass
+    # checking error handling
+    error_msg = "date_bin value: 'millennia' is not a valid value. Unable to initialize DateBucketProcessor."
+    with pytest.raises(ValueError, match=error_msg):
+        DateBucketProcessor("millennia")
 
 
 # Selective Date Component Redaction
