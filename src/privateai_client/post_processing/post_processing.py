@@ -49,14 +49,3 @@ def deidentify_text(
             )
         modified_texts.append(modified_text)
     return modified_texts
-
-
-def replace_names(response: TextResponse) -> list[str]:
-    """ """
-    acceptable_entities = [
-        "NAME",
-        "NAME_GIVEN",
-        "NAME_FAMILY",
-        "NAME_MEDICAL_PROFESSIONAL",
-    ]
-    pass
