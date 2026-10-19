@@ -20,6 +20,20 @@ from ..post_processing import (
 from ..tests.test_files import test_response_body
 
 
+# helper functions
+def make_fake_response(response_body: list[dict]) -> requests.Response:
+    """
+    Make a fake response that is made by the Requests library
+
+    Arg:
+        response_body: a json structured list representing a http response body from the DEID container.
+    """
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(response_body).encode("utf-8")
+    return response
+
+
 # Deidentify text
 def test_deidentify_text_no_entities():
     response = requests.Response()
@@ -388,15 +402,26 @@ def test_deidentify_text_with_synthetic_replacements():
         ),
     ],
 )
-def test_age_bucket_processor(entity, bucket_size, text_processed):
+def test_age_bucket_processor(
+    entity: list[dict], bucket_size: int, text_processed: str
+):
+    """
+    Testing the age bucketing post-processor.
+
+    Args:
+        entity: a list of entities found by the DEID container.
+        bucket_size: the size of a bucket in years
+        text_processed: the expected output text from the AgeEntityBucketProcessor() function
+    """
     processor = AgeEntityBucketProcessor(bin_size=bucket_size)
     assert processor(entity) == text_processed
 
 
 def test_deidentify_text_with_age_bucketing():
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps(test_response_body.age_repsonse_1).encode("utf-8")
+    """
+    Test de-identifying text and age bucketing post-processors.
+    """
+    response = make_fake_response(test_response_body.age_repsonse_1)
 
     text_out = deidentify_text(
         text=["A 32-year old wants to travel."],
@@ -425,12 +450,26 @@ def test_deidentify_text_with_age_bucketing():
         ),
     ],
 )
-def test_date_shifting_processor(entity, date_offset, operator, text_processed):
+def test_date_shifting_processor(
+    entity: list[dict], date_offset: relativedelta, operator: str, text_processed: str
+):
+    """
+    Testing the date shifting post-processor.
+
+    Args:
+        entity: a list of entities found by the DEID container.
+        date_offset: the amount of time to change the date by.
+        operator: whether to 'add' or 'subtract' the date offset.
+        text_processed: the expected output text from the DateShiftProcessor() function
+    """
     processor = DateShiftProcessor(date_offset, operator)
     assert processor(entity) == text_processed
 
 
 def test_date_shifting_processor_wrong_arg():
+    """
+    Test passing the date shifting post-processor an incorrect argument.
+    """
     offset = relativedelta(months=3)
     # checking error handling
     error_msg = (
@@ -441,9 +480,10 @@ def test_date_shifting_processor_wrong_arg():
 
 
 def test_deidentify_text_with_date_shifting():
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps(test_response_body.date_response_1).encode("utf-8")
+    """
+    Test de-identifying text and date shifting post-processors.
+    """
+    response = make_fake_response(test_response_body.date_response_1)
 
     text_out = deidentify_text(
         text=["today is 1990-01-01."],
@@ -478,12 +518,25 @@ def test_deidentify_text_with_date_shifting():
         ),
     ],
 )
-def test_date_bucketing_processor(entity, date_bin, text_processed):
+def test_date_bucketing_processor(
+    entity: list[dict], date_bin: str, text_processed: str
+):
+    """
+    Testing the date bucketing post-processor.
+
+    Args:
+        entity: a list of entities found by the DEID container.
+        date_bin: a time horizon to bucket dates into, such as month, year, decade.
+        text_processed: the expected output text from the DateBucketProcessor() function
+    """
     processor = DateBucketProcessor(date_bin)
     assert processor(entity) == text_processed
 
 
 def test_date_bucketing_processor_wrong_arg():
+    """
+    Test passing the date bucketing post-processor an incorrect argument.
+    """
     # checking error handling
     error_msg = "ate_bin value: millennia is not a valid value. Unable to initialize DateBucketProcessor."
     with pytest.raises(ValueError, match=error_msg):
@@ -491,9 +544,10 @@ def test_date_bucketing_processor_wrong_arg():
 
 
 def test_deidentify_text_with_date_bucketing():
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps(test_response_body.date_response_1).encode("utf-8")
+    """
+    Test de-identifying text and date bucketing post-processors.
+    """
+    response = make_fake_response(test_response_body.date_response_1)
 
     text_out = deidentify_text(
         text=["today is 1990-01-01."],
@@ -548,15 +602,26 @@ def test_deidentify_text_with_date_bucketing():
         ),
     ],
 )
-def test_date_component_processor(entity, redact_date_comps, text_processed):
+def test_date_component_processor(
+    entity: list[dict], redact_date_comps: list[str], text_processed: str
+):
+    """
+    Testing the selective date redaction post-processor.
+
+    Args:
+        entity: a list of entities found by the DEID container.
+        redact_date_comps: a list of date components to redact.
+        text_processed: the expected output text from the DateComponentProcessor() function
+    """
     processor = DateComponentProcessor(redact_date_comps)
     assert processor(entity) == text_processed
 
 
 def test_deidentify_text_with_date_comp_redaction():
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps(test_response_body.date_response_2).encode("utf-8")
+    """
+    Test de-identifying text and selective date redation post-processors.
+    """
+    response = make_fake_response(test_response_body.date_response_2)
 
     text_out = deidentify_text(
         text=["today is 1990-01-01."],
@@ -571,19 +636,6 @@ def test_deidentify_text_with_date_comp_redaction():
 
 
 # rehydrate PII
-def make_fake_response(response_body: list[dict]) -> requests.Response:
-    """
-    Make a fake response that is made by the Requests library
-
-    Arg:
-        response_body: a json structured list representing a http response body from the DEID container.
-    """
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps(response_body).encode("utf-8")
-    return response
-
-
 @pytest.mark.parametrize(
     argnames=["response", "text_processed"],
     argvalues=[
@@ -602,13 +654,10 @@ def test_rehydrate_PII(response: list[dict], text_processed: str):
     Test for placing PII data back into a redacted text.
 
     Args:
-        response: a http response from the DEID container process/text endpoint.
+        response: a json structured list representing a http response body from the DEID container.
         text_processed: the expected output text from the reidentify_process_text() function
     """
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps(response).encode("utf-8")
+    process_text_response = make_fake_response(response)
 
-    text_out = reidentify_process_text(response=TextResponse(response))
-    expected_txt = text_processed
-    assert text_out == [expected_txt]
+    text_out = reidentify_process_text(response=TextResponse(process_text_response))
+    assert text_out == [text_processed]
