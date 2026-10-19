@@ -176,6 +176,11 @@ class AnalyzeTextResponse(NerTextResponse):
     def analysis_result(self):
         return self.get_attribute_entries("analysis_result")
 
+    def to_text_response(self, response_object: Response = None):
+        if response_object is None:
+            response_object = self.response
+        return TextResponse(response_object)
+
 
 class TextResponse(DemiTextResponse):
     def __init__(self, response_object: Response = None):

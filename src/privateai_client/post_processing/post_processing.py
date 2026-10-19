@@ -1,4 +1,7 @@
+import json
 from typing import Callable
+
+import requests
 
 from privateai_client.components import (
     AnalyzeTextResponse,
@@ -15,6 +18,7 @@ def deidentify_text(
     response: AnalyzeTextResponse,
     entity_processors: dict[str, EntityProcessor],
     default_processor: EntityProcessor,
+    convert_response: bool = False,
 ) -> list[str]:
     """
     Deidentifies analyzed text by processing entities with multiple processors, adjusting text dynamically.
@@ -26,16 +30,28 @@ def deidentify_text(
             `{ENTITY_TYPE: entity_processor_fn}`, where `entity_processor_fn` takes an entity dictionary
             and returns modified text for all occurrences of that entity type.
         default_processor: A fallback function used to process entities not found in `entity_processors`.
+        convert_response: inidcates whether you want to modify the existing AnalyzeResponse into a TextResponse.
 
 
     Returns:
         A list of de-identified text messages, with the same length and order as the `text` argument.
 
     """
+    # only used if convert_response
+    redactions = []
+
     modified_texts = []
-    for t, entities in zip(text, response.entities):
+    for t, entities, chars_processed, langs in zip(
+        text,
+        response.entities,
+        response.characters_processed,
+        response.languages_detected,
+    ):
         offset = 0
         modified_text = t
+        # only used if convert_response
+        converted_entities = []
+
         for entity in sorted(entities, key=lambda e: e["location"]["stt_idx"]):
             start_idx = entity["location"]["stt_idx"] + offset
             end_idx = entity["location"]["end_idx"] + offset
@@ -52,12 +68,44 @@ def deidentify_text(
                 + modified_entity_text
                 + modified_text[end_idx:]
             )
+
+            # construct a new response, if client wants a text response for de-identification
+            if convert_response:
+                entity_details = dict(entity)
+                modified_locations = entity_details["location"]
+                modified_locations["stt_idx_processed"] = start_idx
+                modified_locations["end_idx_processed"] = start_idx + len(
+                    modified_entity_text
+                )
+                # add in the processed replacement text
+                entity_details["processed_text"] = modified_entity_text
+                converted_entities.append(entity_details)
+        # add the processed text to the linked batch
         modified_texts.append(modified_text)
+
+        if convert_response:
+            redacted_msg_dtls = {
+                "entities": converted_entities,
+                "entities_present": len(converted_entities) > 0,
+                "characters_processed": chars_processed,
+                "languages_detected": langs,
+                "processed_text": modified_text,
+            }
+            redactions.append(redacted_msg_dtls)
+    # make a new response from the post-processed redaction
+    if len(redactions) > 0:
+        temp_response = requests.Response()
+        temp_response.status_code = 200
+        temp_response._content = json.dumps(redactions).encode("utf-8")
+        response.response = temp_response
     return modified_texts
 
 
 def reidentify_process_text(
-    response: TextResponse | FilesBase64Response | FilesUriResponse,
+    response: AnalyzeTextResponse
+    | TextResponse
+    | FilesBase64Response
+    | FilesUriResponse,
 ):
     """
     Rehydrate text that has PII removed.
@@ -66,6 +114,9 @@ def reidentify_process_text(
         response: The response object returned by `PAIClient.process_text()`, `PAIClient.process_files_base64()`,
             and `PAIClient.process_files_uri()`containing detected entities.
     """
+    if isinstance(response, AnalyzeTextResponse):
+        # if its an Analyze text response, convert it to a TextResponse
+        response.to_text_response()
     returned_text_msgs = []
     # handle linked batches
     for text, entities in zip(response.processed_text, response.entities):
