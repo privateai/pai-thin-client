@@ -4,7 +4,7 @@ import pytest
 import requests
 from dateutil.relativedelta import relativedelta
 
-from ..components.pai_responses import AnalyzeTextResponse
+from ..components.pai_responses import AnalyzeTextResponse, TextResponse
 from ..post_processing import (
     AgeEntityBucketProcessor,
     DateBucketProcessor,
@@ -15,6 +15,7 @@ from ..post_processing import (
     MaskEntityProcessor,
     SyntheticReplacementProcessor,
     deidentify_text,
+    reidentify_process_text,
 )
 from ..tests.test_files import test_response_body
 
@@ -567,3 +568,47 @@ def test_deidentify_text_with_date_comp_redaction():
         default_processor=MaskEntityProcessor(),
     )
     assert text_out == ["today is 1990-01-##."]
+
+
+# rehydrate PII
+def make_fake_response(response_body: list[dict]) -> requests.Response:
+    """
+    Make a fake response that is made by the Requests library
+
+    Arg:
+        response_body: a json structured list representing a http response body from the DEID container.
+    """
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(response_body).encode("utf-8")
+    return response
+
+
+@pytest.mark.parametrize(
+    argnames=["response", "text_processed"],
+    argvalues=[
+        (
+            test_response_body.processed_text_response_1,
+            "Case info. Good afternoon. Thank you for calling the Georgia Division of Transportation. My name is miss Johanna, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? 614-5555 01. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? Jiminy Cricket. 12345. I am Bob Douglas. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? 123 Fake St, Atlanta, Georgia 40234, You said my phone number? Phone number and email, please. 555-666-7777@bob.douglas@gmail.com. Alright, ma am. Thank you so much for verifying that information today.",
+        ),
+        (
+            test_response_body.processed_text_response_2,
+            "Case info. Good afternoon. Thank you for calling the Georgia Division of Transportation. My name is miss Johanna, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? 614-5555 01. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? Jiminy Cricket. 12345. I am Bob Douglas. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? 123 Fake St, Atlanta, Georgia 40234, You said my phone number? Phone number and email, please. 555-666-7777@bob.douglas@gmail.com. Alright, ma am. Thank you so much for verifying that information today.",
+        ),
+    ],
+)
+def test_rehydrate_PII(response: list[dict], text_processed: str):
+    """
+    Test for placing PII data back into a redacted text.
+
+    Args:
+        response: a http response from the DEID container process/text endpoint.
+        text_processed: the expected output text from the reidentify_process_text() function
+    """
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps(response).encode("utf-8")
+
+    text_out = reidentify_process_text(response=TextResponse(response))
+    expected_txt = text_processed
+    assert text_out == [expected_txt]
