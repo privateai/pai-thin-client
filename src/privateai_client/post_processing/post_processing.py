@@ -114,10 +114,18 @@ def reidentify_process_text(
         response: The response object returned by `PAIClient.process_text()`, `PAIClient.process_files_base64()`,
             and `PAIClient.process_files_uri()`containing detected entities.
     """
+    returned_text_msgs = []
+
     if isinstance(response, AnalyzeTextResponse):
         # if its an Analyze text response, convert it to a TextResponse
-        response.to_text_response()
-    returned_text_msgs = []
+        redacted_text_key = "processed_text"
+        json_resp_keys = response.body[0].keys()
+        if redacted_text_key in json_resp_keys:
+            response.to_text_response()
+        else:
+            err_msg = f"This response has no key '{redacted_text_key}'."
+            raise KeyError(err_msg)
+
     # handle linked batches
     for text, entities in zip(response.processed_text, response.entities):
         rehydrated_text = text
