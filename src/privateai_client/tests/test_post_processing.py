@@ -1,4 +1,5 @@
 import json
+from typing import Callable
 
 import pytest
 import requests
@@ -18,6 +19,8 @@ from ..post_processing import (
     reidentify_process_text,
 )
 from ..tests.test_files import test_response_body
+
+EntityProcessor = Callable[[dict], str]
 
 
 # helper functions
@@ -661,3 +664,51 @@ def test_rehydrate_PII(response: list[dict], text_processed: str):
 
     text_out = reidentify_process_text(response=TextResponse(process_text_response))
     assert text_out == [text_processed]
+
+
+# test_response_body.analyze_text_1
+@pytest.mark.parametrize(
+    argnames=["text", "response_json", "entity_processors", "default_processor"],
+    argvalues=[
+        (
+            test_response_body.analyze_text_1,
+            test_response_body.analyze_response_1,
+            {"AGE": AgeEntityBucketProcessor(bin_size=5)},
+            MaskEntityProcessor(),
+        ),
+        (
+            test_response_body.analyze_text_1,
+            test_response_body.analyze_response_1,
+            {
+                "AGE": AgeEntityBucketProcessor(bin_size=7),
+                "DATE": DateBucketProcessor("month"),
+                "DOB": DateComponentProcessor(redact_components=["DAY"]),
+            },
+            MarkerEntityProcessor(),
+        ),
+    ],
+)
+def test_analyze_deidentify_rehydrate_PII(
+    text: list[str],
+    response_json: list[dict],
+    entity_processors: dict[str, EntityProcessor],
+    default_processor: EntityProcessor,
+):
+    """
+    Test redacting text using the http AnalyzeResponse and rehydrating the redacted processed text in
+    the converted response back into the original text.
+    """
+    response = AnalyzeTextResponse(make_fake_response(response_json))
+
+    redacted_text_out = deidentify_text(
+        text=text,
+        response=response,
+        entity_processors=entity_processors,
+        default_processor=default_processor,
+        convert_response=True,
+    )
+
+    rehydrated_text_out = reidentify_process_text(response)
+
+    assert text == rehydrated_text_out
+    assert isinstance(redacted_text_out, str)
