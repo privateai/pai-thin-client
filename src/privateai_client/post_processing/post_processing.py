@@ -121,7 +121,7 @@ def reidentify_process_text(
         redacted_text_key = "processed_text"
         json_resp_keys = response.body[0].keys()
         if redacted_text_key in json_resp_keys:
-            response.to_text_response()
+            response = response.to_text_response()
         else:
             err_msg = f"This response has no key '{redacted_text_key}'."
             raise KeyError(err_msg)

@@ -654,7 +654,7 @@ def test_deidentify_text_with_date_comp_redaction():
 )
 def test_rehydrate_PII(response: list[dict], text_processed: str):
     """
-    Test for placing PII data back into a redacted text.
+    Test for placing PII data back into a redacted text using the process/text endpoint response (TextResponse).
 
     Args:
         response: a json structured list representing a http response body from the DEID container.
@@ -695,8 +695,8 @@ def test_analyze_deidentify_rehydrate_PII(
     default_processor: EntityProcessor,
 ):
     """
-    Test redacting text using the http AnalyzeResponse and rehydrating the redacted processed text in
-    the converted response back into the original text.
+    Test redacting text using the analyze/text endpoint response (AnalyzeResponse) and rehydrating
+    the redacted processed text in the converted AnalyzeResponse back into the original text.
     """
     response = AnalyzeTextResponse(make_fake_response(response_json))
 
@@ -711,4 +711,6 @@ def test_analyze_deidentify_rehydrate_PII(
     rehydrated_text_out = reidentify_process_text(response)
 
     assert text == rehydrated_text_out
-    assert isinstance(redacted_text_out, str)
+    assert isinstance(redacted_text_out, list) and all(
+        isinstance(text_blk, str) for text_blk in redacted_text_out
+    )
