@@ -644,11 +644,11 @@ def test_deidentify_text_with_date_comp_redaction():
     argvalues=[
         (
             test_response_body.processed_text_response_1,
-            "Case info. Good afternoon. Thank you for calling the Georgia Division of Transportation. My name is miss Johanna, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? 614-5555 01. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? Jiminy Cricket. 12345. I am Bob Douglas. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? 123 Fake St, Atlanta, Georgia 40234, You said my phone number? Phone number and email, please. 555-666-7777@bob.douglas@gmail.com. Alright, ma am. Thank you so much for verifying that information today.",
+            test_response_body.process_text_1[0],
         ),
         (
             test_response_body.processed_text_response_2,
-            "Case info. Good afternoon. Thank you for calling the Georgia Division of Transportation. My name is miss Johanna, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? 614-5555 01. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? Jiminy Cricket. 12345. I am Bob Douglas. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? 123 Fake St, Atlanta, Georgia 40234, You said my phone number? Phone number and email, please. 555-666-7777@bob.douglas@gmail.com. Alright, ma am. Thank you so much for verifying that information today.",
+            test_response_body.process_text_1[0],
         ),
     ],
 )
@@ -666,7 +666,6 @@ def test_rehydrate_PII(response: list[dict], text_processed: str):
     assert text_out == [text_processed]
 
 
-# test_response_body.analyze_text_1
 @pytest.mark.parametrize(
     argnames=["text", "response_json", "entity_processors", "default_processor"],
     argvalues=[
@@ -697,6 +696,13 @@ def test_analyze_deidentify_rehydrate_PII(
     """
     Test redacting text using the analyze/text endpoint response (AnalyzeResponse) and rehydrating
     the redacted processed text in the converted AnalyzeResponse back into the original text.
+
+    Args:
+        text: the original text that needs to be redacted.
+        response_json: a json response returned by the analyze/text endpoint.
+        entity_processors: a dictionary associating entity processors with entities.
+        default_processor: the processor to use if an entity doesn't have an explicit entity processor associated
+            with it.
     """
     response = AnalyzeTextResponse(make_fake_response(response_json))
 
