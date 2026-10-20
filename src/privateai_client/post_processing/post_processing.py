@@ -106,7 +106,7 @@ def reidentify_process_text(
     | TextResponse
     | FilesBase64Response
     | FilesUriResponse,
-):
+) -> list[str]:
     """
     Rehydrate text that has PII removed.
 
