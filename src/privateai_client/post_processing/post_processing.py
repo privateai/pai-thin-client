@@ -132,6 +132,9 @@ def post_redacted_text(
             curr_entity = entity["best_label"]
             # skip any entities that aren't specified by the entity_processors
             if curr_entity not in entity_processors:
+                # adjust entity locations based on prior changes
+                entity["location"]["stt_idx_processed"] += offset
+                entity["location"]["end_idx_processed"] += offset
                 continue
 
             start_idx = entity["location"]["stt_idx_processed"] + offset
@@ -163,6 +166,10 @@ def post_redacted_text(
                     entity["processed_text"] = modified_entity_text
             except AttributeError as e:
                 logging.warning(e)
+                # since no changes occur when errors are raised, adjust entity
+                # locations based on prior changes
+                entity["location"]["stt_idx_processed"] += offset
+                entity["location"]["end_idx_processed"] += offset
                 continue
         # add the processed text to the linked batch
         redacted_msg_dtls = {
