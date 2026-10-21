@@ -117,9 +117,12 @@ def post_redacted_text(
     Returns:
          A list of de-identified text messages, with the transformations applied to entities specified by the entity_processor.
     """
-    post_processed_text_blks = []
-    for redacted_text_blk, entities_in_text_blk in zip(
-        response.processed_text, response.entities
+    redactions = []
+    for redacted_text_blk, entities_in_text_blk, chars_processed, langs in zip(
+        response.processed_text,
+        response.entities,
+        response.characters_processed,
+        response.languages_detected,
     ):
         offset = 0
         modified_txt_blk = redacted_text_blk
@@ -140,9 +143,8 @@ def post_redacted_text(
                 if processor.can_process_text_response():
                     modified_entity_text = processor(entity)
 
-                    length_diff = len(modified_entity_text) - len(
-                        entity["processed_text"]
-                    )
+                    # use the span length, since the marker in the text includes brackets
+                    length_diff = len(modified_entity_text) - (end_idx - start_idx)
                     offset += length_diff
 
                     modified_txt_blk = (
@@ -163,10 +165,21 @@ def post_redacted_text(
                 logging.warning(e)
                 continue
         # add the processed text to the linked batch
-        post_processed_text_blks.append(modified_txt_blk)
+        redacted_msg_dtls = {
+            "entities": entities_in_text_blk,
+            "entities_present": len(entities_in_text_blk) > 0,
+            "characters_processed": chars_processed,
+            "languages_detected": langs,
+            "processed_text": modified_txt_blk,
+        }
+        redactions.append(redacted_msg_dtls)
     # add all text blocks back to the response
-    response.processed_text = post_processed_text_blks
-    return post_processed_text_blks
+    if len(redactions) > 0:
+        temp_response = requests.Response()
+        temp_response.status_code = 200
+        temp_response._content = json.dumps(redactions).encode("utf-8")
+        response.response = temp_response
+    return response.processed_text
 
 
 def reidentify_process_text(response: AnalyzeTextResponse | TextResponse) -> list[str]:

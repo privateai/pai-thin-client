@@ -678,12 +678,14 @@ def test_post_redacted_text(
         text_processed: the expected output text from the post_redacted_text() function
     """
     process_text_response = TextResponse(make_fake_response(response_json))
-    response_before = copy.deepcopy(process_text_response.entities)
+    response_before = copy.deepcopy(process_text_response)
 
     # start post-processing of the text response
     reprocessed_redaction = post_redacted_text(process_text_response, entity_processors)
 
+    # test the transformations were done correctly
     assert text_processed == reprocessed_redaction[0]
+    # also ensure that the response changed
     assert process_text_response.processed_text != response_before.processed_text
     assert process_text_response.entities != response_before.entities
 
