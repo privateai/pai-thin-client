@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
 
+from dateutil import parser
 from dateutil.relativedelta import relativedelta
 
+from .base_processor import BaseProcessor
 
-class DateShiftProcessor:
+
+class DateShiftProcessor(BaseProcessor):
     """
     Scales dates by a defined offset.
     """
@@ -22,6 +25,9 @@ class DateShiftProcessor:
             operation:denotes whether the offset is added/subtracted from the original date.
             date_format: a python date code used to format the outputted dates.
         """
+        super().__init__()
+        # ensure processor can be accessed by a TextResponse
+        self._can_process_textresp = True
         # validate operation values
         valid_operations = ["add", "subtract"]
         if operation.lower() in valid_operations:
@@ -69,9 +75,21 @@ class DateShiftProcessor:
             >>> anon_text_blocks
                 ["today is [1990-04-01]."]
         """
-        # iso-8601 format: date as year-month-day
-        iso_date_str = entity["analysis_result"].get("formatted")
-        date_obj = datetime.fromisoformat(iso_date_str)
+        # validate we are only processing dates
+        valid_entities = ["DATE", "DATE_OF_DEATH", "DOB"]
+        curr_entity = entity["best_label"]
+        if curr_entity not in valid_entities:
+            raise ValueError(
+                f"DateShiftProcessor can't be applied to the {curr_entity} entity."
+            )
+
+        # start processing
+        if "analysis_result" not in entity:
+            date_obj = parser.parse(entity["text"])
+        else:
+            # iso-8601 format: date as year-month-day
+            iso_date_str = entity["analysis_result"].get("formatted")
+            date_obj = datetime.fromisoformat(iso_date_str)
 
         # select the operation
         if self._operation == "add":
@@ -81,7 +99,7 @@ class DateShiftProcessor:
         return f"[{new_date.strftime(self._date_format)}]"
 
 
-class DateBucketProcessor:
+class DateBucketProcessor(BaseProcessor):
     """
     Bin date entities into defined buckets.
     """
@@ -95,6 +113,9 @@ class DateBucketProcessor:
                 "year", and "month".
             date_format: a python date code used to format the outputted dates.
         """
+        super().__init__()
+        # ensure processor can be accessed by a TextResponse
+        self._can_process_textresp = True
         # check for valid bin values
         valid_date_bins = ["decade", "year", "month"]
         if date_bin.lower() in valid_date_bins:
@@ -141,9 +162,21 @@ class DateBucketProcessor:
             >>> anon_text_blocks
                 ["today is [1990-01-01 and 1990-12-31]."]
         """
-        # iso-8601 format: date as year-month-day
-        iso_date_str = entity["analysis_result"].get("formatted")
-        date_obj = datetime.fromisoformat(iso_date_str)
+        # validate we are only processing dates
+        valid_entities = ["DATE", "DATE_OF_DEATH", "DOB"]
+        curr_entity = entity["best_label"]
+        if curr_entity not in valid_entities:
+            raise ValueError(
+                f"DateBucketProcessor can't be applied to the {curr_entity} entity."
+            )
+
+        # start processing
+        if "analysis_result" not in entity:
+            date_obj = parser.parse(entity["text"])
+        else:
+            # iso-8601 format: date as year-month-day
+            iso_date_str = entity["analysis_result"].get("formatted")
+            date_obj = datetime.fromisoformat(iso_date_str)
 
         # start period
         if self._date_bin == "decade":
@@ -166,7 +199,7 @@ class DateBucketProcessor:
         return f"[{strt_date.strftime(self._date_format)} to {end_date.strftime(self._date_format)}]"
 
 
-class DateComponentProcessor:
+class DateComponentProcessor(BaseProcessor):
     """
     Redact select part of a date.
     """
@@ -178,6 +211,9 @@ class DateComponentProcessor:
         Args:
             redact_component: the date compnents that need to be redacted.
         """
+        super().__init__()
+        # ensure processor can be accessed by a TextResponse
+        self._can_process_textresp = True
         # valid date redacted date components
         valid_date_comps = ["DAY", "MONTH", "YEAR"]
         for date_comp in redact_components:
@@ -223,11 +259,38 @@ class DateComponentProcessor:
             >>> anon_text_blocks
                 ["today is 1990-01-##."]
         """
-        offset = entity["location"]["stt_idx"]
-        text = entity["text"]
-        for subtype in entity["analysis_result"]["subtypes"]:
-            if subtype["label"] in self._redact_components and "location" in subtype:
-                stt = subtype["location"]["stt_idx"] - offset
-                end = subtype["location"]["end_idx"] - offset
-                text = text[:stt] + "#" * (end - stt) + text[end:]
+        # validate we are only processing dates
+        valid_entities = ["DATE", "DATE_OF_DEATH", "DOB"]
+        curr_entity = entity["best_label"]
+        if curr_entity not in valid_entities:
+            raise ValueError(
+                f"DateComponentProcessor can't be applied to the {curr_entity} entity."
+            )
+
+        # start processing
+        if "analysis_result" not in entity:
+            date_obj = parser.parse(entity["text"])
+            date_format_dict = {"YEAR": "%Y", "MONTH": "%m", "DAY": "%d"}
+            delimiter = ""
+            format_str = ""
+            for date_element, format_code in date_format_dict.items():
+                format_str += delimiter
+                if date_element not in self._redact_components:
+                    format_str += format_code
+                else:
+                    num_chars = 4 if date_element == "Year" else 2
+                    format_str += "#" * num_chars
+                delimiter = "-"
+            text = date_obj.strftime(format_str)
+        else:
+            offset = entity["location"]["stt_idx"]
+            text = entity["text"]
+            for subtype in entity["analysis_result"]["subtypes"]:
+                if (
+                    subtype["label"] in self._redact_components
+                    and "location" in subtype
+                ):
+                    stt = subtype["location"]["stt_idx"] - offset
+                    end = subtype["location"]["end_idx"] - offset
+                    text = text[:stt] + "#" * (end - stt) + text[end:]
         return text

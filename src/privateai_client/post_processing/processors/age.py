@@ -1,4 +1,7 @@
-class AgeEntityBucketProcessor:
+from .base_processor import BaseProcessor
+
+
+class AgeEntityBucketProcessor(BaseProcessor):
     """
     Bin age entities found by the DEID container into consistently sized buckets.
     """
@@ -7,10 +10,12 @@ class AgeEntityBucketProcessor:
         """
         Initialize the AgeEntityBucketProcessor.
 
-         Args:
+        Args:
             bin_size: the size of each bin (measured in years) used to bucket ages. Buckets start at age zero and
                 progress in multiple of the bin_size.
         """
+        super().__init__()
+        self._can_process_textresp = True
         self.bin_size = bin_size
 
     def __call__(self, entity: dict) -> str:
@@ -48,10 +53,29 @@ class AgeEntityBucketProcessor:
             >>> anon_text_blocks
                 ["A [30-34]-year old wants to travel."]
         """
-        formatted_age = entity["analysis_result"].get("formatted")
-        if not formatted_age:
-            return "[%-%]"
+        # validate we are only processing ages
+        curr_entity = entity["best_label"]
+        if curr_entity != "AGE":
+            raise ValueError(
+                f"AgeEntityBucketProcessor only works on the 'AGE' entity, not {curr_entity}."
+            )
 
-        start_age = (formatted_age // self.bin_size) * self.bin_size
-        end_age = start_age + self.bin_size
-        return f"[{start_age}-{end_age-1}]"
+        # start processing
+        default_marker = "[%-%]"
+        if "analysis_result" not in entity:
+            formatted_age = (
+                int(entity["text"]) if entity["text"].isnumeric() else default_marker
+            )
+        else:
+            formatted_age = entity["analysis_result"].get("formatted")
+            if not formatted_age:
+                # only executes if value for formatted is None
+                formatted_age = default_marker
+
+        if isinstance(formatted_age, int):
+            start_age = (formatted_age // self.bin_size) * self.bin_size
+            end_age = start_age + self.bin_size
+            result = f"[{start_age}-{end_age-1}]"
+        else:
+            result = formatted_age
+        return result

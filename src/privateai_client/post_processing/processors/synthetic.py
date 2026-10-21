@@ -1,4 +1,7 @@
-class SyntheticReplacementProcessor:
+from .base_processor import BaseProcessor
+
+
+class SyntheticReplacementProcessor(BaseProcessor):
     def __call__(self, entity: dict) -> str:
         if "synthetic_text" not in entity:
             entity_type = entity["best_label"]

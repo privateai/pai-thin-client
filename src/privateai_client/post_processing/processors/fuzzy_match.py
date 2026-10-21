@@ -3,8 +3,10 @@ from typing import Literal
 
 from pyxdameraulevenshtein import damerau_levenshtein_distance
 
+from .base_processor import BaseProcessor
 
-class FuzzyMatchEntityProcessor:
+
+class FuzzyMatchEntityProcessor(BaseProcessor):
     def __init__(
         self,
         known_words_list: list[str] | tuple[str] | set[str],
@@ -14,6 +16,7 @@ class FuzzyMatchEntityProcessor:
         masking_character: str = "#",
         ignore_casing: bool = True,
     ):
+        super().__init__()
         self.known_words_list = known_words_list
         self.threshold = threshold
         self.process_type = process_type

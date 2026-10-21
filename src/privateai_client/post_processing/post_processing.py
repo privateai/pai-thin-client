@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Callable
 
 import requests
@@ -116,15 +117,59 @@ def post_redacted_text(
     Returns:
          A list of de-identified text messages, with the transformations applied to entities specified by the entity_processor.
     """
-    pass
+    post_processed_text_blks = []
+    for redacted_text_blk, entities_in_text_blk in zip(
+        response.processed_text, response.entities
+    ):
+        offset = 0
+        modified_txt_blk = redacted_text_blk
+        for entity in sorted(
+            entities_in_text_blk, key=lambda e: e["location"]["stt_idx"]
+        ):
+            curr_entity = entity["best_label"]
+            # skip any entities that aren't specified by the entity_processors
+            if curr_entity not in entity_processors:
+                continue
+
+            start_idx = entity["location"]["stt_idx_processed"] + offset
+            end_idx = entity["location"]["end_idx_processed"] + offset
+
+            # each processor is associated with the entity it should be used for using the dict key
+            processor = entity_processors.get(curr_entity)
+            try:
+                if processor.can_process_text_response():
+                    modified_entity_text = processor(entity)
+
+                    length_diff = len(modified_entity_text) - len(
+                        entity["processed_text"]
+                    )
+                    offset += length_diff
+
+                    modified_txt_blk = (
+                        modified_txt_blk[:start_idx]
+                        + modified_entity_text
+                        + modified_txt_blk[end_idx:]
+                    )
+
+                    # modify the processed text response for de-identification
+                    entity_locations = entity["location"]
+                    entity_locations["stt_idx_processed"] = start_idx
+                    entity_locations["end_idx_processed"] = start_idx + len(
+                        modified_entity_text
+                    )
+                    # add in the processed replacement text
+                    entity["processed_text"] = modified_entity_text
+            except AttributeError as e:
+                logging.warning(e)
+                continue
+        # add the processed text to the linked batch
+        post_processed_text_blks.append(modified_txt_blk)
+    # add all text blocks back to the response
+    response.processed_text = post_processed_text_blks
+    return post_processed_text_blks
 
 
-def reidentify_process_text(
-    response: AnalyzeTextResponse
-    | TextResponse
-    | FilesBase64Response
-    | FilesUriResponse,
-) -> list[str]:
+def reidentify_process_text(response: AnalyzeTextResponse | TextResponse) -> list[str]:
     """
     Rehydrate text that has PII removed.
 
