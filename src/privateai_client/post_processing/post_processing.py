@@ -101,6 +101,24 @@ def deidentify_text(
     return modified_texts
 
 
+def post_redacted_text(
+    response: TextResponse, entity_processors: dict[str, EntityProcessor]
+) -> list[str]:
+    """
+    Post-process TextResponse from the process/text endpoint with replacement markers.
+
+    Args:
+        response: The response object returned by `PAIClient.process_text()` containing detected entities.
+        entity_processors: A dictionary mapping entity types to processing functions in the format
+            `{ENTITY_TYPE: entity_processor_fn}`, where `entity_processor_fn` takes an entity dictionary
+            and returns modified text for all occurrences of that entity type.
+
+    Returns:
+         A list of de-identified text messages, with the transformations applied to entities specified by the entity_processor.
+    """
+    pass
+
+
 def reidentify_process_text(
     response: AnalyzeTextResponse
     | TextResponse
