@@ -1,3 +1,4 @@
+import copy
 import json
 from typing import Callable
 
@@ -16,6 +17,7 @@ from ..post_processing import (
     MaskEntityProcessor,
     SyntheticReplacementProcessor,
     deidentify_text,
+    post_redacted_text,
     reidentify_process_text,
 )
 from ..tests.test_files import test_response_body
@@ -636,6 +638,54 @@ def test_deidentify_text_with_date_comp_redaction():
         default_processor=MaskEntityProcessor(),
     )
     assert text_out == ["today is 1990-01-##."]
+
+
+# re-process redacted text from TextProcess
+@pytest.mark.parametrize(
+    argnames=["response_json", "entity_processors", "text_processed"],
+    argvalues=[
+        (
+            [test_response_body.processed_text_response_3[9]],
+            {"DOB": DateBucketProcessor(date_bin="year")},
+            "Caller: My date of birth is [1988-01-01 to 1988-12-31]. And my medicaid card expires on [DATE_1]",
+        ),
+        (
+            [test_response_body.processed_text_response_3[9]],
+            {
+                "DOB": DateBucketProcessor(date_bin="year"),
+                "DATE": DateComponentProcessor(redact_components=["DAY"]),
+            },
+            "Caller: My date of birth is [1988-01-01 to 1988-12-31]. And my medicaid card expires on 2024-06-##",
+        ),
+        (
+            [test_response_body.processed_text_response_3[21]],
+            {"AGE": AgeEntityBucketProcessor(bin_size=5)},
+            "Caller: I'm [35-39] and have no major medical concerns. I just have a [CONDITION_3].",
+        ),
+    ],
+)
+def test_post_redacted_text(
+    response_json: list[dict],
+    entity_processors: dict[str, EntityProcessor],
+    text_processed: str,
+):
+    """
+    Test post-processing of TextResponses.
+
+    Args:
+        response_json: a json structured list representing a http response body from the DEID container.
+        entity_processors: a dictionary associating entity processors with entities.
+        text_processed: the expected output text from the post_redacted_text() function
+    """
+    process_text_response = TextResponse(make_fake_response(response_json))
+    response_before = copy.deepcopy(process_text_response.entities)
+
+    # start post-processing of the text response
+    reprocessed_redaction = post_redacted_text(process_text_response, entity_processors)
+
+    assert text_processed == reprocessed_redaction[0]
+    assert process_text_response.processed_text != response_before.processed_text
+    assert process_text_response.entities != response_before.entities
 
 
 # rehydrate PII

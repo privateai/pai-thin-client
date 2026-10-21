@@ -106,6 +106,10 @@ date_response_2 = [
 ]
 
 
+process_text_1 = [
+    "Case info. Good afternoon. Thank you for calling the Georgia Division of Transportation. My name is miss Johanna, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? 614-5555 01. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? Jiminy Cricket. 12345. I am Bob Douglas. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? 123 Fake St, Atlanta, Georgia 40234, You said my phone number? Phone number and email, please. 555-666-7777@bob.douglas@gmail.com. Alright, ma am. Thank you so much for verifying that information today."
+]
+
 processed_text_response_1 = [
     {
         "entities": [
@@ -249,9 +253,6 @@ processed_text_response_1 = [
 ]
 
 
-process_text_1 = [
-    "Case info. Good afternoon. Thank you for calling the Georgia Division of Transportation. My name is miss Johanna, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? 614-5555 01. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? Jiminy Cricket. 12345. I am Bob Douglas. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? 123 Fake St, Atlanta, Georgia 40234, You said my phone number? Phone number and email, please. 555-666-7777@bob.douglas@gmail.com. Alright, ma am. Thank you so much for verifying that information today."
-]
 processed_text_response_2 = [
     {
         "entities": [
@@ -392,6 +393,749 @@ processed_text_response_2 = [
         "languages_detected": {"en": 0.8577668070793152},
         "processed_text": "Case ####. Good afternoon. Thank you for calling the ##################################. My name is miss #######, and it is a pleasure assisting you today. For security reasons, may I please have either your Social Security number or your case number? ###########. Thank you so much. Could you please verify your name, your date of birth, and the name of the other parent on the case you are calling for? ##############. #####. I am ###########. Thank you, ma am. And lastly, could you please verify your address, phone number, and email? ###################################, You said my phone number? Phone number and email, please. ############@#####################. Alright, ma am. Thank you so much for verifying that information today.",
     }
+]
+
+
+process_text_3 = [
+    "Operator: Thanks for calling City Help Line, my name is Sean James. May I ask who I'm speaking with today?",
+    "Caller: Ummmm... yes my name is Russel Forkton. How are you?",
+    "Operator: I'm good, thanks for asking. Is it ok if I call you Russel?",
+    "Caller: Yes that is ok.",
+    "Operator: Russel... can you tell me, how can I help you today?",
+    "Caller: I woke up this morning with some pain in my left side, a sore throat, and a nasty cough. I'm curious if I need to visit a doctor, or if I can just go to a pharmacy and get some OTC drugs.",
+    "Operator: Can I ask you a few more questions? Can you let me know your which city are you located in and your postal code? What's your health card number? And how long have you been feeling unwell? ",
+    "Caller: I'm currently in Anchorage, Alaska. Whats a postal code? ... do you mean a zip code? If so, mine is 99515. My medicaid number is 12387654. I've only felt all these symptoms this morning, when I woke up. But I was vomitting 3 days ago on Monday.",
+    "Operator: Thanks for sharing that info. Apologies, yes I meant zip code. I just moved here from France........ To complete your profile, can you tell me what is your date of borth and the expiry on your medicaid card?",
+    "Caller: My date of birth is February 28, 1988. And my medicaid card expires on June 6th 2024",
+    "Operator: What were you doing on Monday before you vomitted?",
+    "Caller: I was out at Darcy's Restaurant on Linx Drive. It was opening week and the food was good. I had the char but the first order tasted odd. So I sent back and got the beef tacos. Other than that, I didn't do much that day or the days prior.",
+    "Operator: Sounds like you may have food poissoning. Have you experienced that before?",
+    "Caller: Yes, I had food poissioning about 3 months ago.",
+    "Operator: Do you have an exact date?",
+    "Caller: Umm.. that was a whiile ago... maybe about February 10, 2023? But I can't be sure.",
+    "Operator: Did they prescibe you SootheDrug?",
+    "Caller: Yes, that worked great! Thinking about it... if you can give me that I should be ggood.",
+    "Operator: I can prescribe some medicine for you at the local pharmacy. If you give me your credit card number, I can put it on file and you can pick it up at the Samo Pharmacy on Arctic Blvd.",
+    "Caller: Yes that sounds great! My card is 7283-1234-5678-1290 expiring 10/23 and CCV 009.",
+    "Operator: And to make sure I'm prescibing the right medication, can you let me know your age and any relevent medical history?",
+    "Caller: I'm 35 and have no major medical concerns. I just have a small allergy to dogs.",
+    "Operator: Sounds good. I've sent a prescription to your local pharamcy. You should be able to pick it up by 4pm today.",
+]
+
+processed_text_response_3 = [
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9154},
+            },
+            {
+                "processed_text": "ORGANIZATION_1",
+                "text": "City Help Line",
+                "location": {
+                    "stt_idx": 29,
+                    "end_idx": 43,
+                    "stt_idx_processed": 35,
+                    "end_idx_processed": 51,
+                },
+                "best_label": "ORGANIZATION",
+                "labels": {"ORGANIZATION": 0.8928},
+            },
+            {
+                "processed_text": "NAME_1",
+                "text": "Sean James",
+                "location": {
+                    "stt_idx": 56,
+                    "end_idx": 66,
+                    "stt_idx_processed": 64,
+                    "end_idx_processed": 72,
+                },
+                "best_label": "NAME",
+                "labels": {"NAME_FAMILY": 0.4619, "NAME_GIVEN": 0.3694, "NAME": 0.9123},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 106,
+        "languages_detected": {"en": 0.9740498065948486},
+        "processed_text": "[OCCUPATION_1]: Thanks for calling [ORGANIZATION_1], my name is [NAME_1]. May I ask who I'm speaking with today?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "NAME_2",
+                "text": "Russel Forkton",
+                "location": {
+                    "stt_idx": 32,
+                    "end_idx": 46,
+                    "stt_idx_processed": 32,
+                    "end_idx_processed": 40,
+                },
+                "best_label": "NAME",
+                "labels": {"NAME_FAMILY": 0.4572, "NAME": 0.9099, "NAME_GIVEN": 0.3878},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 60,
+        "languages_detected": {"en": 0.8560548424720764},
+        "processed_text": "Caller: Ummmm... yes my name is [NAME_2]. How are you?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9078},
+            },
+            {
+                "processed_text": "NAME_GIVEN_1",
+                "text": "Russel",
+                "location": {
+                    "stt_idx": 62,
+                    "end_idx": 68,
+                    "stt_idx_processed": 68,
+                    "end_idx_processed": 82,
+                },
+                "best_label": "NAME_GIVEN",
+                "labels": {"NAME_GIVEN": 0.9044, "NAME": 0.9056},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 69,
+        "languages_detected": {"en": 0.9290556311607361},
+        "processed_text": "[OCCUPATION_1]: I'm good, thanks for asking. Is it ok if I call you [NAME_GIVEN_1]?",
+    },
+    {
+        "entities": [],
+        "entities_present": False,
+        "characters_processed": 23,
+        "languages_detected": {"en": 0.8519818782806396},
+        "processed_text": "Caller: Yes that is ok.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9077},
+            },
+            {
+                "processed_text": "NAME_GIVEN_1",
+                "text": "Russel",
+                "location": {
+                    "stt_idx": 10,
+                    "end_idx": 16,
+                    "stt_idx_processed": 16,
+                    "end_idx_processed": 30,
+                },
+                "best_label": "NAME_GIVEN",
+                "labels": {"NAME": 0.9082, "NAME_GIVEN": 0.8962},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 62,
+        "languages_detected": {"en": 0.955325722694397},
+        "processed_text": "[OCCUPATION_1]: [NAME_GIVEN_1]... can you tell me, how can I help you today?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_2",
+                "text": "doctor",
+                "location": {
+                    "stt_idx": 130,
+                    "end_idx": 136,
+                    "stt_idx_processed": 130,
+                    "end_idx_processed": 144,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9291},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 195,
+        "languages_detected": {"en": 0.9391918182373047},
+        "processed_text": "Caller: I woke up this morning with some pain in my left side, a sore throat, and a nasty cough. I'm curious if I need to visit a [OCCUPATION_2], or if I can just go to a pharmacy and get some OTC drugs.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9184},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 198,
+        "languages_detected": {"en": 0.9883536100387573},
+        "processed_text": "[OCCUPATION_1]: Can I ask you a few more questions? Can you let me know your which city are you located in and your postal code? What's your health card number? And how long have you been feeling unwell? ",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "LOCATION_1",
+                "text": "Anchorage, Alaska",
+                "location": {
+                    "stt_idx": 25,
+                    "end_idx": 42,
+                    "stt_idx_processed": 25,
+                    "end_idx_processed": 37,
+                },
+                "best_label": "LOCATION",
+                "labels": {
+                    "LOCATION_STATE": 0.3351,
+                    "LOCATION": 0.9298,
+                    "LOCATION_CITY": 0.5054,
+                },
+            },
+            {
+                "processed_text": "LOCATION_ZIP_1",
+                "text": "99515",
+                "location": {
+                    "stt_idx": 108,
+                    "end_idx": 113,
+                    "stt_idx_processed": 103,
+                    "end_idx_processed": 119,
+                },
+                "best_label": "LOCATION_ZIP",
+                "labels": {"LOCATION": 0.9439, "LOCATION_ZIP": 0.9571},
+            },
+            {
+                "processed_text": "HEALTHCARE_NUMBER_1",
+                "text": "12387654",
+                "location": {
+                    "stt_idx": 137,
+                    "end_idx": 145,
+                    "stt_idx_processed": 143,
+                    "end_idx_processed": 164,
+                },
+                "best_label": "HEALTHCARE_NUMBER",
+                "labels": {"HEALTHCARE_NUMBER": 0.9319},
+            },
+            {
+                "processed_text": "DURATION_1",
+                "text": "3 days",
+                "location": {
+                    "stt_idx": 231,
+                    "end_idx": 237,
+                    "stt_idx_processed": 250,
+                    "end_idx_processed": 262,
+                },
+                "best_label": "DURATION",
+                "labels": {"DURATION": 0.9353},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 252,
+        "languages_detected": {"en": 0.9291459321975708},
+        "processed_text": "Caller: I'm currently in [LOCATION_1]. Whats a postal code? ... do you mean a zip code? If so, mine is [LOCATION_ZIP_1]. My medicaid number is [HEALTHCARE_NUMBER_1]. I've only felt all these symptoms this morning, when I woke up. But I was vomitting [DURATION_1] ago on Monday.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9264},
+            },
+            {
+                "processed_text": "LOCATION_COUNTRY_1",
+                "text": "France",
+                "location": {
+                    "stt_idx": 96,
+                    "end_idx": 102,
+                    "stt_idx_processed": 102,
+                    "end_idx_processed": 122,
+                },
+                "best_label": "LOCATION_COUNTRY",
+                "labels": {"LOCATION": 0.9097, "LOCATION_COUNTRY": 0.935},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 217,
+        "languages_detected": {"en": 0.9049315452575684},
+        "processed_text": "[OCCUPATION_1]: Thanks for sharing that info. Apologies, yes I meant zip code. I just moved here from [LOCATION_COUNTRY_1]........ To complete your profile, can you tell me what is your date of borth and the expiry on your medicaid card?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "DOB_1",
+                "text": "February 28, 1988",
+                "location": {
+                    "stt_idx": 28,
+                    "end_idx": 45,
+                    "stt_idx_processed": 28,
+                    "end_idx_processed": 35,
+                },
+                "best_label": "DOB",
+                "labels": {"DOB": 0.94},
+            },
+            {
+                "processed_text": "DATE_1",
+                "text": "June 6th 2024",
+                "location": {
+                    "stt_idx": 79,
+                    "end_idx": 92,
+                    "stt_idx_processed": 69,
+                    "end_idx_processed": 77,
+                },
+                "best_label": "DATE",
+                "labels": {"DATE": 0.8182},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 92,
+        "languages_detected": {"en": 0.9528557062149048},
+        "processed_text": "Caller: My date of birth is [DOB_1]. And my medicaid card expires on [DATE_1]",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9133},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 60,
+        "languages_detected": {"en": 0.9941988587379456},
+        "processed_text": "[OCCUPATION_1]: What were you doing on Monday before you vomitted?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "ORGANIZATION_2",
+                "text": "Darcy's Restaurant",
+                "location": {
+                    "stt_idx": 21,
+                    "end_idx": 39,
+                    "stt_idx_processed": 21,
+                    "end_idx_processed": 37,
+                },
+                "best_label": "ORGANIZATION",
+                "labels": {"ORGANIZATION": 0.9021},
+            },
+            {
+                "processed_text": "LOCATION_ADDRESS_STREET_1",
+                "text": "Linx Drive",
+                "location": {
+                    "stt_idx": 43,
+                    "end_idx": 53,
+                    "stt_idx_processed": 41,
+                    "end_idx_processed": 68,
+                },
+                "best_label": "LOCATION_ADDRESS_STREET",
+                "labels": {
+                    "LOCATION_ADDRESS": 0.8488,
+                    "LOCATION": 0.9141,
+                    "LOCATION_ADDRESS_STREET": 0.9164,
+                },
+            },
+            {
+                "processed_text": "DURATION_2",
+                "text": "day",
+                "location": {
+                    "stt_idx": 223,
+                    "end_idx": 226,
+                    "stt_idx_processed": 238,
+                    "end_idx_processed": 250,
+                },
+                "best_label": "DURATION",
+                "labels": {"DURATION": 0.6547},
+            },
+            {
+                "processed_text": "DURATION_2",
+                "text": "days",
+                "location": {
+                    "stt_idx": 234,
+                    "end_idx": 238,
+                    "stt_idx_processed": 258,
+                    "end_idx_processed": 270,
+                },
+                "best_label": "DURATION",
+                "labels": {"DURATION": 0.6487},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 245,
+        "languages_detected": {"en": 0.9937317967414856},
+        "processed_text": "Caller: I was out at [ORGANIZATION_2] on [LOCATION_ADDRESS_STREET_1]. It was opening week and the food was good. I had the char but the first order tasted odd. So I sent back and got the beef tacos. Other than that, I didn't do much that [DURATION_2] or the [DURATION_2] prior.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9245},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 85,
+        "languages_detected": {"en": 0.9612001776695251},
+        "processed_text": "[OCCUPATION_1]: Sounds like you may have food poissoning. Have you experienced that before?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "CONDITION_1",
+                "text": "food poissioning",
+                "location": {
+                    "stt_idx": 19,
+                    "end_idx": 35,
+                    "stt_idx_processed": 19,
+                    "end_idx_processed": 32,
+                },
+                "best_label": "CONDITION",
+                "labels": {"CONDITION": 0.6801},
+            },
+            {
+                "processed_text": "DURATION_3",
+                "text": "3 months",
+                "location": {
+                    "stt_idx": 42,
+                    "end_idx": 50,
+                    "stt_idx_processed": 39,
+                    "end_idx_processed": 51,
+                },
+                "best_label": "DURATION",
+                "labels": {"DURATION": 0.9432},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 95,
+        "languages_detected": {"en": 0.9663041830062866},
+        "processed_text": "Caller: Yes, I had [CONDITION_1] about [DURATION_3] ago. But the sore throat, and cough are new.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9136},
+            },
+            {
+                "processed_text": "CONDITION_2",
+                "text": "food poisoning",
+                "location": {
+                    "stt_idx": 66,
+                    "end_idx": 80,
+                    "stt_idx_processed": 72,
+                    "end_idx_processed": 85,
+                },
+                "best_label": "CONDITION",
+                "labels": {"CONDITION": 0.6422},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 81,
+        "languages_detected": {"en": 0.9489797949790955},
+        "processed_text": "[OCCUPATION_1]: Do you have an exact date for your last experience with [CONDITION_2]?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "DATE_2",
+                "text": "February 10, 2023",
+                "location": {
+                    "stt_idx": 50,
+                    "end_idx": 67,
+                    "stt_idx_processed": 50,
+                    "end_idx_processed": 58,
+                },
+                "best_label": "DATE",
+                "labels": {"DATE": 0.9292},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 89,
+        "languages_detected": {"en": 0.9939161539077759},
+        "processed_text": "Caller: Umm.. that was a while ago... maybe about [DATE_2]? But I can't be sure.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9193},
+            },
+            {
+                "processed_text": "DRUG_1",
+                "text": "SootheDrug",
+                "location": {
+                    "stt_idx": 32,
+                    "end_idx": 42,
+                    "stt_idx_processed": 38,
+                    "end_idx_processed": 46,
+                },
+                "best_label": "DRUG",
+                "labels": {"DRUG": 0.8853},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 43,
+        "languages_detected": {"en": 0.9090543389320374},
+        "processed_text": "[OCCUPATION_1]: Did they prescibe you [DRUG_1]?",
+    },
+    {
+        "entities": [],
+        "entities_present": False,
+        "characters_processed": 95,
+        "languages_detected": {"en": 0.9646866321563721},
+        "processed_text": "Caller: Yes, that worked great! Thinking about it... if you can give me that I should be ggood.",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9161},
+            },
+            {
+                "processed_text": "ORGANIZATION_MEDICAL_FACILITY_1",
+                "text": "Samo Pharmacy",
+                "location": {
+                    "stt_idx": 162,
+                    "end_idx": 175,
+                    "stt_idx_processed": 168,
+                    "end_idx_processed": 201,
+                },
+                "best_label": "ORGANIZATION_MEDICAL_FACILITY",
+                "labels": {
+                    "ORGANIZATION": 0.9193,
+                    "ORGANIZATION_MEDICAL_FACILITY": 0.9447,
+                },
+            },
+            {
+                "processed_text": "LOCATION_ADDRESS_STREET_2",
+                "text": "Arctic Blvd",
+                "location": {
+                    "stt_idx": 179,
+                    "end_idx": 190,
+                    "stt_idx_processed": 205,
+                    "end_idx_processed": 232,
+                },
+                "best_label": "LOCATION_ADDRESS_STREET",
+                "labels": {
+                    "LOCATION_ADDRESS_STREET": 0.8265,
+                    "LOCATION": 0.8753,
+                    "LOCATION_ADDRESS": 0.7098,
+                },
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 191,
+        "languages_detected": {"en": 0.9311161041259766},
+        "processed_text": "[OCCUPATION_1]: I can prescribe some medicine for you at the local pharmacy. If you give me your credit card number, I can put it on file and you can pick it up at the [ORGANIZATION_MEDICAL_FACILITY_1] on [LOCATION_ADDRESS_STREET_2].",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "CREDIT_CARD_1",
+                "text": "7283-1234-5678-1290",
+                "location": {
+                    "stt_idx": 42,
+                    "end_idx": 61,
+                    "stt_idx_processed": 42,
+                    "end_idx_processed": 57,
+                },
+                "best_label": "CREDIT_CARD",
+                "labels": {"CREDIT_CARD": 0.9109},
+            },
+            {
+                "processed_text": "CREDIT_CARD_EXPIRATION_1",
+                "text": "10/23",
+                "location": {
+                    "stt_idx": 71,
+                    "end_idx": 76,
+                    "stt_idx_processed": 67,
+                    "end_idx_processed": 93,
+                },
+                "best_label": "CREDIT_CARD_EXPIRATION",
+                "labels": {"CREDIT_CARD_EXPIRATION": 0.9216},
+            },
+            {
+                "processed_text": "CVV_1",
+                "text": "009",
+                "location": {
+                    "stt_idx": 85,
+                    "end_idx": 88,
+                    "stt_idx_processed": 102,
+                    "end_idx_processed": 109,
+                },
+                "best_label": "CVV",
+                "labels": {"CVV": 0.9527},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 89,
+        "languages_detected": {"en": 0.6855595111846924},
+        "processed_text": "Caller: Yes that sounds great! My card is [CREDIT_CARD_1] expiring [CREDIT_CARD_EXPIRATION_1] and CCV [CVV_1].",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.917},
+            }
+        ],
+        "entities_present": True,
+        "characters_processed": 126,
+        "languages_detected": {"en": 0.9271936416625977},
+        "processed_text": "[OCCUPATION_1]: And to make sure I'm prescibing the right medication, can you let me know your age and any relevent medical history?",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "AGE_1",
+                "text": "35",
+                "location": {
+                    "stt_idx": 12,
+                    "end_idx": 14,
+                    "stt_idx_processed": 12,
+                    "end_idx_processed": 19,
+                },
+                "best_label": "AGE",
+                "labels": {"AGE": 0.9528},
+            },
+            {
+                "processed_text": "CONDITION_3",
+                "text": "small allergy to dogs",
+                "location": {
+                    "stt_idx": 65,
+                    "end_idx": 86,
+                    "stt_idx_processed": 70,
+                    "end_idx_processed": 83,
+                },
+                "best_label": "CONDITION",
+                "labels": {"CONDITION": 0.7742},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 87,
+        "languages_detected": {"en": 0.9749331474304199},
+        "processed_text": "Caller: I'm [AGE_1] and have no major medical concerns. I just have a [CONDITION_3].",
+    },
+    {
+        "entities": [
+            {
+                "processed_text": "OCCUPATION_1",
+                "text": "Operator",
+                "location": {
+                    "stt_idx": 0,
+                    "end_idx": 8,
+                    "stt_idx_processed": 0,
+                    "end_idx_processed": 14,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.9297},
+            },
+            {
+                "processed_text": "OCCUPATION_3",
+                "text": "pharam",
+                "location": {
+                    "stt_idx": 62,
+                    "end_idx": 68,
+                    "stt_idx_processed": 68,
+                    "end_idx_processed": 82,
+                },
+                "best_label": "OCCUPATION",
+                "labels": {"OCCUPATION": 0.544},
+            },
+            {
+                "processed_text": "TIME_1",
+                "text": "4pm",
+                "location": {
+                    "stt_idx": 108,
+                    "end_idx": 111,
+                    "stt_idx_processed": 122,
+                    "end_idx_processed": 130,
+                },
+                "best_label": "TIME",
+                "labels": {"TIME": 0.9437},
+            },
+        ],
+        "entities_present": True,
+        "characters_processed": 118,
+        "languages_detected": {"en": 0.9650671482086182},
+        "processed_text": "[OCCUPATION_1]: Sounds good. I've sent a prescription to your local [OCCUPATION_3]cy. You should be able to pick it up by [TIME_1] today.",
+    },
 ]
 
 

@@ -160,7 +160,7 @@ class DateBucketProcessor(BaseProcessor):
                     default_processor=MarkerEntityProcessor()
                 )
             >>> anon_text_blocks
-                ["today is [1990-01-01 and 1990-12-31]."]
+                ["today is [1990-01-01 to 1990-12-31]."]
         """
         # validate we are only processing dates
         valid_entities = ["DATE", "DATE_OF_DEATH", "DOB"]
