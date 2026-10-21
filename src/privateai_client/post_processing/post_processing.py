@@ -14,6 +14,13 @@ from privateai_client.components import (
 EntityProcessor = Callable[[dict], str]
 
 
+def _strip_marker_brackets(text: str) -> str:
+    """Match the DEID convention of storing marker text without its enclosing brackets."""
+    if len(text) >= 2 and text.startswith("[") and text.endswith("]"):
+        return text[1:-1]
+    return text
+
+
 def deidentify_text(
     text: list[str],
     response: AnalyzeTextResponse,
@@ -79,7 +86,9 @@ def deidentify_text(
                     modified_entity_text
                 )
                 # add in the processed replacement text
-                entity_details["processed_text"] = modified_entity_text
+                entity_details["processed_text"] = _strip_marker_brackets(
+                    modified_entity_text
+                )
                 converted_entities.append(entity_details)
         # add the processed text to the linked batch
         modified_texts.append(modified_text)
@@ -163,7 +172,14 @@ def post_redacted_text(
                         modified_entity_text
                     )
                     # add in the processed replacement text
-                    entity["processed_text"] = modified_entity_text
+                    entity["processed_text"] = _strip_marker_brackets(
+                        modified_entity_text
+                    )
+                else:
+                    # processor can't handle TextResponses, so only adjust entity
+                    # locations based on prior changes
+                    entity["location"]["stt_idx_processed"] += offset
+                    entity["location"]["end_idx_processed"] += offset
             except AttributeError as e:
                 logging.warning(e)
                 # since no changes occur when errors are raised, adjust entity

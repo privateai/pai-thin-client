@@ -26,6 +26,18 @@ EntityProcessor = Callable[[dict], str]
 
 
 # helper functions
+def assert_entity_spans_match(response: TextResponse):
+    """
+    Assert that each entity's processed location points to its processed text, which may be
+    stored without the enclosing brackets of a marker.
+    """
+    for text, entities in zip(response.processed_text, response.entities):
+        for entity in entities:
+            location = entity["location"]
+            span = text[location["stt_idx_processed"] : location["end_idx_processed"]]
+            assert span in (entity["processed_text"], f"[{entity['processed_text']}]")
+
+
 def make_fake_response(response_body: list[dict]) -> requests.Response:
     """
     Make a fake response that is made by the Requests library
@@ -662,6 +674,15 @@ def test_deidentify_text_with_date_comp_redaction():
             {"AGE": AgeEntityBucketProcessor(bin_size=5)},
             "Caller: I'm [35-39] and have no major medical concerns. I just have a [CONDITION_3].",
         ),
+        (
+            # SyntheticReplacementProcessor can't process TextResponses, so DATE is left as-is
+            [test_response_body.processed_text_response_3[9]],
+            {
+                "DOB": DateBucketProcessor(date_bin="year"),
+                "DATE": SyntheticReplacementProcessor(),
+            },
+            "Caller: My date of birth is [1988-01-01 to 1988-12-31]. And my medicaid card expires on [DATE_1]",
+        ),
     ],
 )
 def test_post_redacted_text(
@@ -688,6 +709,8 @@ def test_post_redacted_text(
     # also ensure that the response changed
     assert process_text_response.processed_text != response_before.processed_text
     assert process_text_response.entities != response_before.entities
+    # ensure entity locations point to their (bracket-less) processed text
+    assert_entity_spans_match(process_text_response)
 
 
 # rehydrate PII
@@ -766,6 +789,7 @@ def test_analyze_deidentify_rehydrate_PII(
         convert_response=True,
     )
 
+    assert_entity_spans_match(response.to_text_response())
     rehydrated_text_out = reidentify_process_text(response)
 
     assert text == rehydrated_text_out
