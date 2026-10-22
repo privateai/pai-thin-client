@@ -11,14 +11,9 @@ from privateai_client.components import (
     TextResponse,
 )
 
+from ._helper_functions import post_processing_helpers as helpers
+
 EntityProcessor = Callable[[dict], str]
-
-
-def _strip_marker_brackets(text: str) -> str:
-    """Match the DEID convention of storing marker text without its enclosing brackets."""
-    if len(text) >= 2 and text.startswith("[") and text.endswith("]"):
-        return text[1:-1]
-    return text
 
 
 def deidentify_text(
@@ -86,7 +81,7 @@ def deidentify_text(
                     modified_entity_text
                 )
                 # add in the processed replacement text
-                entity_details["processed_text"] = _strip_marker_brackets(
+                entity_details["processed_text"] = helpers._strip_marker_brackets(
                     modified_entity_text
                 )
                 converted_entities.append(entity_details)
@@ -115,7 +110,8 @@ def post_redacted_text(
     response: TextResponse, entity_processors: dict[str, EntityProcessor]
 ) -> list[str]:
     """
-    Post-process TextResponse from the process/text endpoint with replacement markers.
+    Post-process TextResponse from the process/text endpoint by processing entities with multiple
+    processors, adjusting redaction dynamically.
 
     Args:
         response: The response object returned by `PAIClient.process_text()` containing detected entities.
@@ -127,6 +123,14 @@ def post_redacted_text(
          A list of de-identified text messages, with the transformations applied to entities specified by the entity_processor.
     """
     redactions = []
+    # check if response is a PDF response
+    if (
+        isinstance(response.entities, list)
+        and isinstance(response.entities[0], list)
+        and "stt_idx" not in response.entities[0][0]["location"]
+    ):
+        response = helpers._enhance_pdf_redact_response(response)
+
     for redacted_text_blk, entities_in_text_blk, chars_processed, langs in zip(
         response.processed_text,
         response.entities,
@@ -172,7 +176,7 @@ def post_redacted_text(
                         modified_entity_text
                     )
                     # add in the processed replacement text
-                    entity["processed_text"] = _strip_marker_brackets(
+                    entity["processed_text"] = helpers._strip_marker_brackets(
                         modified_entity_text
                     )
                 else:
@@ -214,9 +218,17 @@ def reidentify_process_text(response: AnalyzeTextResponse | TextResponse) -> lis
             and `PAIClient.process_files_uri()`containing detected entities.
     """
     returned_text_msgs = []
+    # check if response is a PDF response
+    if (
+        isinstance(response.entities, list)
+        and isinstance(response.entities[0], list)
+        and "stt_idx" not in response.entities[0][0]["location"]
+    ):
+        response = helpers._enhance_pdf_redact_response(response)
 
+    # check if reponse is AnalyzeText
     if isinstance(response, AnalyzeTextResponse):
-        # if its an Analyze text response, convert it to a TextResponse
+        # if it is, convert it to a TextResponse
         redacted_text_key = "processed_text"
         json_resp_keys = response.body[0].keys()
         if redacted_text_key in json_resp_keys:
@@ -225,7 +237,8 @@ def reidentify_process_text(response: AnalyzeTextResponse | TextResponse) -> lis
             err_msg = f"This response has no key '{redacted_text_key}'."
             raise KeyError(err_msg)
 
-    # handle linked batches
+    # now that we know we have at text response:
+    # start reidentification
     for text, entities in zip(response.processed_text, response.entities):
         rehydrated_text = text
         for entity in sorted(
