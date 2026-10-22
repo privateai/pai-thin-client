@@ -5,3 +5,4 @@ dist/
 .venv
 .vscode/
 src/privateai_client/tests/**/test_1.py
+local_test_examples/*
