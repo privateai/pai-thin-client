@@ -89,7 +89,7 @@ def _enhance_pdf_redact_response(response: TextResponse) -> TextResponse:
     Returns:
         a redacted text response.
     """
-    json_response = TextResponse.response
+    json_response = response.body
     redact_list = json_response if isinstance(json_response, list) else [json_response]
     if not redact_list or any(
         not isinstance(redact_blk, dict)
@@ -112,8 +112,11 @@ def _enhance_pdf_redact_response(response: TextResponse) -> TextResponse:
                 "{json_file} response rows must have string 'processed_text' "
                 "and list 'entities' values"
             )
+
+        if "characters_processed" not in redact_blk:
+            redact_blk.setdefault("characters_processed", None)
         # repopulate entity locations into PDF entities
-        _populate_entity_locations(blk_processed_text, blk_entities)
+        _populate_entity_locations(blk_processed_text, blk_entities, False)
     # make a new response
     response = Response()
     response.status_code = 200

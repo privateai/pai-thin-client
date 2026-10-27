@@ -124,12 +124,14 @@ def post_redacted_text(
     """
     redactions = []
     # check if response is a PDF response
-    if (
-        isinstance(response.entities, list)
-        and isinstance(response.entities[0], list)
-        and "stt_idx" not in response.entities[0][0]["location"]
-    ):
-        response = helpers._enhance_pdf_redact_response(response)
+    entities = response.entities
+    first_entity = (
+        (entities[0][0] if entities and isinstance(entities[0], list) else entities[0])
+        if entities
+        else None
+    )
+    if first_entity and "stt_idx" not in first_entity["location"]:
+        response.response = helpers._enhance_pdf_redact_response(response).response
 
     for redacted_text_blk, entities_in_text_blk, chars_processed, langs in zip(
         response.processed_text,
@@ -224,7 +226,7 @@ def reidentify_process_text(response: AnalyzeTextResponse | TextResponse) -> lis
         and isinstance(response.entities[0], list)
         and "stt_idx" not in response.entities[0][0]["location"]
     ):
-        response = helpers._enhance_pdf_redact_response(response)
+        response.response = helpers._enhance_pdf_redact_response(response).response
 
     # check if reponse is AnalyzeText
     if isinstance(response, AnalyzeTextResponse):

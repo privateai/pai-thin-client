@@ -85,7 +85,10 @@ class DateShiftProcessor(BaseProcessor):
 
         # start processing
         if "analysis_result" not in entity:
-            date_obj = parser.parse(entity["text"])
+            try:
+                date_obj = parser.parse(entity["text"])
+            except parser._parser.ParserError:
+                return "[DATE_NOT_PARSED]"
         else:
             # iso-8601 format: date as year-month-day
             iso_date_str = entity["analysis_result"].get("formatted")
@@ -172,7 +175,10 @@ class DateBucketProcessor(BaseProcessor):
 
         # start processing
         if "analysis_result" not in entity:
-            date_obj = parser.parse(entity["text"])
+            try:
+                date_obj = parser.parse(entity["text"])
+            except parser._parser.ParserError:
+                return "[DATE_NOT_PARSED]"
         else:
             # iso-8601 format: date as year-month-day
             iso_date_str = entity["analysis_result"].get("formatted")
@@ -269,7 +275,11 @@ class DateComponentProcessor(BaseProcessor):
 
         # start processing
         if "analysis_result" not in entity:
-            date_obj = parser.parse(entity["text"])
+            try:
+                date_obj = parser.parse(entity["text"])
+            except parser._parser.ParserError:
+                return "[DATE_NOT_PARSED]"
+
             date_format_dict = {"YEAR": "%Y", "MONTH": "%m", "DAY": "%d"}
             delimiter = ""
             format_str = ""
