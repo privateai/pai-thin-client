@@ -1399,3 +1399,83 @@ analyze_response_1 = [
         "languages_detected": {"en": 0.9613739848136902},
     }
 ]
+
+
+# process/files/base64 response for a PDF: entity locations are OCR bounding boxes, not text spans
+processed_file_base64_response_1 = {
+    "processed_file": "JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVy",
+    "processed_text": "Patient [NAME_1] is [AGE_1] years old, born [DOB_1]. Seen by [NAME_MEDICAL_PROFESSIONAL_1] on [DATE_1].",
+    "entities": [
+        {
+            "processed_text": "NAME_1",
+            "text": "Jane Doe",
+            "location": {
+                "page": 1,
+                "x0": 0.1201,
+                "x1": 0.2104,
+                "y0": 0.0512,
+                "y1": 0.0698,
+            },
+            "best_label": "NAME",
+            "labels": {"NAME": 0.9312, "NAME_GIVEN": 0.4521, "NAME_FAMILY": 0.4317},
+        },
+        {
+            "processed_text": "AGE_1",
+            "text": "42",
+            "location": {
+                "page": 1,
+                "x0": 0.2405,
+                "x1": 0.2601,
+                "y0": 0.0512,
+                "y1": 0.0698,
+            },
+            "best_label": "AGE",
+            "labels": {"AGE": 0.9533},
+        },
+        {
+            "processed_text": "DOB_1",
+            "text": "1981-03-14",
+            "location": {
+                "page": 1,
+                "x0": 0.4012,
+                "x1": 0.4987,
+                "y0": 0.0512,
+                "y1": 0.0698,
+            },
+            "best_label": "DOB",
+            "labels": {"DOB": 0.9124, "DATE": 0.8811},
+        },
+        {
+            "processed_text": "NAME_MEDICAL_PROFESSIONAL_1",
+            "text": "Dr. Smith",
+            "location": {
+                "page": 1,
+                "x0": 0.1201,
+                "x1": 0.2003,
+                "y0": 0.0821,
+                "y1": 0.1007,
+            },
+            "best_label": "NAME_MEDICAL_PROFESSIONAL",
+            "labels": {"NAME_MEDICAL_PROFESSIONAL": 0.9017, "NAME": 0.8842},
+        },
+        {
+            "processed_text": "DATE_1",
+            "text": "2024-06-06",
+            "location": {
+                "page": 1,
+                "x0": 0.2304,
+                "x1": 0.3298,
+                "y0": 0.0821,
+                "y1": 0.1007,
+            },
+            "best_label": "DATE",
+            "labels": {"DATE": 0.9401},
+        },
+    ],
+    "objects": [],
+    "entities_present": True,
+    "objects_present": False,
+    "languages_detected": {"en": 0.9512},
+    "audio_duration": None,
+    "page_count": 1,
+}

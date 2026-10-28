@@ -133,6 +133,7 @@ def post_redacted_text(
     if first_entity and "stt_idx" not in first_entity["location"]:
         response.response = helpers._enhance_pdf_redact_response(response).response
 
+    # start post-processing
     for redacted_text_blk, entities_in_text_blk, chars_processed, langs in zip(
         response.processed_text,
         response.entities,

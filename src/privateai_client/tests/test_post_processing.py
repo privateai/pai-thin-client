@@ -15,6 +15,7 @@ from ..post_processing import (
     FuzzyMatchEntityProcessor,
     MarkerEntityProcessor,
     MaskEntityProcessor,
+    RehydratePIIProcessor,
     SyntheticReplacementProcessor,
     deidentify_text,
     post_redacted_text,
@@ -393,7 +394,7 @@ def test_deidentify_text_with_synthetic_replacements():
     assert text_out == ["My name is Ezekiel. I live in ######."]
 
 
-# Age Bucketing
+# Age Bucketing Entity
 @pytest.mark.parametrize(
     argnames=["entity", "bucket_size", "text_processed"],
     argvalues=[
@@ -449,7 +450,7 @@ def test_deidentify_text_with_age_bucketing():
     assert text_out == ["A [30-34]-year old wants to travel."]
 
 
-# Date Shifting
+# Date Shifting Entity
 @pytest.mark.parametrize(
     argnames=["entity", "date_offset", "operator", "text_processed"],
     argvalues=[
@@ -514,7 +515,7 @@ def test_deidentify_text_with_date_shifting():
     assert text_out == ["today is [1990-04-01]."]
 
 
-# Date Bucketing
+# Date Bucketing Entity
 @pytest.mark.parametrize(
     argnames=["entity", "date_bin", "text_processed"],
     argvalues=[
@@ -578,7 +579,7 @@ def test_deidentify_text_with_date_bucketing():
     assert text_out == ["today is [1990-01-01 to 1990-12-31]."]
 
 
-# Selective Date Component Redaction
+# Selective Date Component Redaction Entity
 @pytest.mark.parametrize(
     argnames=["entity", "redact_date_comps", "text_processed"],
     argvalues=[
@@ -652,7 +653,7 @@ def test_deidentify_text_with_date_comp_redaction():
     assert text_out == ["today is 1990-01-##."]
 
 
-# re-process redacted text from TextProcess
+# Re-process Redacted Text from TextProcess
 @pytest.mark.parametrize(
     argnames=["response_json", "entity_processors", "text_processed"],
     argvalues=[
@@ -682,6 +683,12 @@ def test_deidentify_text_with_date_comp_redaction():
                 "DATE": SyntheticReplacementProcessor(),
             },
             "Caller: My date of birth is [1988-01-01 to 1988-12-31]. And my medicaid card expires on [DATE_1]",
+        ),
+        (
+            # Post-process redacted text by reinserting PII
+            [test_response_body.processed_text_response_3[0]],
+            {"OCCUPATION": RehydratePIIProcessor()},
+            "Operator: Thanks for calling [ORGANIZATION_1], my name is [NAME_1]. May I ask who I'm speaking with today?",
         ),
     ],
 )
@@ -713,7 +720,71 @@ def test_post_redacted_text(
     assert_entity_spans_match(process_text_response)
 
 
-# rehydrate PII
+@pytest.mark.parametrize(
+    argnames=["response_json", "entity_processors", "texts_processed"],
+    argvalues=[
+        (
+            # full process/text response (list of text blocks with text span locations)
+            test_response_body.processed_text_response_3,
+            {
+                "OCCUPATION": RehydratePIIProcessor(),
+                "DOB": DateBucketProcessor(date_bin="year"),
+                "AGE": AgeEntityBucketProcessor(bin_size=5),
+            },
+            {
+                0: "Operator: Thanks for calling [ORGANIZATION_1], my name is [NAME_1]. May I ask who I'm speaking with today?",
+                9: "Caller: My date of birth is [1988-01-01 to 1988-12-31]. And my medicaid card expires on [DATE_1]",
+                21: "Caller: I'm [35-39] and have no major medical concerns. I just have a [CONDITION_3].",
+            },
+        ),
+        (
+            # process/files/base64 response (single object with PDF bounding box locations),
+            # wrapped in a list as when loading a saved response into a TextResponse
+            [test_response_body.processed_file_base64_response_1],
+            {
+                "AGE": AgeEntityBucketProcessor(bin_size=5),
+                "DOB": DateBucketProcessor(date_bin="year"),
+                "NAME_MEDICAL_PROFESSIONAL": RehydratePIIProcessor(),
+            },
+            {
+                0: "Patient [NAME_1] is [40-44] years old, born [1981-01-01 to 1981-12-31]. Seen by Dr. Smith on [DATE_1].",
+            },
+        ),
+    ],
+    ids=["process_text", "process_files_base64"],
+)
+def test_post_redacted_text_endpoint_responses(
+    response_json: list[dict],
+    entity_processors: dict[str, EntityProcessor],
+    texts_processed: dict[int, str],
+):
+    """
+    Test post-processing of full responses returned by the process/text and process/files/base64 endpoints.
+
+    Args:
+        response_json: a json structured list representing a http response body from the DEID container.
+        entity_processors: a dictionary associating entity processors with entities.
+        texts_processed: the expected output text from the post_redacted_text() function, keyed by text block index.
+    """
+    response = TextResponse(make_fake_response(response_json))
+    response_before = copy.deepcopy(response)
+
+    # start post-processing of the response
+    reprocessed_redaction = post_redacted_text(response, entity_processors)
+
+    # test the transformations were done correctly
+    assert len(reprocessed_redaction) == len(response_json)
+    for blk_idx, text_processed in texts_processed.items():
+        assert reprocessed_redaction[blk_idx] == text_processed
+    # also ensure that the response changed
+    assert response.processed_text == reprocessed_redaction
+    assert response.processed_text != response_before.processed_text
+    assert response.entities != response_before.entities
+    # ensure entity locations point to their (bracket-less) processed text
+    assert_entity_spans_match(response)
+
+
+# Rehydrate PII into Text
 @pytest.mark.parametrize(
     argnames=["response", "text_processed"],
     argvalues=[
@@ -727,7 +798,7 @@ def test_post_redacted_text(
         ),
     ],
 )
-def test_rehydrate_PII(response: list[dict], text_processed: str):
+def test_rehydrate_PII_text(response: list[dict], text_processed: str):
     """
     Test for placing PII data back into a redacted text using the process/text endpoint response (TextResponse).
 
