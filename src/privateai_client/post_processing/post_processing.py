@@ -16,6 +16,56 @@ from ._helper_functions import post_processing_helpers as helpers
 EntityProcessor = Callable[[dict], str]
 
 
+def convert_to_text_response(
+    input_response: AnalyzeTextResponse | list[dict] | dict,
+) -> TextResponse:
+    """
+    Convert an analyze text response or list of dict representing a process text
+    response to a TextResponse.
+
+    Args:
+        input_response: an http response from the DEID container with process text inputs.
+
+    Returns:
+        a response with the TextResponse properties.
+    """
+    redacted_text_key = "processed_text"
+    if isinstance(input_response, AnalyzeTextResponse):
+        # validate response keys
+        json_resp_keys = input_response.body[0].keys()
+        if redacted_text_key in json_resp_keys:
+            response = input_response.to_text_response()
+        else:
+            err_msg = f"This response has no key '{redacted_text_key}'."
+            raise KeyError(err_msg)
+    else:
+        # validate response data type
+        first_redaction = (
+            (input_response[0] if isinstance(input_response[0], dict) else None)
+            if input_response and isinstance(input_response, list)
+            else (input_response if isinstance(input_response, dict) else None)
+        )
+        if first_redaction:
+            data = input_response
+            json_resp_keys = first_redaction.keys()
+            # validate response keys
+            if redacted_text_key in json_resp_keys:
+                temp_response = requests.Response()
+                temp_response.status_code = 200
+                if not isinstance(data, list):
+                    data = [input_response]
+                temp_response._content = json.dumps(data).encode("utf-8")
+                temp_response.headers["Content-Type"] = "application/json"
+                response = TextResponse(temp_response)
+            else:
+                err_msg = f"This dict has no key '{redacted_text_key}'."
+                raise KeyError(err_msg)
+        else:
+            err_msg = "input_response is not a list or a dict."
+            raise TypeError(err_msg)
+    return response
+
+
 def deidentify_text(
     text: list[str],
     response: AnalyzeTextResponse,
@@ -102,11 +152,12 @@ def deidentify_text(
         temp_response = requests.Response()
         temp_response.status_code = 200
         temp_response._content = json.dumps(redactions).encode("utf-8")
+        temp_response.headers["Content-Type"] = "application/json"
         response.response = temp_response
     return modified_texts
 
 
-def post_redacted_text(
+def process_replacements(
     response: TextResponse, entity_processors: dict[str, EntityProcessor]
 ) -> list[str]:
     """
@@ -231,14 +282,10 @@ def reidentify_process_text(response: AnalyzeTextResponse | TextResponse) -> lis
 
     # check if reponse is AnalyzeText
     if isinstance(response, AnalyzeTextResponse):
-        # if it is, convert it to a TextResponse
-        redacted_text_key = "processed_text"
-        json_resp_keys = response.body[0].keys()
-        if redacted_text_key in json_resp_keys:
-            response = response.to_text_response()
-        else:
-            err_msg = f"This response has no key '{redacted_text_key}'."
-            raise KeyError(err_msg)
+        try:
+            response = convert_to_text_response(response)
+        except KeyError as e:
+            print(e)
 
     # now that we know we have at text response:
     # start reidentification

@@ -17,8 +17,9 @@ from ..post_processing import (
     MaskEntityProcessor,
     RehydratePIIProcessor,
     SyntheticReplacementProcessor,
+    convert_to_text_response,
     deidentify_text,
-    post_redacted_text,
+    process_replacements,
     reidentify_process_text,
 )
 from ..tests.test_files import test_response_body
@@ -50,6 +51,81 @@ def make_fake_response(response_body: list[dict]) -> requests.Response:
     response.status_code = 200
     response._content = json.dumps(response_body).encode("utf-8")
     return response
+
+
+# convert to text response
+@pytest.mark.parametrize(
+    argnames=["response", "unredacted_text"],
+    argvalues=[
+        (
+            test_response_body.processed_text_response_1,
+            test_response_body.process_text_1,
+        ),
+        (
+            AnalyzeTextResponse(
+                make_fake_response(test_response_body.analyze_response_1)
+            ),
+            test_response_body.analyze_text_1,
+        ),
+    ],
+)
+def test_convert_to_text_response(response, unredacted_text):
+    """
+    Test that response conversion works as expected.
+    """
+    if isinstance(response, AnalyzeTextResponse):
+        # insert process/text markers into the response
+        entity_processors = {
+            "AGE": AgeEntityBucketProcessor(bin_size=7),
+            "DATE": DateBucketProcessor("month"),
+            "DOB": DateComponentProcessor(redact_components=["DAY"]),
+        }
+
+        default_processor = MarkerEntityProcessor()
+
+        deidentify_text(
+            text=unredacted_text,
+            response=response,
+            entity_processors=entity_processors,
+            default_processor=default_processor,
+            convert_response=True,
+        )
+    # convert response, dict and list[dict] into TextResponse
+    response = convert_to_text_response(response)
+    assert isinstance(response, TextResponse)
+
+
+@pytest.mark.parametrize(
+    argnames=["response", "error_type", "error_msg"],
+    argvalues=[
+        (
+            AnalyzeTextResponse(
+                make_fake_response(test_response_body.analyze_response_1)
+            ),
+            KeyError,
+            "This response has no key 'processed_text'.",
+        ),
+        (
+            test_response_body.analyze_response_1,
+            KeyError,
+            "This dict has no key 'processed_text'.",
+        ),
+        (
+            (
+                {"test_date": 1, "process_test": "Hi my name is James"},
+                ["apple", "bannas"],
+            ),
+            TypeError,
+            "input_response is not a list or a dict.",
+        ),
+    ],
+)
+def test_convert_to_text_response_errors(response, error_type, error_msg):
+    """
+    Test converting response that dont meet the test_convert_to_text_response() constructor's requirements.
+    """
+    with pytest.raises(error_type, match=error_msg):
+        convert_to_text_response(response)
 
 
 # Deidentify text
@@ -709,7 +785,9 @@ def test_post_redacted_text(
     response_before = copy.deepcopy(process_text_response)
 
     # start post-processing of the text response
-    reprocessed_redaction = post_redacted_text(process_text_response, entity_processors)
+    reprocessed_redaction = process_replacements(
+        process_text_response, entity_processors
+    )
 
     # test the transformations were done correctly
     assert text_processed == reprocessed_redaction[0]
@@ -770,7 +848,7 @@ def test_post_redacted_text_endpoint_responses(
     response_before = copy.deepcopy(response)
 
     # start post-processing of the response
-    reprocessed_redaction = post_redacted_text(response, entity_processors)
+    reprocessed_redaction = process_replacements(response, entity_processors)
 
     # test the transformations were done correctly
     assert len(reprocessed_redaction) == len(response_json)
