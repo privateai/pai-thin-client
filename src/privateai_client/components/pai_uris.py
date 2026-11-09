@@ -19,13 +19,14 @@ class PAIURIs:
                 "PAIClient needs either a url, or a scheme and host to initialize. You can find more information on which url to use here: https://docs.private-ai.com/thin-client/"
             )
 
+    # container info
     @property
     def pai_uri(self):
         return self._pai_uri
 
     @property
-    def bleep(self):
-        return self._create_uri(self.pai_uri, "bleep")
+    def version(self):
+        return self._create_uri(self.pai_uri, "")
 
     @property
     def health(self):
@@ -39,21 +40,10 @@ class PAIURIs:
     def diagnostics(self):
         return self._create_uri(self.pai_uri, "diagnostics")
 
+    # text processing
     @property
     def process_text(self):
         return self._create_uri(self.pai_uri, "process", "text")
-
-    @property
-    def process_files_uri(self):
-        return self._create_uri(self.pai_uri, "process", "files", "uri")
-
-    @property
-    def reidentify_text(self):
-        return self._create_uri(self.pai_uri, "process", "text", "reidentify")
-
-    @property
-    def process_files_base64(self):
-        return self._create_uri(self.pai_uri, "process", "files", "base64")
 
     @property
     def ner_text(self):
@@ -64,8 +54,30 @@ class PAIURIs:
         return self._create_uri(self.pai_uri, "analyze", "text")
 
     @property
-    def version(self):
-        return self._create_uri(self.pai_uri, "")
+    def reidentify_text(self):
+        return self._create_uri(self.pai_uri, "process", "text", "reidentify")
 
+    # file processing
+    @property
+    def process_files_base64(self):
+        return self._create_uri(self.pai_uri, "process", "files", "base64")
+
+    @property
+    def process_files_uri(self):
+        return self._create_uri(self.pai_uri, "process", "files", "uri")
+
+    @property
+    def ner_files_base64(self):
+        return self._create_uri(self.pai_uri, "ner", "files", "base64")
+
+    @property
+    def ner_files_uri(self):
+        return self._create_uri(self.pai_uri, "ner", "files", "uri")
+
+    @property
+    def bleep(self):
+        return self._create_uri(self.pai_uri, "bleep")
+
+    # create uri
     def _create_uri(self, *args):
         return "/".join([x.strip("/") for x in args])

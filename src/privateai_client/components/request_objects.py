@@ -447,19 +447,34 @@ class FilterSelector(BaseRequestObject):
 
 
 class PDFOptions(BaseRequestObject):
+    default_approach = "standard"
+    valid_approaches = ["auto", "standard", "enhanced"]
     default_density = 200
     default_max_resolution = 3000
     default_enable_pdf_text_layer: bool = True
+    default_use_inline_replacement = True
+    valid_element_types_to_process = ["page_contents", "hyperlinks"]
 
     def __init__(
         self,
+        approach: str = default_approach,
         density: int = default_density,
         max_resolution: int = default_max_resolution,
         enable_pdf_text_layer: bool = default_enable_pdf_text_layer,
+        use_inline_replacement: bool = default_use_inline_replacement,
+        element_types_to_process: Optional[str] = None,
     ):
+        if self._approach_validator(approach):
+            self._approach = approach
         self._density = density
         self._max_resolution = max_resolution
         self._enable_pdf_text_layer = enable_pdf_text_layer
+        self._use_inline_replacement = use_inline_replacement
+        self._element_types_to_process = element_types_to_process
+
+    @property
+    def approach(self):
+        return self._approach
 
     @property
     def density(self):
@@ -472,6 +487,19 @@ class PDFOptions(BaseRequestObject):
     @property
     def enable_pdf_text_layer(self):
         return self._enable_pdf_text_layer
+
+    @property
+    def use_inline_replacement(self):
+        return self._use_inline_replacement
+
+    @property
+    def element_types_to_process(self):
+        return self._element_types_to_process
+
+    @approach.setter
+    def approach(self, var):
+        if self._approach_validator(var):
+            self._approach = var
 
     @density.setter
     def density(self, var):
@@ -488,6 +516,23 @@ class PDFOptions(BaseRequestObject):
         if self._enable_pdf_text_layer_validator(var):
             self._enable_pdf_text_layer = var
 
+    @use_inline_replacement.setter
+    def use_inline_replacement(self, var):
+        if self._use_inline_replacement_validator(var):
+            self._use_inline_replacement = var
+
+    @element_types_to_process.setter
+    def element_types_to_process(self, var):
+        if self._element_types_to_process_validator(var):
+            self._element_types_to_process = var
+
+    def _approach_validator(self, var):
+        if var not in self.valid_approaches:
+            raise ValueError(
+                f"PDFOptions.approach must be one of {','.join(self.valid_approaches)}, but got {var}"
+            )
+        return True
+
     def _density_validator(self, var):
         if type(var) is not int:
             raise ValueError("PDFOptions.density must be of type int and >0")
@@ -501,6 +546,18 @@ class PDFOptions(BaseRequestObject):
     def _enable_pdf_text_layer_validator(self, var):
         if type(var) is not bool:
             raise ValueError("PDFOptions.enable_pdf_text_layer must be of type bool")
+        return True
+
+    def _use_inline_replacement_validator(self, var):
+        if type(var) is not bool:
+            raise ValueError("PDFOptions.use_inline_replacement must be of type bool")
+        return True
+
+    def _element_types_to_process_validator(self, var):
+        if var not in self.valid_element_types_to_process:
+            raise ValueError(
+                f"PDFOptions.element_types_to_process must be one of {','.join(self.valid_element_types_to_process)}, but got {var}"
+            )
         return True
 
     @classmethod
@@ -604,7 +661,23 @@ class ProcessedMarkerText(BaseRequestObject):
         "UNIQUE_HASHED_ENTITY_TYPE",
     ]
     default_marker_language = "en"
-    valid_marker_languages = ["auto", "en", "fr", "de", "ja", "ko", "nl", "ru", "uk"]
+    valid_marker_languages = [
+        "auto",
+        "nl",
+        "en",
+        "fr",
+        "de",
+        "hi",
+        "it",
+        "ja",
+        "ko",
+        "zh",
+        "pt",
+        "ru",
+        "es",
+        "tl",
+        "uk",
+    ]
     default_coreference_resolution = "heuristics"
     valid_coreference_resolutions = ["heuristics", "model_prediction", "combined"]
 
@@ -708,29 +781,52 @@ class SyntheticAccuracy(Enum):
     STANDARD = "standard"
     STANDARD_MULTILINGUAL = "standard_multilingual"
     STANDARD_AUTOMATIC = "standard_automatic"
+    STANDARD_HIGH_MULTILINGUAL = "standard_high_multilingual"
+    HIGH_MULTILINGUAL = "high_multilingual"
 
 
 class ProcessedSyntheticText(BaseRequestObject):
     attributes = ["_synthetic_entity_accuracy"]
+    default_coreference_resolution = "heuristics"
+    valid_coreference_resolutions = ["heuristics", "model_prediction", "combined"]
 
     def __init__(
         self,
+        coreference_resolution: str = default_coreference_resolution,
         synthetic_entity_accuracy: str = SyntheticAccuracy.STANDARD_AUTOMATIC.value,
     ):
         for attribute in ProcessedMarkerText.attributes + ProcessedMaskText.attributes:
             delattr(self, attribute) if hasattr(self, attribute) else False
         self._type = "SYNTHETIC"
+        if self._coreference_resolution_validator(coreference_resolution):
+            self._coreference_resolution = coreference_resolution
         if self._synthetic_entity_accuracy_validator(synthetic_entity_accuracy):
             self._synthetic_entity_accuracy = synthetic_entity_accuracy
+
+    @property
+    def coreference_resolution(self):
+        return self._coreference_resolution
 
     @property
     def synthetic_entity_accuracy(self):
         return self._synthetic_entity_accuracy
 
+    @coreference_resolution.setter
+    def coreference_resolution(self, var):
+        if self._coreference_resolution_validator(var):
+            self._coreference_resolution = var
+
     @synthetic_entity_accuracy.setter
     def synthetic_entity_accuracy(self, var):
         if self._synthetic_entity_accuracy_validator(var):
             self._synthetic_entity_accuracy = var
+
+    def _coreference_resolution_validator(self, var):
+        if var not in self.valid_coreference_resolutions:
+            raise ValueError(
+                f"{var} is not valid. ProcessedText.coreference_resolution can only be one of the following: {', '.join(self.valid_coreference_resolutions)}"
+            )
+        return True
 
     def _synthetic_entity_accuracy_validator(self, var):
         valid_values = [e.value for e in SyntheticAccuracy]
@@ -1137,11 +1233,13 @@ class NerTextRequest(BaseRequestObject):
         link_batch: Optional[bool] = None,
         entity_detection: Optional[EntityDetection] = None,
         project_id: Optional[str] = None,
+        enable_gibberish_detection: Optional[bool] = None,
     ):
         self.text = text
         self.link_batch = link_batch
         self.entity_detection = entity_detection
         self.project_id = project_id
+        self.enable_gibberish_detection = enable_gibberish_detection
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -1335,11 +1433,13 @@ class ReidentifyTextRequest(BaseRequestObject):
         entities: List[Entity] = [],
         model: str = "",
         reidentify_sensitive_fields: bool = True,
+        project_id: Optional[str] = None,
     ):
         self.reidentify_sensitive_fields = reidentify_sensitive_fields
         self.processed_text = processed_text
         self.entities = entities
         self.model = model
+        self.project_id = project_id
 
     @classmethod
     def fromdict(cls, values: dict):

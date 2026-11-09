@@ -54,27 +54,10 @@ class PAIPostRequests(PAIRequests):
         self.request_type = requests.post
         super(PAIPostRequests, self).__init__(uris)
 
+    # text processing
     def process_text(self, request_object):
         return self.make_request(
             self.request_type, self.uris.process_text, request_object
-        )
-
-    def process_files_uri(self, request_object):
-        return self.make_request(
-            self.request_type, self.uris.process_files_uri, request_object
-        )
-
-    def process_files_base64(self, request_object):
-        return self.make_request(
-            self.request_type, self.uris.process_files_base64, request_object
-        )
-
-    def bleep(self, request_object):
-        return self.make_request(self.request_type, self.uris.bleep, request_object)
-
-    def reidentify_text(self, request_object):
-        return self.make_request(
-            self.request_type, self.uris.reidentify_text, request_object
         )
 
     def ner_text(self, request_object):
@@ -84,3 +67,32 @@ class PAIPostRequests(PAIRequests):
         return self.make_request(
             self.request_type, self.uris.analyze_text, request_object
         )
+
+    def reidentify_text(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.reidentify_text, request_object
+        )
+
+    # file processing
+    def process_files_base64(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.process_files_base64, request_object
+        )
+
+    def process_files_uri(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.process_files_uri, request_object
+        )
+
+    def ner_files_base64(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.ner_files_base64, request_object
+        )
+
+    def ner_files_uri(self, request_object):
+        return self.make_request(
+            self.request_type, self.uris.ner_files_uri, request_object
+        )
+
+    def bleep(self, request_object):
+        return self.make_request(self.request_type, self.uris.bleep, request_object)
