@@ -34,6 +34,7 @@ class BaseRequestObject:
 class AudioOptions(BaseRequestObject):
     default_bleep_start_padding: float = 0.5
     default_bleep_end_padding: float = 0.5
+    default_distortion_steps: Optional[int] = 0
     default_bleep_frequency: Optional[int] = None
     default_bleep_gain: Optional[int] = None
 
@@ -41,6 +42,7 @@ class AudioOptions(BaseRequestObject):
         self,
         bleep_start_padding: float = default_bleep_start_padding,
         bleep_end_padding: float = default_bleep_end_padding,
+        distortion_steps: Optional[int] = default_distortion_steps,
         bleep_frequency: Optional[int] = default_bleep_frequency,
         bleep_gain: Optional[int] = default_bleep_gain,
     ):
@@ -48,6 +50,8 @@ class AudioOptions(BaseRequestObject):
             self._bleep_start_padding = bleep_start_padding
         if self._bleep_end_padding_validator(bleep_end_padding):
             self._bleep_end_padding = bleep_end_padding
+        if self._distortion_steps_validator(distortion_steps):
+            self._distortion_steps = distortion_steps
         if self._bleep_frequency_validator(bleep_frequency):
             self._bleep_frequency = bleep_frequency
         if self._bleep_gain_validator(bleep_gain):
@@ -60,6 +64,10 @@ class AudioOptions(BaseRequestObject):
     @property
     def bleep_end_padding(self):
         return self._bleep_end_padding
+
+    @property
+    def distortion_steps(self):
+        return self._distortion_steps
 
     @property
     def bleep_frequency(self):
@@ -78,6 +86,11 @@ class AudioOptions(BaseRequestObject):
     def bleep_end_padding(self, var):
         if self._bleep_end_padding_validator(var):
             self._bleep_end_padding = var
+
+    @distortion_steps.setter
+    def distortion_steps(self, var):
+        if self._distortion_steps_validator(var):
+            self._distortion_steps = var
 
     @bleep_frequency.setter
     def bleep_frequency(self, var):
@@ -106,6 +119,12 @@ class AudioOptions(BaseRequestObject):
         if var < 0:
             raise ValueError("AudioOptions.bleep_end_padding must be positive")
         return True
+
+    def _distortion_steps_validator(self, var):
+        if type(var) is not int and var is not None:
+            raise ValueError(
+                f"AudioOptionsdistortion_steps must be of type int or None, but got {type(var)}"
+            )
 
     def _bleep_frequency_validator(self, var):
         if type(var) is not int and var is not None:
@@ -570,32 +589,186 @@ class PDFOptions(BaseRequestObject):
             )
 
 
+class OfficeOptions(BaseRequestObject):
+    default_chart_behaviour = "deidentify"
+    valid_chart_behaviour = ["deidentify", "set_to_zero"]
+    default_unsupported_image_behaviour = "replace"
+    valid_unsupported_image_behaviour = ["replace", "keep"]
+    default_bin_containing_file_behaviour = "convert"
+    valid_bin_containing_file_behaviour = ["convert", "leave"]
+
+    def __init__(
+        self,
+        chart_behaviour: Optional[str] = None,
+        unsupported_image_behaviour: Optional[str] = None,
+        structure_tables: Optional[bool] = None,
+        original_file_integrity_check: Optional[bool] = None,
+        bin_containing_file_behaviour: Optional[str] = None,
+        element_types_to_process: Optional[list] = None,
+    ):
+        if self._chart_behaviour_validator(chart_behaviour):
+            self._chart_behaviour = chart_behaviour
+        if self._unsupported_image_behaviour_validator(unsupported_image_behaviour):
+            self._unsupported_image_behaviour = unsupported_image_behaviour
+        if self._structure_tables_validator(structure_tables):
+            self._structure_tables = structure_tables
+        if self._original_file_integrity_check_validator(original_file_integrity_check):
+            self._original_file_integrity_check = original_file_integrity_check
+        if self._bin_containing_file_behaviour_validator(bin_containing_file_behaviour):
+            self._bin_containing_file_behaviour = bin_containing_file_behaviour
+        self._element_types_to_process = element_types_to_process
+
+    @property
+    def chart_behaviour(self):
+        return self._chart_behaviour
+
+    @property
+    def unsupported_image_behaviour(self):
+        return self._unsupported_image_behaviour
+
+    @property
+    def structure_tables(self):
+        return self._structure_tables
+
+    @property
+    def original_file_integrity_check(self):
+        return self._original_file_integrity_check
+
+    @property
+    def bin_containing_file_behaviour(self):
+        return self._bin_containing_file_behaviour
+
+    @property
+    def element_types_to_process(self):
+        return self._element_types_to_process
+
+    @chart_behaviour.setter
+    def chart_behaviour(self, var):
+        if self._chart_behaviour_validator(var):
+            self._chart_behaviour = var
+
+    @unsupported_image_behaviour.setter
+    def unsupported_image_behaviour(self, var):
+        if self._unsupported_image_behaviour_validator(var):
+            self._unsupported_image_behaviour = var
+
+    @structure_tables.setter
+    def structure_tables(self, var):
+        if self._structure_tables_validator(var):
+            self._structure_tables = var
+
+    @original_file_integrity_check.setter
+    def original_file_integrity_check(self, var):
+        if self._original_file_integrity_check_validator(var):
+            self._original_file_integrity_check = var
+
+    @bin_containing_file_behaviour.setter
+    def bin_containing_file_behaviour(self, var):
+        if self._bin_containing_file_behaviour_validator(var):
+            self._bin_containing_file_behaviour = var
+
+    @element_types_to_process.setter
+    def element_types_to_process(self, var):
+        self._element_types_to_process = var
+
+    def _chart_behaviour_validator(self, var):
+        if var not in self.valid_chart_behaviour:
+            raise ValueError(
+                f"OfficeOptions.chart_behaviour must be one of {','.join(self.valid_chart_behaviour)}, but got {var}"
+            )
+        return True
+
+    def _unsupported_image_behaviour_validator(self, var):
+        if var not in self.valid_unsupported_image_behaviour:
+            raise ValueError(
+                f"OfficeOptions.unsupported_image_behaviour must be one of {','.join(self.valid_unsupported_image_behaviour)}, but got {var}"
+            )
+        return True
+
+    def _structure_tables_validator(self, var):
+        if type(var) is not bool and var is not None:
+            raise TypeError(
+                "OfficeOptions.structure_tables must be of type bool or None"
+            )
+        return True
+
+    def _original_file_integrity_check_validator(self, var):
+        if type(var) is not bool and var is not None:
+            raise TypeError(
+                "OfficeOptions.original_file_integrity_check must be of type bool or None"
+            )
+        return True
+
+    def _bin_containing_file_behaviour_validator(self, var):
+        if var not in self.valid_bin_containing_file_behaviour:
+            raise ValueError(
+                f"OfficeOptions.bin_containing_file_behaviour must be one of {','.join(self.valid_bin_containing_file_behaviour)}, but got {var}"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            return cls._fromdict(values)
+        except TypeError:
+            raise TypeError(
+                "OfficeOptions can only accept 'chart_behaviour', 'unsupported_image_behaviour', 'structure_tables',"
+                " 'original_file_integrity_check', 'bin_containing_file_behaviour', and 'element_types_to_process'"
+            )
+
+
 class OCROptions(BaseRequestObject):
     default_ocr_system = "paddleocr"
     VALID_OCR_SYSTEM = [
+        "aws_textract",
         "azure_computer_vision",
         "azure_doc_intelligence",
         "hybrid",
         "paddleocr",
     ]
+    valid_ocr_sys_enable_options = ["paddleocr", "hybrid"]
+    default_padding_ratio = 0.15
 
-    def __init__(self, ocr_system: str = default_ocr_system):
+    def __init__(
+        self,
+        ocr_system: str = default_ocr_system,
+        padding_ratio: Optional[float] = default_padding_ratio,
+    ):
         self._ocr_system = ocr_system
+        if (
+            self._padding_ratio_validator(padding_ratio)
+            and padding_ratio in self.valid_ocr_sys_enable_options
+        ):
+            self._padding_ratio = padding_ratio
 
     @property
     def ocr_system(self):
         return self._ocr_system
+
+    @property
+    def padding_ratio(self):
+        return self._padding_ratio
 
     @ocr_system.setter
     def ocr_system(self, var):
         if self._ocr_system_validator(var):
             self._ocr_system = var
 
+    @padding_ratio.setter
+    def padding_ratio(self, var):
+        if self._padding_ratio_validator(var):
+            self._padding_ratio = var
+
     def _ocr_system_validator(self, var):
         if var not in self.VALID_OCR_SYSTEM:
             raise ValueError(
                 f"OCROptions.ocr_system must be one of {','.join(self.VALID_OCR_SYSTEM)}, but got {var}"
             )
+        return True
+
+    def _padding_ratio_validator(self, var):
+        if not isinstance(var, float) and var is not None:
+            raise TypeError("OCROptions.padding_ratio must be of type float or None")
         return True
 
     @classmethod
@@ -1306,8 +1479,10 @@ class ProcessFileUriRequest(BaseRequestObject):
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
+        processed_text: Optional[ProcessedText] = None,
         project_id: Optional[str] = None,
         ocr_options: Optional[OCROptions] = None,
+        return_processed_text: Optional[bool] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
@@ -1315,8 +1490,18 @@ class ProcessFileUriRequest(BaseRequestObject):
         self.pdf_options = pdf_options
         self.audio_options = audio_options
         self.image_options = image_options
+        self.processed_text = processed_text
         self.project_id = project_id
         self.ocr_options = ocr_options
+        if self._return_processed_text_validator(return_processed_text):
+            self.return_processed_text = return_processed_text
+
+    def _return_processed_text_validator(self, var):
+        if not isinstance(var, bool) and var is not None:
+            raise TypeError(
+                f"ProcessFileUriRequest.return_processed_text must be of type bool or None, but got {type(var)}"
+            )
+        return True
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -1335,6 +1520,8 @@ class ProcessFileUriRequest(BaseRequestObject):
                     initializer_dict[key] = ImageOptions.fromdict(value)
                 elif key == "ocr_options":
                     initializer_dict[key] = OCROptions.fromdict(value)
+                elif key == "processed_text":
+                    initializer_dict[key] = ProcessedText.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
@@ -1353,8 +1540,10 @@ class ProcessFileBase64Request(BaseRequestObject):
         pdf_options: Optional[PDFOptions] = None,
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
+        processed_text: Optional[ProcessedText] = None,
         project_id: Optional[str] = None,
         ocr_options: Optional[OCROptions] = None,
+        return_processed_text: Optional[bool] = None,
     ):
         self.file = file
         self.entity_detection = entity_detection
@@ -1362,8 +1551,18 @@ class ProcessFileBase64Request(BaseRequestObject):
         self.pdf_options = pdf_options
         self.audio_options = audio_options
         self.image_options = image_options
+        self.processed_text = processed_text
         self.project_id = project_id
         self.ocr_options = ocr_options
+        if self._return_processed_text_validator(return_processed_text):
+            self.return_processed_text = return_processed_text
+
+    def _return_processed_text_validator(self, var):
+        if not isinstance(var, bool) and var is not None:
+            raise TypeError(
+                f"ProcessFileBase64Request.return_processed_text must be of type bool or None, but got {type(var)}"
+            )
+        return True
 
     @classmethod
     def fromdict(cls, values: dict):
@@ -1384,6 +1583,8 @@ class ProcessFileBase64Request(BaseRequestObject):
                     initializer_dict[key] = ImageOptions.fromdict(value)
                 elif key == "ocr_options":
                     initializer_dict[key] = OCROptions.fromdict(value)
+                elif key == "processed_text":
+                    initializer_dict[key] = ProcessedText.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
