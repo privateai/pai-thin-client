@@ -1477,6 +1477,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         object_entity_detection: Optional[ObjectEntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
+        office_options: Optional[OfficeOptions] = None,
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
         processed_text: Optional[ProcessedText] = None,
@@ -1488,6 +1489,7 @@ class ProcessFileUriRequest(BaseRequestObject):
         self.entity_detection = entity_detection
         self.object_entity_detection = object_entity_detection
         self.pdf_options = pdf_options
+        self.office_options = office_options
         self.audio_options = audio_options
         self.image_options = image_options
         self.processed_text = processed_text
@@ -1514,6 +1516,8 @@ class ProcessFileUriRequest(BaseRequestObject):
                     initializer_dict[key] = ObjectEntityDetection.fromdict(value)
                 elif key == "pdf_options":
                     initializer_dict[key] = PDFOptions.fromdict(value)
+                elif key == "office_options":
+                    initializer_dict[key] = OfficeOptions.fromdict(value)
                 elif key == "audio_options":
                     initializer_dict[key] = AudioOptions.fromdict(value)
                 elif key == "image_options":
@@ -1538,6 +1542,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         entity_detection: Optional[EntityDetection] = None,
         object_entity_detection: Optional[ObjectEntityDetection] = None,
         pdf_options: Optional[PDFOptions] = None,
+        office_options: Optional[OfficeOptions] = None,
         audio_options: Optional[AudioOptions] = None,
         image_options: Optional[ImageOptions] = None,
         processed_text: Optional[ProcessedText] = None,
@@ -1549,6 +1554,7 @@ class ProcessFileBase64Request(BaseRequestObject):
         self.entity_detection = entity_detection
         self.object_entity_detection = object_entity_detection
         self.pdf_options = pdf_options
+        self.office_options = office_options
         self.audio_options = audio_options
         self.image_options = image_options
         self.processed_text = processed_text
@@ -1577,20 +1583,170 @@ class ProcessFileBase64Request(BaseRequestObject):
                     initializer_dict[key] = ObjectEntityDetection.fromdict(value)
                 elif key == "pdf_options":
                     initializer_dict[key] = PDFOptions.fromdict(value)
-                elif key == "audio_options":
-                    initializer_dict[key] = AudioOptions.fromdict(value)
+                elif key == "office_options":
+                    initializer_dict[key] = OfficeOptions.fromdict(value)
                 elif key == "image_options":
                     initializer_dict[key] = ImageOptions.fromdict(value)
-                elif key == "ocr_options":
-                    initializer_dict[key] = OCROptions.fromdict(value)
+                elif key == "audio_options":
+                    initializer_dict[key] = AudioOptions.fromdict(value)
                 elif key == "processed_text":
                     initializer_dict[key] = ProcessedText.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
                 else:
                     initializer_dict[key] = value
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
                 "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+            )
+
+
+class NERFilesBased64Request(BaseRequestObject):
+    def __init__(
+        self,
+        file: File,
+        entity_detection: Optional[EntityDetection] = None,
+        object_entity_detection: Optional[ObjectEntityDetection] = None,
+        pdf_options: Optional[PDFOptions] = None,
+        office_options: Optional[OfficeOptions] = None,
+        image_options: Optional[ImageOptions] = None,
+        audio_options: Optional[AudioOptions] = None,
+        project_id: Optional[str] = None,
+        ocr_options: Optional[OCROptions] = None,
+        enable_gibberish_detection: Optional[bool] = None,
+        return_extracted_text: Optional[bool] = None,
+    ):
+        self.file = file
+        self.entity_detection = entity_detection
+        self.object_entity_detection = object_entity_detection
+        self.pdf_options = pdf_options
+        self.office_options = office_options
+        self.image_options = image_options
+        self.audio_options = audio_options
+        self.project_id = project_id
+        self.ocr_options = ocr_options
+        if self._enable_gibberish_detection_validator(enable_gibberish_detection):
+            self.enable_gibberish_detection = enable_gibberish_detection
+        if self._return_extracted_text_validator(return_extracted_text):
+            self.return_extracted_text = return_extracted_text
+
+    def _enable_gibberish_detection_validator(self, var):
+        if not isinstance(var, bool) and var is not None:
+            raise TypeError(
+                f"NERFilesBased64Request.enable_gibberish_detection must be of type bool or None, but got {type(var)}"
+            )
+        return True
+
+    def _return_extracted_text_validator(self, var):
+        if not isinstance(var, bool) and var is not None:
+            raise TypeError(
+                f"NERFilesBased64Request.return_extracted_text must be of type bool or None, but got {type(var)}"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "file":
+                    initializer_dict[key] = File.fromdict(value)
+                elif key == "entity_detection":
+                    initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "object_entity_detection":
+                    initializer_dict[key] = ObjectEntityDetection.fromdict(value)
+                elif key == "pdf_options":
+                    initializer_dict[key] = PDFOptions.fromdict(value)
+                elif key == "office_options":
+                    initializer_dict[key] = OfficeOptions.fromdict(value)
+                elif key == "image_options":
+                    initializer_dict[key] = ImageOptions.fromdict(value)
+                elif key == "audio_options":
+                    initializer_dict[key] = AudioOptions.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "NERFilesBased64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', "
+                "'pdf_options', 'office_options', 'image_options', 'audio_options', 'project_id', "
+                "'ocr_options', 'enable_gibberish_detection' and 'return_extracted_text'"
+            )
+
+
+class NERFilesUriRequest(BaseRequestObject):
+    def __init__(
+        self,
+        uri: str,
+        entity_detection: Optional[EntityDetection],
+        object_entity_detection: Optional[ObjectEntityDetection],
+        pdf_options: Optional[PDFOptions],
+        office_options: Optional[OfficeOptions],
+        image_options: Optional[ImageOptions],
+        audio_options: Optional[AudioOptions],
+        project_id: Optional[str],
+        ocr_options: Optional[OCROptions],
+        enable_gibberish_detection: Optional[bool],
+        return_extracted_text: Optional[bool],
+    ):
+        self.uri = uri
+        self.entity_detection = entity_detection
+        self.object_entity_detection = object_entity_detection
+        self.pdf_options = pdf_options
+        self.office_options = office_options
+        self.image_options = image_options
+        self.audio_options = audio_options
+        self.project_id = project_id
+        self.ocr_options = ocr_options
+        if self._enable_gibberish_detection_validator(enable_gibberish_detection):
+            self.enable_gibberish_detection = enable_gibberish_detection
+        if self._return_extracted_text_validator(return_extracted_text):
+            self.return_extracted_text = return_extracted_text
+
+    def _enable_gibberish_detection_validator(self, var):
+        if not isinstance(var, bool) and var is not None:
+            raise TypeError(
+                f"NERFilesUriRequest.enable_gibberish_detection must be of type bool or None, but got {type(var)}"
+            )
+        return True
+
+    def _return_extracted_text_validator(self, var):
+        if not isinstance(var, bool) and var is not None:
+            raise TypeError(
+                f"NERFilesUriRequest.return_extracted_text must be of type bool or None, but got {type(var)}"
+            )
+        return True
+
+    @classmethod
+    def fromdict(cls, values: dict):
+        try:
+            initializer_dict = {}
+            for key, value in values.items():
+                if key == "entity_detection":
+                    initializer_dict[key] = EntityDetection.fromdict(value)
+                elif key == "object_entity_detection":
+                    initializer_dict[key] = ObjectEntityDetection.fromdict(value)
+                elif key == "pdf_options":
+                    initializer_dict[key] = PDFOptions.fromdict(value)
+                elif key == "office_options":
+                    initializer_dict[key] = OfficeOptions.fromdict(value)
+                elif key == "image_options":
+                    initializer_dict[key] = ImageOptions.fromdict(value)
+                elif key == "audio_options":
+                    initializer_dict[key] = AudioOptions.fromdict(value)
+                elif key == "ocr_options":
+                    initializer_dict[key] = OCROptions.fromdict(value)
+                else:
+                    initializer_dict[key] = value
+            return cls._fromdict(initializer_dict)
+        except TypeError:
+            raise TypeError(
+                "NERFilesUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', "
+                "'pdf_options', 'office_options', 'image_options', 'audio_options', 'project_id', "
+                "'ocr_options', 'enable_gibberish_detection' and 'return_extracted_text'"
             )
 
 
