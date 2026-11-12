@@ -204,6 +204,42 @@ class PAIClient:
             )
         return response
 
+    def ner_files_base64(self, request_object: Union[dict, NERFilesBased64Request]):
+        """
+        Used to deidentify base64 files
+        """
+        if isinstance(request_object, NERFilesBased64Request):
+            self.check_version_compatibility()
+            response = NERFilesBase64Response(
+                self.post.ner_files_base64(request_object.to_dict())
+            )
+        elif isinstance(request_object, dict):
+            self.check_version_compatibility()
+            response = NERFilesBase64Response(
+                self.post.ner_files_base64(request_object)
+            )
+        else:
+            raise ValueError(
+                "request_object can only be a dictionary or a NERFilesBased64Request object"
+            )
+
+    def ner_files_uri(self, request_object: Union[dict, NERFilesUriRequest]):
+        """
+        Used to deidentify files by uri
+        """
+        if isinstance(request_object, NERFilesUriRequest):
+            self.check_version_compatibility()
+            response = NERFilesUriResponse(
+                self.post.ner_files_uri(request_object.to_dict())
+            )
+        elif isinstance(request_object, dict):
+            self.check_version_compatibility()
+            response = NERFilesUriResponse(self.post.ner_files_uri(request_object))
+        else:
+            raise ValueError(
+                "request_object can only be a dictionary or a NERFilesUriRequest object"
+            )
+
     def analyze_text(self, request_object: Union[dict, AnalyzeTextRequest]):
         """
         Used to analyze text

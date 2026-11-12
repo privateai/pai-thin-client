@@ -7,6 +7,8 @@ class request_objects:
     file_base64_obj = req_objects.ProcessFileBase64Request
     process_text_obj = req_objects.ProcessTextRequest
     ner_text_obj = req_objects.NerTextRequest
+    ner_file_base64_obj = req_objects.NERFilesBased64Request
+    ner_file_uri_obj = req_objects.NERFilesUriRequest
     analyze_text_obj = req_objects.AnalyzeTextRequest
     audio_options_obj = req_objects.AudioOptions
     image_options_obj = req_objects.ImageOptions
@@ -18,6 +20,7 @@ class request_objects:
     file_obj = req_objects.File
     filter_selector_obj = req_objects.FilterSelector
     pdf_options_obj = req_objects.PDFOptions
+    office_options_obj = req_objects.OfficeOptions
     ocr_options_obj = req_objects.OCROptions
     processed_text_obj = req_objects.ProcessedText
     reidentify_text_obj = req_objects.ReidentifyTextRequest

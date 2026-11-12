@@ -6,6 +6,8 @@ from .pai_responses import (
     FilesBase64Response,
     FilesUriResponse,
     MetricsResponse,
+    NERFilesBase64Response,
+    NERFilesUriResponse,
     NerTextResponse,
     ReidentifyTextResponse,
     TextResponse,
