@@ -176,6 +176,15 @@ class AnalyzeTextResponse(NerTextResponse):
     def analysis_result(self):
         return self.get_attribute_entries("analysis_result")
 
+    @property
+    def synthetic_text(self):
+        return self.get_attribute_entries("synthetic_text")
+
+    def to_text_response(self, response_object: Response = None):
+        if response_object is None:
+            response_object = self.response
+        return TextResponse(response_object)
+
 
 class TextResponse(DemiTextResponse):
     def __init__(self, response_object: Response = None):
@@ -198,6 +207,26 @@ class FilesUriResponse(DemiTextResponse):
     def result_uri(self):
         return self.get_attribute_entries("result_uri")
 
+    @property
+    def languages_detected(self):
+        return self.get_attribute_entries("languages_detected")
+
+    @property
+    def objects(self):
+        return self.get_attribute_entries("objects")
+
+    @property
+    def objects_present(self):
+        return self.get_attribute_entries("objects_present")
+
+    @property
+    def audio_duration(self):
+        return self.get_attribute_entries("audio_duration")
+
+    @property
+    def page_count(self):
+        return self.get_attribute_entries("page_count")
+
 
 class FilesBase64Response(DemiTextResponse):
     def __init__(self, response_object: Response = None):
@@ -206,6 +235,26 @@ class FilesBase64Response(DemiTextResponse):
     @property
     def processed_file(self):
         return self.get_attribute_entries("processed_file")
+
+    @property
+    def languages_detected(self):
+        return self.get_attribute_entries("languages_detected")
+
+    @property
+    def objects(self):
+        return self.get_attribute_entries("objects")
+
+    @property
+    def objects_present(self):
+        return self.get_attribute_entries("objects_present")
+
+    @property
+    def audio_duration(self):
+        return self.get_attribute_entries("audio_duration")
+
+    @property
+    def page_count(self):
+        return self.get_attribute_entries("page_count")
 
 
 class BleepResponse(BaseResponse):
@@ -220,3 +269,53 @@ class BleepResponse(BaseResponse):
 class ReidentifyTextResponse(BaseResponse):
     def __init__(self, response_object: Response = None):
         super(ReidentifyTextResponse, self).__init__(response_object, True)
+
+
+class NERFilesBase64Response(NerTextResponse):
+    def __init__(self, response_object: Response = None):
+        super(NerTextResponse, self).__init__(response_object)
+
+    @property
+    def extracted_text(self):
+        return self.get_attribute_entries("extracted_text")
+
+    @property
+    def objects(self):
+        return self.get_attribute_entries("objects")
+
+    @property
+    def objects_present(self):
+        return self.get_attribute_entries("objects_present")
+
+    @property
+    def audio_duration(self):
+        return self.get_attribute_entries("audio_duration")
+
+    @property
+    def page_count(self):
+        return self.get_attribute_entries("page_count")
+
+
+class NERFilesUriResponse(NerTextResponse):
+    def __init__(self, response_object: Response = None):
+        super(NerTextResponse, self).__init__(response_object)
+
+    @property
+    def extracted_text(self):
+        return self.get_attribute_entries("extracted_text")
+
+    @property
+    def objects(self):
+        return self.get_attribute_entries("objects")
+
+    @property
+    def objects_present(self):
+        return self.get_attribute_entries("objects_present")
+
+    @property
+    def audio_duration(self):
+        return self.get_attribute_entries("audio_duration")
+
+    @property
+    def page_count(self):
+        return self.get_attribute_entries("page_count")
