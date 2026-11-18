@@ -16,6 +16,19 @@ def _get_client():
     return client
 
 
+def _get_file_obj(file_name, content_type):
+    test_dir = "/".join(__file__.split("/")[:-1])
+    filepath = os.path.join(f"{test_dir}", "test_files", file_name)
+    with open(filepath, "rb") as b64_file:
+        file_data = base64.b64encode(b64_file.read()).decode("ascii")
+    return rq.file_obj(data=file_data, content_type=content_type)
+
+
+PPTX_CONTENT_TYPE = (
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+)
+
+
 def test_ping():
     client = _get_client()
     assert client.ping() == True
@@ -172,6 +185,16 @@ def test_processed_text_marker_language():
     assert resp.ok
 
 
+def test_processed_text_marker_language_new():
+    client = _get_client()
+    req = rq.process_text_obj(
+        text=["Hey there!"],
+        processed_text=rq.processed_text_obj(type="MARKER", marker_language="es"),
+    )
+    resp = client.process_text(req)
+    assert resp.ok
+
+
 def test_processed_text_mask():
     client = _get_client()
     req = rq.process_text_obj(
@@ -185,6 +208,18 @@ def test_processed_text_synthetic():
     client = _get_client()
     req = rq.process_text_obj(
         text=["Hey there!"], processed_text=rq.processed_text_obj(type="SYNTHETIC")
+    )
+    resp = client.process_text(req)
+    assert resp.ok
+
+
+def test_processed_text_synthetic_coref():
+    client = _get_client()
+    req = rq.process_text_obj(
+        text=["Hey there!"],
+        processed_text=rq.processed_text_obj(
+            type="SYNTHETIC", coreference_resolution="combined"
+        ),
     )
     resp = client.process_text(req)
     assert resp.ok
@@ -225,6 +260,16 @@ def test_reidentify_text():
     )
     resp = client.reidentify_text(reid_req)
     assert resp.ok
+
+
+def test_reidentify_text_from_process_text_response():
+    client = _get_client()
+    req = rq.process_text_obj(text=["My name is John Smith."], project_id="test")
+    resp = client.process_text(req)
+    reid_req = resp.get_reidentify_request()
+    reid_req.project_id = "test"
+    reid_resp = client.reidentify_text(reid_req)
+    assert reid_resp.ok
 
 
 def test_process_file_base64():
@@ -326,6 +371,65 @@ def test_process_ocr_image_file_base64():
     assert resp.ok
 
 
+def test_process_file_base64_dict_request():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    resp = client.process_files_base64(request_object={"file": file_obj.to_dict()})
+    assert resp.ok
+
+
+def test_process_file_base64_return_processed_text():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    request_obj = rq.file_base64_obj(
+        file=file_obj,
+        processed_text=rq.processed_text_obj(type="MASK"),
+        return_processed_text=True,
+    )
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+    assert resp.processed_text is not None
+
+
+def test_process_file_base64_project_id():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    request_obj = rq.file_base64_obj(file=file_obj, project_id="test")
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_process_pptx_file_base64_office_options():
+    client = _get_client()
+    file_obj = _get_file_obj("demo-simple.pptx", PPTX_CONTENT_TYPE)
+    office_options_obj = rq.office_options_obj(
+        chart_behaviour="set_to_zero",
+        unsupported_image_behaviour="keep",
+        structure_tables=True,
+    )
+    request_obj = rq.file_base64_obj(file=file_obj, office_options=office_options_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_process_audio_file_base64_distortion_steps():
+    client = _get_client()
+    file_obj = _get_file_obj("test_audio.mp3", "audio/mp3")
+    audio_option_obj = rq.audio_options_obj(distortion_steps=2)
+    request_obj = rq.file_base64_obj(file=file_obj, audio_options=audio_option_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_process_ocr_image_file_base64_padding_ratio():
+    client = _get_client()
+    file_obj = _get_file_obj("test_image.jpg", "image/jpg")
+    ocr_option_obj = rq.ocr_options_obj(ocr_system="paddleocr", padding_ratio=0.2)
+    request_obj = rq.file_base64_obj(file=file_obj, ocr_options=ocr_option_obj)
+    resp = client.process_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
 def test_object_entity_detection_default():
     client = _get_client()
 
@@ -423,6 +527,22 @@ def test_ner_text_only():
     assert resp.ok
 
 
+def test_ner_text_enable_gibberish_detection():
+    client = _get_client()
+    req = rq.ner_text_obj(
+        text=["Hey there! asdkjfh qwpeoiru"], enable_gibberish_detection=True
+    )
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_text_project_id():
+    client = _get_client()
+    req = rq.ner_text_obj(text=["Hey there!"], project_id="test")
+    resp = client.ner_text(req)
+    assert resp.ok
+
+
 def test_ner_entity_detection_default():
     client = _get_client()
     req = rq.ner_text_obj(
@@ -497,6 +617,94 @@ def test_ner_full_entity_detection():
         ),
     )
     resp = client.ner_text(req)
+    assert resp.ok
+
+
+def test_ner_file_base64():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    request_obj = rq.ner_file_base64_obj(file=file_obj)
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+    assert resp.entities is not None
+
+
+def test_ner_file_base64_dict_request():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    resp = client.ner_files_base64(request_object={"file": file_obj.to_dict()})
+    assert resp.ok
+
+
+def test_ner_file_base64_return_extracted_text():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    request_obj = rq.ner_file_base64_obj(file=file_obj, return_extracted_text=True)
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+    assert resp.extracted_text is not None
+
+
+def test_ner_file_base64_enable_gibberish_detection():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    request_obj = rq.ner_file_base64_obj(file=file_obj, enable_gibberish_detection=True)
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_ner_file_base64_entity_detection():
+    client = _get_client()
+    file_obj = _get_file_obj("simpsons_wiki.txt", "text/plain")
+    selector = rq.entity_type_selector_obj(type="ENABLE", value=["HIPAA_SAFE_HARBOR"])
+    filter = rq.filter_selector_obj(type="ALLOW", pattern="[A-Za-z0-9]*")
+    request_obj = rq.ner_file_base64_obj(
+        file=file_obj,
+        entity_detection=rq.entity_detection_obj(
+            filter=[filter], entity_types=[selector]
+        ),
+        project_id="test",
+    )
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_ner_pptx_file_base64_office_options():
+    client = _get_client()
+    file_obj = _get_file_obj("demo-simple.pptx", PPTX_CONTENT_TYPE)
+    request_obj = rq.ner_file_base64_obj(
+        file=file_obj,
+        office_options=rq.office_options_obj(structure_tables=True),
+    )
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_ner_dcm_file_base64():
+    client = _get_client()
+    file_obj = _get_file_obj("demo-sequence.dcm", "application/dicom")
+    request_obj = rq.ner_file_base64_obj(file=file_obj)
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_ner_audio_file_base64():
+    client = _get_client()
+    file_obj = _get_file_obj("test_audio.mp3", "audio/mp3")
+    request_obj = rq.ner_file_base64_obj(file=file_obj)
+    resp = client.ner_files_base64(request_object=request_obj)
+    assert resp.ok
+
+
+def test_ner_ocr_image_file_base64():
+    client = _get_client()
+    file_obj = _get_file_obj("test_image.jpg", "image/jpg")
+    request_obj = rq.ner_file_base64_obj(
+        file=file_obj,
+        ocr_options=rq.ocr_options_obj(ocr_system="paddleocr"),
+        object_entity_detection=rq.object_entity_detection_obj(),
+    )
+    resp = client.ner_files_base64(request_object=request_obj)
     assert resp.ok
 
 

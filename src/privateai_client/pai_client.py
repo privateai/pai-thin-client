@@ -222,6 +222,7 @@ class PAIClient:
             raise ValueError(
                 "request_object can only be a dictionary or a NERFilesBased64Request object"
             )
+        return response
 
     def ner_files_uri(self, request_object: Union[dict, NERFilesUriRequest]):
         """
@@ -239,6 +240,7 @@ class PAIClient:
             raise ValueError(
                 "request_object can only be a dictionary or a NERFilesUriRequest object"
             )
+        return response
 
     def analyze_text(self, request_object: Union[dict, AnalyzeTextRequest]):
         """
