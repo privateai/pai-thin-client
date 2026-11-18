@@ -123,8 +123,9 @@ class AudioOptions(BaseRequestObject):
     def _distortion_steps_validator(self, var):
         if type(var) is not int and var is not None:
             raise ValueError(
-                f"AudioOptionsdistortion_steps must be of type int or None, but got {type(var)}"
+                f"AudioOptions.distortion_steps must be of type int or None, but got {type(var)}"
             )
+        return True
 
     def _bleep_frequency_validator(self, var):
         if type(var) is not int and var is not None:
@@ -489,7 +490,8 @@ class PDFOptions(BaseRequestObject):
         self._max_resolution = max_resolution
         self._enable_pdf_text_layer = enable_pdf_text_layer
         self._use_inline_replacement = use_inline_replacement
-        self._element_types_to_process = element_types_to_process
+        if self._element_types_to_process_validator(element_types_to_process):
+            self._element_types_to_process = element_types_to_process
 
     @property
     def approach(self):
@@ -573,7 +575,7 @@ class PDFOptions(BaseRequestObject):
         return True
 
     def _element_types_to_process_validator(self, var):
-        if var not in self.valid_element_types_to_process:
+        if var not in self.valid_element_types_to_process and var is not None:
             raise ValueError(
                 f"PDFOptions.element_types_to_process must be one of {','.join(self.valid_element_types_to_process)}, but got {var}"
             )
@@ -585,7 +587,8 @@ class PDFOptions(BaseRequestObject):
             return cls._fromdict(values)
         except TypeError:
             raise TypeError(
-                "PDFOptions can only accept 'density', 'max_resolution' and 'enable_pdf_text_layer'"
+                "PDFOptions can only accept 'approach', 'density', 'max_resolution', 'enable_pdf_text_layer',"
+                " 'use_inline_replacement', and 'element_types_to_process'"
             )
 
 
@@ -672,14 +675,14 @@ class OfficeOptions(BaseRequestObject):
         self._element_types_to_process = var
 
     def _chart_behaviour_validator(self, var):
-        if var not in self.valid_chart_behaviour:
+        if var not in self.valid_chart_behaviour and var is not None:
             raise ValueError(
                 f"OfficeOptions.chart_behaviour must be one of {','.join(self.valid_chart_behaviour)}, but got {var}"
             )
         return True
 
     def _unsupported_image_behaviour_validator(self, var):
-        if var not in self.valid_unsupported_image_behaviour:
+        if var not in self.valid_unsupported_image_behaviour and var is not None:
             raise ValueError(
                 f"OfficeOptions.unsupported_image_behaviour must be one of {','.join(self.valid_unsupported_image_behaviour)}, but got {var}"
             )
@@ -700,7 +703,7 @@ class OfficeOptions(BaseRequestObject):
         return True
 
     def _bin_containing_file_behaviour_validator(self, var):
-        if var not in self.valid_bin_containing_file_behaviour:
+        if var not in self.valid_bin_containing_file_behaviour and var is not None:
             raise ValueError(
                 f"OfficeOptions.bin_containing_file_behaviour must be one of {','.join(self.valid_bin_containing_file_behaviour)}, but got {var}"
             )
@@ -735,9 +738,10 @@ class OCROptions(BaseRequestObject):
         padding_ratio: Optional[float] = default_padding_ratio,
     ):
         self._ocr_system = ocr_system
+        self._padding_ratio = None
         if (
             self._padding_ratio_validator(padding_ratio)
-            and padding_ratio in self.valid_ocr_sys_enable_options
+            and ocr_system in self.valid_ocr_sys_enable_options
         ):
             self._padding_ratio = padding_ratio
 
@@ -776,7 +780,9 @@ class OCROptions(BaseRequestObject):
         try:
             return cls._fromdict(values)
         except TypeError:
-            raise TypeError("OCROptions can only accept 'ocr_system'")
+            raise TypeError(
+                "OCROptions can only accept 'ocr_system' and 'padding_ratio'"
+            )
 
 
 class ObjectEntityTypeSelector(BaseRequestObject):
@@ -1007,6 +1013,7 @@ class ProcessedSyntheticText(BaseRequestObject):
             raise ValueError(
                 f"{var} is not valid. Synthetic Entity Accuracy can only accept values {', '.join(valid_values)}"
             )
+        return True
 
 
 class ProcessedText(ProcessedMarkerText, ProcessedMaskText, ProcessedSyntheticText):
@@ -1426,7 +1433,7 @@ class NerTextRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
+                "NerTextRequest can only accept the values 'text', 'link_batch', 'entity_detection', 'project_id' and 'enable_gibberish_detection'"
             )
 
 
@@ -1531,7 +1538,9 @@ class ProcessFileUriRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+                "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', "
+                "'pdf_options', 'office_options', 'audio_options', 'image_options', 'processed_text', 'project_id', "
+                "'ocr_options' and 'return_processed_text'"
             )
 
 
@@ -1598,7 +1607,9 @@ class ProcessFileBase64Request(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+                "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', "
+                "'pdf_options', 'office_options', 'audio_options', 'image_options', 'processed_text', 'project_id', "
+                "'ocr_options' and 'return_processed_text'"
             )
 
 
@@ -1681,16 +1692,16 @@ class NERFilesUriRequest(BaseRequestObject):
     def __init__(
         self,
         uri: str,
-        entity_detection: Optional[EntityDetection],
-        object_entity_detection: Optional[ObjectEntityDetection],
-        pdf_options: Optional[PDFOptions],
-        office_options: Optional[OfficeOptions],
-        image_options: Optional[ImageOptions],
-        audio_options: Optional[AudioOptions],
-        project_id: Optional[str],
-        ocr_options: Optional[OCROptions],
-        enable_gibberish_detection: Optional[bool],
-        return_extracted_text: Optional[bool],
+        entity_detection: Optional[EntityDetection] = None,
+        object_entity_detection: Optional[ObjectEntityDetection] = None,
+        pdf_options: Optional[PDFOptions] = None,
+        office_options: Optional[OfficeOptions] = None,
+        image_options: Optional[ImageOptions] = None,
+        audio_options: Optional[AudioOptions] = None,
+        project_id: Optional[str] = None,
+        ocr_options: Optional[OCROptions] = None,
+        enable_gibberish_detection: Optional[bool] = None,
+        return_extracted_text: Optional[bool] = None,
     ):
         self.uri = uri
         self.entity_detection = entity_detection
@@ -1812,5 +1823,5 @@ class ReidentifyTextRequest(BaseRequestObject):
             return cls._fromdict(initializer_dict)
         except TypeError:
             raise TypeError(
-                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_fields'"
+                "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model', 'reidentify_sensitive_fields' and 'project_id'"
             )

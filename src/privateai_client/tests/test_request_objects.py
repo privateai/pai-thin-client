@@ -69,7 +69,7 @@ def test_filter_selector_initializer2():
     assert filter_selector.threshold == 1
 
 
-def test_filter_selector_initializer():
+def test_filter_selector_initializer3():
     test_type = "ALLOW_TEXT"
     test_pattern = "[A-Z]"
     filter_selector = FilterSelector(type=test_type, pattern=test_pattern)
@@ -141,7 +141,7 @@ def test_filter_selector_entity_type_validator():
     assert "FilterSelector.entity_type must be of type string" in str(excinfo.value)
 
 
-def test_filter_selector_entity_type_validator():
+def test_filter_selector_entity_type_validator2():
     test_type = "BLOCK"
     test_pattern = "[A-Z]"
     test_entity_type = "TEST"
@@ -360,7 +360,7 @@ def test_entity_detection_entity_types_validator():
     assert error_msg in str(excinfo.value)
 
 
-def test_entity_detection_entity_types_validator():
+def test_entity_detection_entity_types_validator2():
     error_msg = "EntityDetection.filter can only contain FilterSelector objects"
     with pytest.raises(ValueError) as excinfo:
         EntityDetection(
@@ -642,28 +642,51 @@ def test_pdf_options_default_initializer():
     assert pdf_options.density == 200
     assert pdf_options.max_resolution == 3000
     assert pdf_options.enable_pdf_text_layer is True
+    assert pdf_options.approach == "standard"
+    assert pdf_options.use_inline_replacement is True
 
 
 def test_pdf_options_initializer():
     pdf_options = PDFOptions(
-        density=300, max_resolution=500, enable_pdf_text_layer=False
+        density=300,
+        max_resolution=500,
+        enable_pdf_text_layer=False,
+        approach="auto",
+        use_inline_replacement=False,
+        element_types_to_process="page_contents",
     )
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is False
+    assert pdf_options.approach == "auto"
+    assert pdf_options.use_inline_replacement is False
+    assert pdf_options.element_types_to_process == "page_contents"
 
 
 def test_pdf_options_initialize_fromdict():
     pdf_options = PDFOptions.fromdict(
-        {"density": 300, "max_resolution": 500, "enable_pdf_text_layer": True}
+        {
+            "density": 300,
+            "max_resolution": 500,
+            "enable_pdf_text_layer": True,
+            "approach": "auto",
+            "use_inline_replacement": True,
+            "element_types_to_process": "page_contents",
+        }
     )
     assert pdf_options.density == 300
     assert pdf_options.max_resolution == 500
     assert pdf_options.enable_pdf_text_layer is True
+    assert pdf_options.approach == "auto"
+    assert pdf_options.use_inline_replacement is True
+    assert pdf_options.element_types_to_process == "page_contents"
 
 
 def test_pdf_options_invalid_initialize_fromdict():
-    error_msg = "PDFOptions can only accept 'density', 'max_resolution' and 'enable_pdf_text_layer'"
+    error_msg = (
+        "PDFOptions can only accept 'approach', 'density', 'max_resolution', 'enable_pdf_text_layer',"
+        " 'use_inline_replacement', and 'element_types_to_process'"
+    )
     with pytest.raises(TypeError) as excinfo:
         PDFOptions.fromdict({"density": 300, "max_resolution": 500, "junk": "value"})
     assert error_msg in str(excinfo.value)
@@ -677,6 +700,60 @@ def test_pdf_options_setters():
     assert pdf_options.max_resolution == 10
     pdf_options.enable_pdf_text_layer = False
     assert pdf_options.enable_pdf_text_layer is False
+    pdf_options.approach = "enhanced"
+    assert pdf_options.approach == "enhanced"
+    pdf_options.use_inline_replacement = False
+    assert pdf_options.use_inline_replacement is False
+    pdf_options.element_types_to_process = "hyperlinks"
+    assert pdf_options.element_types_to_process == "hyperlinks"
+
+
+def test_pdf_options_element_types_to_process_initialize_validator():
+    error_msg = "PDFOptions.element_types_to_process must be one of page_contents,hyperlinks, but got junk"
+    with pytest.raises(ValueError) as excinfo:
+        PDFOptions(element_types_to_process="junk")
+    assert error_msg in str(excinfo.value)
+
+
+def test_pdf_options_element_types_to_process_setter_accepts_none():
+    pdf_options = PDFOptions(element_types_to_process="hyperlinks")
+    pdf_options.element_types_to_process = None
+    assert pdf_options.element_types_to_process is None
+
+
+def test_pdf_options_approach_initialize_validator():
+    error_msg = (
+        "PDFOptions.approach must be one of auto,standard,enhanced, but got junk"
+    )
+    with pytest.raises(ValueError) as excinfo:
+        PDFOptions(approach="junk")
+    assert error_msg in str(excinfo.value)
+
+
+def test_pdf_options_approach_validator():
+    error_msg = (
+        "PDFOptions.approach must be one of auto,standard,enhanced, but got junk"
+    )
+    pdf_options = PDFOptions()
+    with pytest.raises(ValueError) as excinfo:
+        pdf_options.approach = "junk"
+    assert error_msg in str(excinfo.value)
+
+
+def test_pdf_options_use_inline_replacement_validator():
+    error_msg = "PDFOptions.use_inline_replacement must be of type bool"
+    pdf_options = PDFOptions()
+    with pytest.raises(ValueError) as excinfo:
+        pdf_options.use_inline_replacement = "junk"
+    assert error_msg in str(excinfo.value)
+
+
+def test_pdf_options_element_types_to_process_validator():
+    error_msg = "PDFOptions.element_types_to_process must be one of page_contents,hyperlinks, but got junk"
+    pdf_options = PDFOptions()
+    with pytest.raises(ValueError) as excinfo:
+        pdf_options.element_types_to_process = "junk"
+    assert error_msg in str(excinfo.value)
 
 
 def test_pdf_options_density_validator():
@@ -708,6 +785,172 @@ def test_pdf_options_to_dict():
     assert pdf_options["density"] == 200
     assert pdf_options["max_resolution"] == 3000
     assert pdf_options["enable_pdf_text_layer"] is True
+    assert pdf_options["approach"] == "standard"
+    assert pdf_options["use_inline_replacement"] is True
+    with pytest.raises(KeyError):
+        pdf_options["element_types_to_process"]
+
+
+# Office Options Tests
+def test_office_options_default_initializer():
+    office_options = OfficeOptions()
+    assert office_options.chart_behaviour is None
+    assert office_options.unsupported_image_behaviour is None
+    assert office_options.structure_tables is None
+    assert office_options.original_file_integrity_check is None
+    assert office_options.bin_containing_file_behaviour is None
+    assert office_options.element_types_to_process is None
+    assert office_options.to_dict() == {}
+
+
+def test_office_options_initializer():
+    office_options = OfficeOptions(
+        chart_behaviour="set_to_zero",
+        unsupported_image_behaviour="keep",
+        structure_tables=True,
+        original_file_integrity_check=False,
+        bin_containing_file_behaviour="leave",
+        element_types_to_process=["page_contents"],
+    )
+    assert office_options.chart_behaviour == "set_to_zero"
+    assert office_options.unsupported_image_behaviour == "keep"
+    assert office_options.structure_tables is True
+    assert office_options.original_file_integrity_check is False
+    assert office_options.bin_containing_file_behaviour == "leave"
+    assert office_options.element_types_to_process == ["page_contents"]
+
+
+def test_office_options_initialize_fromdict():
+    office_options = OfficeOptions.fromdict(
+        {
+            "chart_behaviour": "deidentify",
+            "unsupported_image_behaviour": "replace",
+            "structure_tables": False,
+            "original_file_integrity_check": True,
+            "bin_containing_file_behaviour": "convert",
+            "element_types_to_process": ["page_contents"],
+        }
+    )
+    assert office_options.chart_behaviour == "deidentify"
+    assert office_options.unsupported_image_behaviour == "replace"
+    assert office_options.structure_tables is False
+    assert office_options.original_file_integrity_check is True
+    assert office_options.bin_containing_file_behaviour == "convert"
+    assert office_options.element_types_to_process == ["page_contents"]
+
+
+def test_office_options_invalid_initialize_fromdict():
+    error_msg = (
+        "OfficeOptions can only accept 'chart_behaviour', 'unsupported_image_behaviour', 'structure_tables',"
+        " 'original_file_integrity_check', 'bin_containing_file_behaviour', and 'element_types_to_process'"
+    )
+    with pytest.raises(TypeError) as excinfo:
+        OfficeOptions.fromdict(
+            {
+                "chart_behaviour": "deidentify",
+                "unsupported_image_behaviour": "replace",
+                "bin_containing_file_behaviour": "convert",
+                "junk": "value",
+            }
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_office_options_setters():
+    office_options = OfficeOptions(
+        chart_behaviour="deidentify",
+        unsupported_image_behaviour="replace",
+        bin_containing_file_behaviour="convert",
+    )
+    office_options.chart_behaviour = "set_to_zero"
+    office_options.unsupported_image_behaviour = "keep"
+    office_options.structure_tables = True
+    office_options.original_file_integrity_check = True
+    office_options.bin_containing_file_behaviour = "leave"
+    office_options.element_types_to_process = ["page_contents"]
+
+    assert office_options.chart_behaviour == "set_to_zero"
+    assert office_options.unsupported_image_behaviour == "keep"
+    assert office_options.structure_tables is True
+    assert office_options.original_file_integrity_check is True
+    assert office_options.bin_containing_file_behaviour == "leave"
+    assert office_options.element_types_to_process == ["page_contents"]
+
+
+def test_office_options_chart_behaviour_validator():
+    error_msg = "OfficeOptions.chart_behaviour must be one of deidentify,set_to_zero, but got junk"
+    with pytest.raises(ValueError) as excinfo:
+        OfficeOptions(
+            chart_behaviour="junk",
+            unsupported_image_behaviour="replace",
+            bin_containing_file_behaviour="convert",
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_office_options_unsupported_image_behaviour_validator():
+    error_msg = "OfficeOptions.unsupported_image_behaviour must be one of replace,keep, but got junk"
+    with pytest.raises(ValueError) as excinfo:
+        OfficeOptions(
+            chart_behaviour="deidentify",
+            unsupported_image_behaviour="junk",
+            bin_containing_file_behaviour="convert",
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_office_options_structure_tables_validator():
+    error_msg = "OfficeOptions.structure_tables must be of type bool or None"
+    with pytest.raises(TypeError) as excinfo:
+        OfficeOptions(
+            chart_behaviour="deidentify",
+            unsupported_image_behaviour="replace",
+            structure_tables="junk",
+            bin_containing_file_behaviour="convert",
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_office_options_original_file_integrity_check_validator():
+    error_msg = (
+        "OfficeOptions.original_file_integrity_check must be of type bool or None"
+    )
+    with pytest.raises(TypeError) as excinfo:
+        OfficeOptions(
+            chart_behaviour="deidentify",
+            unsupported_image_behaviour="replace",
+            original_file_integrity_check="junk",
+            bin_containing_file_behaviour="convert",
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_office_options_bin_containing_file_behaviour_validator():
+    error_msg = "OfficeOptions.bin_containing_file_behaviour must be one of convert,leave, but got junk"
+    with pytest.raises(ValueError) as excinfo:
+        OfficeOptions(
+            chart_behaviour="deidentify",
+            unsupported_image_behaviour="replace",
+            bin_containing_file_behaviour="junk",
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_office_options_to_dict():
+    office_options = OfficeOptions(
+        chart_behaviour="deidentify",
+        unsupported_image_behaviour="keep",
+        structure_tables=True,
+        bin_containing_file_behaviour="leave",
+    ).to_dict()
+    assert office_options["chart_behaviour"] == "deidentify"
+    assert office_options["unsupported_image_behaviour"] == "keep"
+    assert office_options["structure_tables"] is True
+    assert office_options["bin_containing_file_behaviour"] == "leave"
+    with pytest.raises(KeyError):
+        office_options["original_file_integrity_check"]
+    with pytest.raises(KeyError):
+        office_options["element_types_to_process"]
 
 
 # Audio Options Tests
@@ -715,6 +958,7 @@ def test_audio_options_default_initializer():
     audio_options = AudioOptions()
     assert audio_options.bleep_end_padding == 0.5
     assert audio_options.bleep_start_padding == 0.5
+    assert audio_options.distortion_steps == 0
     assert audio_options.bleep_frequency == None
     assert audio_options.bleep_gain == None
 
@@ -723,11 +967,13 @@ def test_audio_options_initializer():
     audio_options = AudioOptions(
         bleep_start_padding=200.0,
         bleep_end_padding=300.0,
+        distortion_steps=3,
         bleep_gain=-2,
         bleep_frequency=250,
     )
     assert audio_options.bleep_start_padding == 200.0
     assert audio_options.bleep_end_padding == 300.0
+    assert audio_options.distortion_steps == 3
     assert audio_options.bleep_gain == -2
     assert audio_options.bleep_frequency == 250
 
@@ -776,11 +1022,20 @@ def test_audio_options_setters():
     audio_options.bleep_start_padding = 2.0
     audio_options.bleep_frequency = 100
     audio_options.bleep_gain = -50
+    audio_options.distortion_steps = 5
 
     assert audio_options.bleep_end_padding == 1.0
     assert audio_options.bleep_start_padding == 2.0
     assert audio_options.bleep_frequency == 100
     assert audio_options.bleep_gain == -50
+    assert audio_options.distortion_steps == 5
+
+
+def test_audio_options_distortion_steps_validator():
+    error_msg = "distortion_steps must be of type int or None"
+    with pytest.raises(ValueError) as excinfo:
+        AudioOptions().distortion_steps = "junk"
+    assert error_msg in str(excinfo.value)
 
 
 def test_audio_options_bleep_start_padding_validator():
@@ -815,6 +1070,7 @@ def test_audio_options_to_dict():
     audio_options = AudioOptions().to_dict()
     assert audio_options["bleep_end_padding"] == 0.5
     assert audio_options["bleep_start_padding"] == 0.5
+    assert audio_options["distortion_steps"] == 0
 
     with pytest.raises(KeyError):
         assert audio_options["bleep_gain"] == -3
@@ -885,6 +1141,7 @@ def test_image_options_palette_validator():
 def test_ocr_options_default_initializer():
     ocr_options = OCROptions()
     assert ocr_options.ocr_system == "paddleocr"
+    assert ocr_options.padding_ratio == 0.15
 
 
 def test_ocr_options_initializer():
@@ -892,13 +1149,31 @@ def test_ocr_options_initializer():
     assert ocr_options.ocr_system == "azure_doc_intelligence"
 
 
+def test_ocr_options_padding_ratio_initializer():
+    ocr_options = OCROptions(ocr_system="hybrid", padding_ratio=0.2)
+    assert ocr_options.ocr_system == "hybrid"
+    assert ocr_options.padding_ratio == 0.2
+
+
+def test_ocr_options_padding_ratio_ignored_for_unsupported_ocr_system():
+    ocr_options = OCROptions(ocr_system="azure_doc_intelligence", padding_ratio=0.2)
+    assert ocr_options.padding_ratio is None
+    assert "padding_ratio" not in ocr_options.to_dict()
+
+
 def test_ocr_options_initialize_fromdict():
     ocr_options = OCROptions.fromdict({"ocr_system": "azure_doc_intelligence"})
     assert ocr_options.ocr_system == "azure_doc_intelligence"
 
 
+def test_ocr_options_padding_ratio_initialize_fromdict():
+    ocr_options = OCROptions.fromdict({"ocr_system": "paddleocr", "padding_ratio": 0.3})
+    assert ocr_options.ocr_system == "paddleocr"
+    assert ocr_options.padding_ratio == 0.3
+
+
 def test_ocr_options_invalid_initialize_fromdict():
-    error_msg = "OCROptions can only accept 'ocr_system'"
+    error_msg = "OCROptions can only accept 'ocr_system' and 'padding_ratio'"
     with pytest.raises(TypeError) as excinfo:
         OCROptions.fromdict({"ocr_system": "azure_doc_intelligence", "junk": "value"})
     assert error_msg in str(excinfo.value)
@@ -907,10 +1182,22 @@ def test_ocr_options_invalid_initialize_fromdict():
 def test_ocr_options_setters():
     ocr_options = OCROptions(ocr_system="hybrid")
     assert ocr_options.ocr_system == "hybrid"
+    ocr_options.ocr_system = "aws_textract"
+    assert ocr_options.ocr_system == "aws_textract"
+    ocr_options.padding_ratio = 0.25
+    assert ocr_options.padding_ratio == 0.25
+
+
+def test_ocr_options_padding_ratio_validator():
+    error_msg = "OCROptions.padding_ratio must be of type float or None"
+    ocr_options = OCROptions()
+    with pytest.raises(TypeError) as excinfo:
+        ocr_options.padding_ratio = "junk"
+    assert error_msg in str(excinfo.value)
 
 
 def test_ocr_options_ocr_system_validator():
-    error_msg = "OCROptions.ocr_system must be one of azure_computer_vision,azure_doc_intelligence,hybrid,paddleocr, but got junk"
+    error_msg = "OCROptions.ocr_system must be one of aws_textract,azure_computer_vision,azure_doc_intelligence,hybrid,paddleocr, but got junk"
     ocr_options = OCROptions()
     with pytest.raises(ValueError) as excinfo:
         ocr_options.ocr_system = "junk"
@@ -920,6 +1207,7 @@ def test_ocr_options_ocr_system_validator():
 def test_ocr_options_to_dict():
     ocr_options = OCROptions().to_dict()
     assert ocr_options["ocr_system"] == "paddleocr"
+    assert ocr_options["padding_ratio"] == 0.15
 
 
 # Timestamp Tests
@@ -1202,6 +1490,19 @@ def test_ner_text_request_default_initializer():
     assert ner_text_request.text == ["hey"]
     assert ner_text_request.link_batch is None
     assert ner_text_request.entity_detection is None
+    assert ner_text_request.project_id is None
+    assert ner_text_request.enable_gibberish_detection is None
+
+
+def test_ner_text_request_enable_gibberish_detection():
+    ner_text_request = NerTextRequest(
+        text=["hey"], project_id="my_project", enable_gibberish_detection=True
+    )
+    assert ner_text_request.project_id == "my_project"
+    assert ner_text_request.enable_gibberish_detection is True
+    ner_text_request_dict = ner_text_request.to_dict()
+    assert ner_text_request_dict["project_id"] == "my_project"
+    assert ner_text_request_dict["enable_gibberish_detection"] is True
 
 
 def test_ner_text_request_initializer():
@@ -1266,7 +1567,7 @@ def test_ner_text_request_initialize_fromdict():
 
 
 def test_ner_text_request_invalid_initialize_fromdict():
-    error_msg = "NerTextRequest can only accept the values 'text', 'link_batch' and 'entity_detection'"
+    error_msg = "NerTextRequest can only accept the values 'text', 'link_batch', 'entity_detection', 'project_id' and 'enable_gibberish_detection'"
     request_obj = {
         "text": ["hey!"],
         "link_batch": False,
@@ -1545,7 +1846,60 @@ def test_process_file_uri_request_default_initializer():
     assert process_file_uri_obj.entity_detection is None
     assert process_file_uri_obj.object_entity_detection is None
     assert process_file_uri_obj.pdf_options is None
+    assert process_file_uri_obj.office_options is None
     assert process_file_uri_obj.audio_options is None
+    assert process_file_uri_obj.processed_text is None
+    assert process_file_uri_obj.return_processed_text is None
+
+
+def test_process_file_uri_request_new_options():
+    office_options = OfficeOptions(
+        chart_behaviour="set_to_zero",
+        unsupported_image_behaviour="keep",
+        bin_containing_file_behaviour="leave",
+    )
+    processed_text = ProcessedText(type="MASK")
+    process_file_uri_obj = ProcessFileUriRequest(
+        uri="this/location/right/here.docx",
+        office_options=office_options,
+        processed_text=processed_text,
+        return_processed_text=True,
+    )
+    assert process_file_uri_obj.office_options.chart_behaviour == "set_to_zero"
+    assert process_file_uri_obj.processed_text.type == "MASK"
+    assert process_file_uri_obj.return_processed_text is True
+
+    process_file_uri_dict = process_file_uri_obj.to_dict()
+    assert process_file_uri_dict["office_options"]["chart_behaviour"] == "set_to_zero"
+    assert process_file_uri_dict["processed_text"]["type"] == "MASK"
+    assert process_file_uri_dict["return_processed_text"] is True
+
+
+def test_process_file_uri_request_new_options_fromdict():
+    process_file_uri_obj = ProcessFileUriRequest.fromdict(
+        {
+            "uri": "this/location/right/here.docx",
+            "office_options": {
+                "chart_behaviour": "deidentify",
+                "unsupported_image_behaviour": "replace",
+                "bin_containing_file_behaviour": "convert",
+            },
+            "processed_text": {"type": "MASK"},
+            "return_processed_text": False,
+        }
+    )
+    assert process_file_uri_obj.office_options.chart_behaviour == "deidentify"
+    assert process_file_uri_obj.processed_text.type == "MASK"
+    assert process_file_uri_obj.return_processed_text is False
+
+
+def test_process_file_uri_request_return_processed_text_validator():
+    error_msg = "ProcessFileUriRequest.return_processed_text must be of type bool or None, but got <class 'str'>"
+    with pytest.raises(TypeError) as excinfo:
+        ProcessFileUriRequest(
+            uri="this/location/right/here.png", return_processed_text="junk"
+        )
+    assert error_msg in str(excinfo.value)
 
 
 def test_process_file_uri_request_initializer():
@@ -1632,7 +1986,11 @@ def test_process_file_uri_request_initialize_fromdict():
 
 
 def test_process_file_uri_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+    error_msg = (
+        "ProcessFileUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', "
+        "'pdf_options', 'office_options', 'audio_options', 'image_options', 'processed_text', 'project_id', "
+        "'ocr_options' and 'return_processed_text'"
+    )
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
     entity_detection = EntityDetection(
@@ -1718,7 +2076,71 @@ def test_process_file_base64_request_default_initializer():
     assert process_file_base64_request_obj.entity_detection is None
     assert process_file_base64_request_obj.object_entity_detection is None
     assert process_file_base64_request_obj.pdf_options is None
+    assert process_file_base64_request_obj.office_options is None
     assert process_file_base64_request_obj.audio_options is None
+    assert process_file_base64_request_obj.processed_text is None
+    assert process_file_base64_request_obj.return_processed_text is None
+
+
+def test_process_file_base64_request_new_options():
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    office_options = OfficeOptions(
+        chart_behaviour="set_to_zero",
+        unsupported_image_behaviour="keep",
+        bin_containing_file_behaviour="leave",
+    )
+    processed_text = ProcessedText(type="MASK")
+    process_file_base64_request_obj = ProcessFileBase64Request(
+        file=file,
+        office_options=office_options,
+        processed_text=processed_text,
+        return_processed_text=True,
+    )
+    assert (
+        process_file_base64_request_obj.office_options.chart_behaviour == "set_to_zero"
+    )
+    assert process_file_base64_request_obj.processed_text.type == "MASK"
+    assert process_file_base64_request_obj.return_processed_text is True
+
+    process_file_base64_dict = process_file_base64_request_obj.to_dict()
+    assert (
+        process_file_base64_dict["office_options"]["chart_behaviour"] == "set_to_zero"
+    )
+    assert process_file_base64_dict["processed_text"]["type"] == "MASK"
+    assert process_file_base64_dict["return_processed_text"] is True
+
+
+def test_process_file_base64_request_new_options_fromdict():
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    process_file_base64_request_obj = ProcessFileBase64Request.fromdict(
+        {
+            "file": file.to_dict(),
+            "office_options": {
+                "chart_behaviour": "deidentify",
+                "unsupported_image_behaviour": "replace",
+                "bin_containing_file_behaviour": "convert",
+            },
+            "processed_text": {"type": "MASK"},
+            "ocr_options": {"ocr_system": "aws_textract"},
+            "return_processed_text": False,
+        }
+    )
+    assert process_file_base64_request_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
+    assert (
+        process_file_base64_request_obj.office_options.chart_behaviour == "deidentify"
+    )
+    assert process_file_base64_request_obj.processed_text.type == "MASK"
+    assert process_file_base64_request_obj.ocr_options.ocr_system == "aws_textract"
+    assert process_file_base64_request_obj.return_processed_text is False
+
+
+def test_process_file_base64_request_return_processed_text_validator():
+    error_msg = "ProcessFileBase64Request.return_processed_text must be of type bool or None, but got <class 'str'>"
+    with pytest.raises(TypeError) as excinfo:
+        ProcessFileBase64Request(
+            file="sfsfxe234jkjsdlkfnDATA", return_processed_text="junk"
+        )
+    assert error_msg in str(excinfo.value)
 
 
 def test_process_file_base64_request_initializer():
@@ -1807,7 +2229,11 @@ def test_process_file_base64_request_initialize_fromdict():
 
 
 def test_process_file_base64_request_invalid_initialize_fromdict():
-    error_msg = "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', 'pdf_options', 'audio_options', 'image_options' and 'ocr_options'"
+    error_msg = (
+        "ProcessFileBase64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', "
+        "'pdf_options', 'office_options', 'audio_options', 'image_options', 'processed_text', 'project_id', "
+        "'ocr_options' and 'return_processed_text'"
+    )
     file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
     entity_type = EntityTypeSelector(type="ENABLE", value=["NAME"])
     filter = FilterSelector(type="ALLOW", pattern="hey")
@@ -1883,6 +2309,204 @@ def test_process_file_base64_request_to_dict():
     assert process_file_base64_request_obj["audio_options"]["bleep_end_padding"] == 2.0
     assert process_file_base64_request_obj["audio_options"]["bleep_frequency"] == 200
     assert process_file_base64_request_obj["audio_options"]["bleep_gain"] == -2
+
+
+# NER Files Base64 Request Tests
+def test_ner_files_base64_request_default_initializer():
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    ner_files_base64_obj = NERFilesBased64Request(file=file)
+    assert ner_files_base64_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
+    assert ner_files_base64_obj.entity_detection is None
+    assert ner_files_base64_obj.object_entity_detection is None
+    assert ner_files_base64_obj.pdf_options is None
+    assert ner_files_base64_obj.office_options is None
+    assert ner_files_base64_obj.image_options is None
+    assert ner_files_base64_obj.audio_options is None
+    assert ner_files_base64_obj.project_id is None
+    assert ner_files_base64_obj.ocr_options is None
+    assert ner_files_base64_obj.enable_gibberish_detection is None
+    assert ner_files_base64_obj.return_extracted_text is None
+
+
+def test_ner_files_base64_request_initializer():
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    entity_detection = EntityDetection(accuracy="standard")
+    ner_files_base64_obj = NERFilesBased64Request(
+        file=file,
+        entity_detection=entity_detection,
+        pdf_options=PDFOptions(density=100),
+        ocr_options=OCROptions(ocr_system="aws_textract"),
+        project_id="my_project",
+        enable_gibberish_detection=True,
+        return_extracted_text=False,
+    )
+    assert ner_files_base64_obj.entity_detection.accuracy == "standard"
+    assert ner_files_base64_obj.pdf_options.density == 100
+    assert ner_files_base64_obj.ocr_options.ocr_system == "aws_textract"
+    assert ner_files_base64_obj.project_id == "my_project"
+    assert ner_files_base64_obj.enable_gibberish_detection is True
+    assert ner_files_base64_obj.return_extracted_text is False
+
+
+def test_ner_files_base64_request_initialize_fromdict():
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    ner_files_base64_obj = NERFilesBased64Request.fromdict(
+        {
+            "file": file.to_dict(),
+            "entity_detection": EntityDetection(accuracy="standard").to_dict(),
+            "pdf_options": PDFOptions(density=100).to_dict(),
+            "office_options": {
+                "chart_behaviour": "deidentify",
+                "unsupported_image_behaviour": "replace",
+                "bin_containing_file_behaviour": "convert",
+            },
+            "ocr_options": {"ocr_system": "hybrid"},
+            "enable_gibberish_detection": True,
+            "return_extracted_text": True,
+        }
+    )
+    assert ner_files_base64_obj.file.data == "sfsfxe234jkjsdlkfnDATA"
+    assert ner_files_base64_obj.entity_detection.accuracy == "standard"
+    assert ner_files_base64_obj.pdf_options.density == 100
+    assert ner_files_base64_obj.office_options.chart_behaviour == "deidentify"
+    assert ner_files_base64_obj.ocr_options.ocr_system == "hybrid"
+    assert ner_files_base64_obj.enable_gibberish_detection is True
+    assert ner_files_base64_obj.return_extracted_text is True
+
+
+def test_ner_files_base64_request_invalid_initialize_fromdict():
+    error_msg = (
+        "NERFilesBased64Request can only accept the values 'file', 'entity_detection', 'object_entity_detection', "
+        "'pdf_options', 'office_options', 'image_options', 'audio_options', 'project_id', "
+        "'ocr_options', 'enable_gibberish_detection' and 'return_extracted_text'"
+    )
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    with pytest.raises(TypeError) as excinfo:
+        NERFilesBased64Request.fromdict({"file": file.to_dict(), "junk": "value"})
+    assert error_msg in str(excinfo.value)
+
+
+def test_ner_files_base64_request_enable_gibberish_detection_validator():
+    error_msg = "NERFilesBased64Request.enable_gibberish_detection must be of type bool or None, but got <class 'str'>"
+    with pytest.raises(TypeError) as excinfo:
+        NERFilesBased64Request(
+            file="sfsfxe234jkjsdlkfnDATA", enable_gibberish_detection="junk"
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_ner_files_base64_request_return_extracted_text_validator():
+    error_msg = "NERFilesBased64Request.return_extracted_text must be of type bool or None, but got <class 'str'>"
+    with pytest.raises(TypeError) as excinfo:
+        NERFilesBased64Request(
+            file="sfsfxe234jkjsdlkfnDATA", return_extracted_text="junk"
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_ner_files_base64_request_to_dict():
+    file = File(data="sfsfxe234jkjsdlkfnDATA", content_type="application/pdf")
+    ner_files_base64_obj = NERFilesBased64Request(
+        file=file,
+        entity_detection=EntityDetection(accuracy="standard"),
+        enable_gibberish_detection=True,
+        return_extracted_text=True,
+    ).to_dict()
+    assert ner_files_base64_obj["file"]["data"] == "sfsfxe234jkjsdlkfnDATA"
+    assert ner_files_base64_obj["entity_detection"]["accuracy"] == "standard"
+    assert ner_files_base64_obj["enable_gibberish_detection"] is True
+    assert ner_files_base64_obj["return_extracted_text"] is True
+    with pytest.raises(KeyError):
+        ner_files_base64_obj["pdf_options"]
+
+
+# NER Files URI Request Tests
+def test_ner_files_uri_request_default_initializer():
+    ner_files_uri_obj = NERFilesUriRequest(uri="this/location/right/here.pdf")
+    assert ner_files_uri_obj.uri == "this/location/right/here.pdf"
+    assert ner_files_uri_obj.entity_detection is None
+    assert ner_files_uri_obj.object_entity_detection is None
+    assert ner_files_uri_obj.pdf_options is None
+    assert ner_files_uri_obj.office_options is None
+    assert ner_files_uri_obj.image_options is None
+    assert ner_files_uri_obj.audio_options is None
+    assert ner_files_uri_obj.project_id is None
+    assert ner_files_uri_obj.ocr_options is None
+    assert ner_files_uri_obj.enable_gibberish_detection is None
+    assert ner_files_uri_obj.return_extracted_text is None
+
+
+def test_ner_files_uri_request_initializer():
+    ner_files_uri_obj = NERFilesUriRequest(
+        uri="this/location/right/here.pdf",
+        entity_detection=EntityDetection(accuracy="standard"),
+        object_entity_detection=None,
+        pdf_options=PDFOptions(density=100),
+        office_options=None,
+        image_options=None,
+        audio_options=None,
+        project_id="my_project",
+        ocr_options=OCROptions(ocr_system="aws_textract"),
+        enable_gibberish_detection=True,
+        return_extracted_text=False,
+    )
+    assert ner_files_uri_obj.uri == "this/location/right/here.pdf"
+    assert ner_files_uri_obj.entity_detection.accuracy == "standard"
+    assert ner_files_uri_obj.pdf_options.density == 100
+    assert ner_files_uri_obj.ocr_options.ocr_system == "aws_textract"
+    assert ner_files_uri_obj.project_id == "my_project"
+    assert ner_files_uri_obj.enable_gibberish_detection is True
+    assert ner_files_uri_obj.return_extracted_text is False
+
+
+def test_ner_files_uri_request_initialize_fromdict():
+    ner_files_uri_obj = NERFilesUriRequest.fromdict(
+        {
+            "uri": "this/location/right/here.pdf",
+            "entity_detection": EntityDetection(accuracy="standard").to_dict(),
+            "pdf_options": PDFOptions(density=100).to_dict(),
+            "ocr_options": {"ocr_system": "hybrid"},
+            "enable_gibberish_detection": True,
+            "return_extracted_text": True,
+        }
+    )
+    assert ner_files_uri_obj.uri == "this/location/right/here.pdf"
+    assert ner_files_uri_obj.entity_detection.accuracy == "standard"
+    assert ner_files_uri_obj.pdf_options.density == 100
+    assert ner_files_uri_obj.ocr_options.ocr_system == "hybrid"
+    assert ner_files_uri_obj.enable_gibberish_detection is True
+    assert ner_files_uri_obj.return_extracted_text is True
+
+
+def test_ner_files_uri_request_invalid_initialize_fromdict():
+    error_msg = (
+        "NERFilesUriRequest can only accept the values 'uri', 'entity_detection', 'object_entity_detection', "
+        "'pdf_options', 'office_options', 'image_options', 'audio_options', 'project_id', "
+        "'ocr_options', 'enable_gibberish_detection' and 'return_extracted_text'"
+    )
+    with pytest.raises(TypeError) as excinfo:
+        NERFilesUriRequest.fromdict(
+            {"uri": "this/location/right/here.pdf", "junk": "value"}
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_ner_files_uri_request_enable_gibberish_detection_validator():
+    error_msg = "NERFilesUriRequest.enable_gibberish_detection must be of type bool or None, but got <class 'str'>"
+    with pytest.raises(TypeError) as excinfo:
+        NERFilesUriRequest(
+            uri="this/location/right/here.pdf", enable_gibberish_detection="junk"
+        )
+    assert error_msg in str(excinfo.value)
+
+
+def test_ner_files_uri_request_return_extracted_text_validator():
+    error_msg = "NERFilesUriRequest.return_extracted_text must be of type bool or None, but got <class 'str'>"
+    with pytest.raises(TypeError) as excinfo:
+        NERFilesUriRequest(
+            uri="this/location/right/here.pdf", return_extracted_text="junk"
+        )
+    assert error_msg in str(excinfo.value)
 
 
 # Bleep Request Tests
@@ -1965,7 +2589,7 @@ def test_reidentify_text_request_initialize_fromdict():
 
 
 def test_reidentify_text_request_invalid_initialize_fromdict():
-    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model' and 'reidentify_sensitive_fields'"
+    error_msg = "ReidentifyTextRequest can only accept the values 'processed_text', 'entities', 'model', 'reidentify_sensitive_fields' and 'project_id'"
     processed_text = ["this is a test"]
     entities = [Entity(processed_text="NAME", text="Hola")]
     model = "gpt-700.2-ultra-turbo"
@@ -1978,7 +2602,7 @@ def test_reidentify_text_request_invalid_initialize_fromdict():
                 "junk": "value",
             }
         )
-        assert error_msg in str(excinfo.value)
+    assert error_msg in str(excinfo.value)
 
 
 def test_reidentify_text_request_to_dict():
@@ -1996,6 +2620,16 @@ def test_reidentify_text_request_to_dict():
     assert reid["entities"][0]["text"] == "Hola"
     assert reid["model"] == "gpt-700.2-ultra-turbo"
     assert reid["reidentify_sensitive_fields"] == reidentify_sensitive_fields
+
+
+def test_reidentify_text_request_project_id():
+    reid = ReidentifyTextRequest(processed_text=["this is a test"])
+    assert reid.project_id is None
+    reid = ReidentifyTextRequest(
+        processed_text=["this is a test"], project_id="my_project"
+    )
+    assert reid.project_id == "my_project"
+    assert reid.to_dict()["project_id"] == "my_project"
 
 
 def test_synthetic_text():
@@ -2050,3 +2684,54 @@ def test_synthetic_invalid_accuracy():
     with pytest.raises(ValueError) as excinfo:
         processed_text.synthetic_entity_accuracy = "invalid"
     assert error_msg in str(excinfo.value)
+
+
+def test_synthetic_default_initializer():
+    processed_text = ProcessedText(type="SYNTHETIC")
+    assert processed_text.coreference_resolution == "heuristics"
+    assert processed_text.synthetic_entity_accuracy == "standard_automatic"
+
+
+@pytest.mark.parametrize(
+    "accuracy", ["standard_high_multilingual", "high_multilingual"]
+)
+def test_synthetic_new_accuracies(accuracy):
+    processed_text = ProcessedText(type="SYNTHETIC", synthetic_entity_accuracy=accuracy)
+    assert processed_text.synthetic_entity_accuracy == accuracy
+
+
+def test_synthetic_coreference_initializer():
+    processed_text = ProcessedText(
+        type="SYNTHETIC", coreference_resolution="model_prediction"
+    )
+    assert processed_text.coreference_resolution == "model_prediction"
+
+
+def test_synthetic_coreference_setter():
+    processed_text = ProcessedText(type="SYNTHETIC")
+    processed_text.coreference_resolution = "combined"
+    assert processed_text.coreference_resolution == "combined"
+
+
+def test_synthetic_coreference_validator():
+    error_msg = "junk is not valid. ProcessedText.coreference_resolution can only be one of the following: heuristics, model_prediction, combined"
+    with pytest.raises(ValueError) as excinfo:
+        ProcessedText(type="SYNTHETIC", coreference_resolution="junk")
+    assert error_msg in str(excinfo.value)
+
+
+def test_synthetic_to_dict():
+    processed_text = ProcessedText(
+        type="SYNTHETIC",
+        coreference_resolution="combined",
+        synthetic_entity_accuracy="high_multilingual",
+    ).to_dict()
+    assert processed_text["type"] == "SYNTHETIC"
+    assert processed_text["coreference_resolution"] == "combined"
+    assert processed_text["synthetic_entity_accuracy"] == "high_multilingual"
+
+
+@pytest.mark.parametrize("language", ["hi", "it", "zh", "pt", "es", "tl"])
+def test_processed_text_new_marker_languages(language):
+    processed_text = ProcessedText(type="MARKER", marker_language=language)
+    assert processed_text.marker_language == language
