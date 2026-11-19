@@ -1,8 +1,32 @@
 ## [Unreleased]
 ### Added
+- Added ner_files_base64() and ner_files_uri() to client to access the NER files endpoint 
 - Support for synthetic replacements in analyze/text route
 - `SyntheticReplacementProcessor`: A predefined processor used to replace entities with synthetic text
+- Added the `coreference_resolution` parameter to `ProcessSyntheticText`
+- Added new `distortion_steps` parameter to `AudioOptions`
+- Added 3 new parameters to `PDFOptions`
+    * `approach`: controls whether to process the PDF pages as images or as native PDF files.
+    * `use_inline_replacement`: applicable for the enhanced PDF approach only. Determine whether text PII is replaced in place with the processed_text marker, or instead covered using a bounding box
+    * `element_types_to_process`: applicable for the enhanced PDF approach only. Controls which elements in a PDF file are processed.
+- Added the `OfficeOptions` class to control the redaction behaviour of Office files 
+- Added the `padding_ratio` parameter to `OCROptions`
+- Added support of 4 new fields to the response of `file_base64_obj` and `file_uri_obj` objects:
+    * `languages_detected`: a dictionary containing ISO 639-1 language labels and the likelihood of their detection in the request payload.
+    * `objects`: a list of all object entities found in the provided file using object detection.
+    * `objects_present`: returns True if the list of detected objects is not empty.
+    * `audio_duration`: the length of the audio file in seconds.
+    * `page_count`: the number of pages in the file.
+- Added the new `enable_gibberish_detection` parameter to the `ner_text_obj` object
+- Added 3 new parameters to the `file_uri_obj` and `file_base64_obj`:
+    * `office_options`: options to process Office files, such as table and chart behaviour
+    * `processed_text`: allows the user to generate redacted (default), synthetic or masked text.
+    * `return_processed_text`: Controls whether the response contains the processed_text field. 
+- Added the `project_id` parameter to the `reidentify_text_obj` object
+
 ### Changed
+- Updated the accepted languages for the `marker_language` parameter in ProcessedMarkerText
+- Updated list of selectable models in `ProcessedSyntheticText`
 
 ### Fixed
 
